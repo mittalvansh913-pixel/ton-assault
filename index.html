@@ -1,166 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zombie Fighter</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(#2b1055,#1a043a);
+  color:#fff;
+  text-align:center;
+}
+.hidden{display:none}
+.container{max-width:420px;margin:auto;padding:15px}
+
+/* TOP BAR */
+.top{
+  background:rgba(0,0,0,0.4);
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.stat{font-weight:bold}
+
+/* BARS */
+.bar{
+  background:#444;
+  border-radius:8px;
+  overflow:hidden;
+  height:10px;
+}
+.bar div{height:100%}
+
+/* GAME */
+.game{
+  background:rgba(0,0,0,0.4);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:10px;
+}
+.fighters{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:48px;
+}
+.hp{
+  font-size:12px;
+}
+
+/* BUTTONS */
+button{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.attack{background:#e53935;color:#fff}
+.heal{background:#43a047;color:#fff}
+.taskbtn{background:#1e88e5;color:#fff;width:100%}
+
+button:disabled{opacity:0.5}
+
+/* TASKS */
+.task{
+  background:#222;
+  border-radius:10px;
+  padding:10px;
+  margin-top:8px;
+  font-size:14px;
+}
+
+/* TOAST */
+#toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#000;
+  padding:10px 20px;
+  border-radius:20px;
+  opacity:0;
+  transition:0.3s;
+}
+#toast.show{opacity:1}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="top">
+    <div class="stat">⭐ Level <span id="level">1</span></div>
+    <div class="stat">💰 <span id="coins">0</span></div>
+    <div class="stat">💎 <span id="gems">0</span></div>
+  </div>
+
+  <!-- HP -->
+  <div>
+    ❤️ HP: <span id="hp">100</span>/100
+    <div class="bar">
+      <div id="hpbar" style="width:100%;background:#e53935"></div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="game" id="gameArea">
+    <div class="fighters">
+      <div>
+        🦸‍♂️
+        <div class="hp">You</div>
+      </div>
+
+      ⚔️
+
+      <div>
+        🧟
+        <div class="hp" id="zhp">30/30</div>
+        <div class="bar">
+          <div id="zbar" style="width:100%;background:#43a047"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <button class="attack" onclick="attack()">⚔️ Attack</button>
+    <button class="heal" onclick="heal()">❤️ Heal (20💰)</button>
+  </div>
+
+  <button class="taskbtn" onclick="toggleTasks()">🎁 Tasks</button>
+
+  <!-- TASKS -->
+  <div id="tasks" class="hidden">
+    <div class="task">Kill 5 Zombies (0/5) → 50💰</div>
+    <div class="task">Collect 100 Coins → 10💎</div>
+    <div class="task">Reach Level 3 → 20💎</div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
 <script>
-/* ========= GAME STATE ========= */
-const gameState = {
-  coins: 0,
-  level: 1,
-  coinsPerTap: 1,
-  totalTaps: 0,
-  totalEarned: 0,
-  playerName: "Player",
-  lastDaily: 0
+/* STATE */
+let player={
+  hp:100,max:100,coins:0,gems:0,level:1,damage:10,exp:0
 };
+let zombie={hp:30,max:30,damage:5};
+let kills=0;
 
-/* ========= ELEMENTS ========= */
-const loadingScreen = document.getElementById("loadingScreen");
-const container = document.querySelector(".container");
-const coinsEl = document.getElementById("coins");
-const levelEl = document.getElementById("level");
-const tapCoin = document.getElementById("tapCoin");
-const perSecondEl = document.getElementById("perSecond");
-const toast = document.getElementById("toast");
+/* UI */
+const hpEl=hp, hpbar=document.getElementById("hpbar");
+const zhp=document.getElementById("zhp"), zbar=document.getElementById("zbar");
 
-/* ========= MODALS ========= */
-const modals = {
-  profile: document.getElementById("profileModal"),
-  daily: document.getElementById("dailyModal"),
-  wheel: document.getElementById("wheelModal"),
-  withdraw: document.getElementById("withdrawModal")
-};
-
-/* ========= INIT ========= */
-function init() {
-  loadGame();
-  bindEvents();
-
-  setTimeout(() => {
-    loadingScreen.style.display = "none";
-    container.style.display = "flex";
-    updateUI();
-  }, 2000);
+function update(){
+  coins.textContent=player.coins;
+  gems.textContent=player.gems;
+  level.textContent=player.level;
+  hp.textContent=player.hp;
+  hpbar.style.width=(player.hp/player.max*100)+"%";
+  zhp.textContent=zombie.hp+"/"+zombie.max;
+  zbar.style.width=(zombie.hp/zombie.max*100)+"%";
 }
 
-/* ========= EVENTS ========= */
-function bindEvents() {
-  tapCoin.addEventListener("click", tap);
-
-  document.getElementById("profileBtn").onclick = () => openModal("profile");
-  document.getElementById("dailyBtn").onclick = () => openModal("daily");
-  document.getElementById("wheelBtn").onclick = () => openModal("wheel");
-  document.getElementById("withdrawBtn").onclick = () => openModal("withdraw");
-
-  document.querySelectorAll(".close-btn").forEach(btn => {
-    btn.onclick = () => closeAll();
-  });
-
-  document.getElementById("saveProfile").onclick = saveProfile;
-  document.getElementById("claimDaily").onclick = claimDaily;
-  document.getElementById("spinBtn").onclick = spinWheel;
-  document.getElementById("withdrawBtnAction").onclick = withdrawDemo;
+/* GAME */
+function spawnZombie(){
+  zombie.max=30+player.level*10;
+  zombie.hp=zombie.max;
+  zombie.damage=5+player.level*2;
 }
 
-/* ========= CORE ========= */
-function tap() {
-  gameState.coins += gameState.coinsPerTap;
-  gameState.totalTaps++;
-  gameState.totalEarned++;
-
-  if (gameState.coins >= gameState.level * 50) {
-    gameState.level++;
-    showToast("🔥 Level Up!");
+function attack(){
+  zombie.hp-=player.damage+Math.floor(Math.random()*5);
+  toastMsg("⚔️ Hit!");
+  if(zombie.hp<=0){
+    kills++;
+    player.coins+=10+player.level*5;
+    player.exp+=20;
+    toastMsg("🧟 Zombie killed!");
+    spawnZombie();
+  }else{
+    setTimeout(zombieAttack,300);
   }
-  updateUI();
+  levelCheck();
+  update();
 }
 
-function updateUI() {
-  coinsEl.textContent = gameState.coins;
-  levelEl.textContent = gameState.level;
-  perSecondEl.textContent = "0 coins/sec";
-  document.getElementById("availableCoins").textContent = gameState.coins;
-  document.getElementById("totalEarned").textContent = gameState.totalEarned;
-  document.getElementById("totalTaps").textContent = gameState.totalTaps;
-}
-
-/* ========= DAILY ========= */
-function claimDaily() {
-  const now = Date.now();
-  if (now - gameState.lastDaily < 86400000) {
-    showToast("❌ Come tomorrow");
-    return;
+function zombieAttack(){
+  player.hp-=zombie.damage;
+  toastMsg("💥 Zombie hit!");
+  if(player.hp<=0){
+    alert("Game Over");
+    location.reload();
   }
-  gameState.coins += 100;
-  gameState.lastDaily = now;
-  saveGame();
-  updateUI();
-  closeAll();
-  showToast("🎁 +100 Coins");
+  update();
 }
 
-/* ========= SPIN ========= */
-function spinWheel() {
-  if (gameState.coins < 1) {
-    showToast("❌ Need 1 coin");
-    return;
+function heal(){
+  if(player.coins<20){toastMsg("❌ Not enough coins");return;}
+  player.coins-=20;
+  player.hp=Math.min(player.max,player.hp+30);
+  toastMsg("❤️ Healed");
+  update();
+}
+
+function levelCheck(){
+  if(player.exp>=player.level*100){
+    player.exp=0;
+    player.level++;
+    player.max+=20;
+    player.hp=player.max;
+    player.damage+=5;
+    toastMsg("⭐ Level Up!");
   }
-  gameState.coins--;
-  const wheel = document.getElementById("wheel");
-  const reward = [5, 10, 20, 50][Math.floor(Math.random() * 4)];
-  const deg = 1080 + Math.random() * 360;
-
-  wheel.style.transform = `rotate(${deg}deg)`;
-
-  setTimeout(() => {
-    gameState.coins += reward;
-    document.getElementById("wheelResult").textContent =
-      "🎉 You won " + reward + " coins";
-    updateUI();
-  }, 3000);
 }
 
-/* ========= PROFILE ========= */
-function saveProfile() {
-  const name = document.getElementById("playerName").value || "Player";
-  gameState.playerName = name;
-  saveGame();
-  closeAll();
-  showToast("✅ Profile Saved");
+function toggleTasks(){
+  tasks.classList.toggle("hidden");
 }
 
-/* ========= WITHDRAW ========= */
-function withdrawDemo() {
-  if (gameState.coins < 2) {
-    alert("Minimum withdraw 2 coins");
-    return;
-  }
-  alert("Withdraw DEMO\nFee 50%");
-}
-
-/* ========= MODAL ========= */
-function openModal(key) {
-  closeAll();
-  modals[key].style.display = "flex";
-}
-
-function closeAll() {
-  Object.values(modals).forEach(m => m.style.display = "none");
-}
-
-/* ========= STORAGE ========= */
-function saveGame() {
-  localStorage.setItem("ton_assault", JSON.stringify(gameState));
-}
-
-function loadGame() {
-  const data = localStorage.getItem("ton_assault");
-  if (data) Object.assign(gameState, JSON.parse(data));
-}
-
-/* ========= TOAST ========= */
-function showToast(msg) {
-  toast.textContent = msg;
+function toastMsg(msg){
+  toast.textContent=msg;
   toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2000);
+  setTimeout(()=>toast.classList.remove("show"),1500);
 }
 
-/* ========= START ========= */
-document.addEventListener("DOMContentLoaded", init);
-    </script>
+spawnZombie();
+update();
+</script>
+
+</body>
+</html>
