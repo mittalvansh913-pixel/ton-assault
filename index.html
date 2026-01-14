@@ -1,163 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TON ASSAULT GAME</title>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-body{
-  margin:0;
-  background:#000;
-  overflow:hidden;
-  font-family:Arial,sans-serif;
-}
-canvas{display:block}
-
-#controls{
-  position:fixed;
-  bottom:10px;
-  left:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-}
-.btn{
-  padding:14px 20px;
-  font-weight:bold;
-  border-radius:14px;
-  border:none;
-  color:#fff;
-}
-.move{background:#3f51b5}
-.attack{background:#e53935}
-.skill{background:#ff9800}
-</style>
+    <meta charset="UTF-8">
+    <title>TON ASSAULT GAME</title>
+    <style>
+        body { margin: 0; overflow: hidden; touch-action: none; }
+        canvas { background: #000; display: block; margin: auto; }
+        #gameOver { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 48px; display: none; }
+    </style>
 </head>
-
 <body>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <div id="gameOver">Game Over</div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let player, enemy, coins = 0, gameOver = false;
 
-<canvas id="game"></canvas>
+        // Load sounds
+        const attackSound = new Audio('https://example.com/attack.wav');
+        const hitSound = new Audio('https://example.com/hit.wav');
+        const winSound = new Audio('https://example.com/win.wav');
 
-<div id="controls">
-  <button class="btn move" id="moveBtn">◀ MOVE ▶</button>
-  <div>
-    <button class="btn attack" id="attackBtn">ATTACK</button><br><br>
-    <button class="btn skill" id="skillBtn">SKILL</button>
-  </div>
-</div>
+        function preloadImages() {
+            playerImg = new Image();
+            playerImg.src = 'https://example.com/player.png'; 
+            enemyImg = new Image();
+            enemyImg.src = 'https://example.com/enemy.png'; 
+        }
 
-<script>
-// ================= TELEGRAM =================
-const tg = window.Telegram?.WebApp;
-if(tg){ tg.expand(); tg.ready(); }
+        class Character {
+            constructor(x, y, width, height, health, img) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.health = health;
+                this.img = img;
+            }
+            draw() {
+                ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+            }
+        }
 
-// ================= CANVAS =================
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resize(); window.addEventListener("resize",resize);
+        function resetGame() {
+            player = new Character(50, canvas.height - 100, 50, 100, 100, playerImg);
+            enemy = new Character(canvas.width - 100, canvas.height - 100, 50, 100, 100, enemyImg);
+            gameOver = false;
+            document.getElementById('gameOver').style.display = 'none';
+            coins = 0;
+            mainLoop();
+        }
 
-// ================= SOUNDS =================
-const sounds={
- attack:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-quick-punch-2152.mp3"),
- hit:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-hit-213.wav"),
- skill:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-fireball-attack-2809.mp3"),
- win:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-video-game-win-2016.wav")
-};
-function play(n){ sounds[n].currentTime=0; sounds[n].play().catch(()=>{}); }
+        function handleInput(e) {
+            if (gameOver) return;
+            if (e.type === "keydown") {
+                if (e.key === "ArrowRight") player.x += 5;
+                if (e.key === "ArrowLeft") player.x -= 5;
+                if (e.key === " ") attack();
+            }
+        }
 
-// ================= IMAGES =================
-// Anime-style HERO
-const heroImg = new Image();
-heroImg.src = "https://raw.githubusercontent.com/Chalarangelo/mini-games-assets/main/fighter.png";
+        function attack() {
+            if (player.x + player.width > enemy.x && player.x < enemy.x + enemy.width) {
+                hitSound.play();
+                enemy.health -= 20;
+                if (enemy.health <= 0) {
+                    coins += 10;
+                    winSound.play();
+                    resetGame();
+                }
+            }
+            attackSound.play();
+        }
 
-// Monster BOSS
-const enemyImg = new Image();
-enemyImg.src = "https://raw.githubusercontent.com/Chalarangelo/mini-games-assets/main/monster.png";
+        function enemyAI() {
+            if (enemy.x + enemy.width < player.x) enemy.x += 1;
+            else if (enemy.x > player.x + player.width) enemy.x -= 1;
 
-// ================= GAME DATA =================
-let player={x:120,hp:100};
-let enemy={x:0,hp:100};
-let coins=0;
-let shake=0;
+            if (Math.abs(player.x - enemy.x) < 50) {
+                player.health -= 1;
+                if (player.health <= 0) {
+                    gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                }
+            }
+        }
 
-function reset(){
-  player.hp=100;
-  enemy.hp=100;
-  enemy.x=canvas.width-220;
-}
-reset();
+        function mainLoop() {
+            if (gameOver) return;
 
-// ================= INPUT =================
-let moveDir=0;
-document.getElementById("moveBtn").ontouchstart=e=>{
- const r=e.target.getBoundingClientRect();
- moveDir=(e.touches[0].clientX<r.left+r.width/2)?-1:1;
-};
-document.getElementById("moveBtn").ontouchend=()=>moveDir=0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            player.draw();
+            enemy.draw();
+            enemyAI();
 
-document.getElementById("attackBtn").onclick=()=>{
- play("attack");
- enemy.hp-=15; shake=12; play("hit");
- if(enemy.hp<=0){ coins+=10; play("win"); reset(); }
-};
+            requestAnimationFrame(mainLoop);
+        }
 
-document.getElementById("skillBtn").onclick=()=>{
- play("skill");
- enemy.hp-=35; shake=18;
- if(enemy.hp<=0){ coins+=20; play("win"); reset(); }
-};
+        window.addEventListener('keydown', handleInput);
+        window.addEventListener('touchstart', (e) => {
+            const touchX = e.touches[0].clientX;
+            if (touchX > canvas.width / 2) attack();
+            else player.x += 5;
+        });
 
-// ================= LOOP =================
-function loop(){
- ctx.save();
-
- // background
- const g=ctx.createLinearGradient(0,0,0,canvas.height);
- g.addColorStop(0,"#0f2027");
- g.addColorStop(1,"#203a43");
- ctx.fillStyle=g;
- ctx.fillRect(0,0,canvas.width,canvas.height);
-
- if(shake>0){
-   ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
-   shake*=0.85;
- }
-
- // move
- player.x+=moveDir*5;
- player.x=Math.max(40,Math.min(canvas.width/2-60,player.x));
-
- const ground=canvas.height*0.72;
-
- // ground line
- ctx.strokeStyle="#444"; ctx.lineWidth=3;
- ctx.beginPath(); ctx.moveTo(0,ground); ctx.lineTo(canvas.width,ground); ctx.stroke();
-
- // HERO
- ctx.drawImage(heroImg,player.x,ground-140,120,140);
-
- // ENEMY
- ctx.drawImage(enemyImg,enemy.x,ground-160,150,160);
-
- // HUD
- ctx.fillStyle="#fff"; ctx.font="16px Arial";
- ctx.fillText("PLAYER HP: "+player.hp,20,30);
- ctx.fillText("ENEMY HP: "+enemy.hp,canvas.width-160,30);
- ctx.fillText("COINS: "+coins,canvas.width/2-40,30);
-
- ctx.restore();
- requestAnimationFrame(loop);
-}
-loop();
-</script>
-
+        preloadImages();
+        resetGame();
+    </script>
 </body>
 </html>
