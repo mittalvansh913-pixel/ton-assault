@@ -8,105 +8,93 @@
 <style>
 body{
   margin:0;
-  background:#0b0b0b;
+  background:linear-gradient(#0a0a0a,#000);
   color:#fff;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
   text-align:center;
-  overflow:hidden;
 }
 
-h1{
-  margin:10px 0;
-}
+h1{margin:10px 0;}
 
 #hud{
   display:flex;
-  justify-content:space-around;
-  margin-top:10px;
+  justify-content:space-between;
+  padding:10px 20px;
+}
+
+.hp-box{
+  width:120px;
 }
 
 .bar{
-  width:120px;
-  height:12px;
+  height:10px;
   background:#333;
-  border-radius:6px;
+  border-radius:5px;
   overflow:hidden;
 }
 
 .hp{
   height:100%;
   background:#00ff55;
-  width:100%;
 }
 
-.enemy-hp{
-  background:#ff3333;
-}
+.enemy-hp{background:#ff3333;}
 
 #arena{
   position:relative;
-  height:280px;
-  margin-top:20px;
+  height:260px;
+  margin-top:10px;
+  background:radial-gradient(circle at center,#1a1a1a,#000);
+  border-top:2px solid #222;
+  border-bottom:2px solid #222;
+}
+
+.ground{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:40px;
+  background:#111;
 }
 
 .char{
   position:absolute;
-  bottom:20px;
-  width:120px;
+  bottom:40px;
+  width:110px;
   transition:transform 0.2s;
 }
 
-#player{
-  left:30px;
-}
+#player{left:40px;}
+#enemy{right:40px; transform:scaleX(-1);}
 
-#enemy{
-  right:30px;
-  transform:scaleX(-1);
-}
+.attack{transform:translateX(30px);}
+.enemy-attack{transform:translateX(-30px) scaleX(-1);}
 
-.attack{
-  transform:translateX(40px);
-}
-
-.enemy-attack{
-  transform:translateX(-40px) scaleX(-1);
-}
-
-.hit{
-  animation:shake 0.2s;
-}
-
+.hit{animation:shake 0.2s;}
 @keyframes shake{
   0%{transform:translateX(0)}
   50%{transform:translateX(6px)}
   100%{transform:translateX(0)}
 }
 
-#effects{
+#effect{
   position:absolute;
   top:120px;
   left:50%;
   transform:translateX(-50%);
-  font-size:30px;
+  font-size:32px;
   opacity:0;
 }
 
-.show-effect{
-  animation:boom 0.6s;
-}
-
+.show{animation:boom 0.6s;}
 @keyframes boom{
   0%{opacity:1; transform:translate(-50%,0) scale(1)}
-  100%{opacity:0; transform:translate(-50%,-40px) scale(1.5)}
+  100%{opacity:0; transform:translate(-50%,-40px) scale(1.4)}
 }
 
-#controls{
-  margin-top:20px;
-}
-
+#controls{margin:15px;}
 button{
-  padding:12px 18px;
+  padding:12px 22px;
   margin:6px;
   font-size:15px;
   border:none;
@@ -114,7 +102,7 @@ button{
   cursor:pointer;
 }
 
-.attack-btn{background:#ff4444;color:#fff;}
+.attack-btn{background:#ff3b3b;color:#fff;}
 .skill-btn{background:#ff9800;color:#fff;}
 </style>
 </head>
@@ -124,14 +112,12 @@ button{
 <h1>🔥 TON ASSAULT GAME 🔥</h1>
 
 <div id="hud">
-  <div>
+  <div class="hp-box">
     👤 HP
     <div class="bar"><div id="php" class="hp"></div></div>
   </div>
-  <div>
-    🪙 Coins: <span id="coins">0</span>
-  </div>
-  <div>
+  <div>🪙 <span id="coins">0</span></div>
+  <div class="hp-box">
     👹 HP
     <div class="bar"><div id="ehp" class="hp enemy-hp"></div></div>
   </div>
@@ -139,10 +125,11 @@ button{
 
 <div id="arena">
   <img id="player" class="char"
-   src="https://i.imgur.com/8QfQ8Zp.png">
+   src="https://raw.githubusercontent.com/jakesgordon/javascript-racer/master/images/player.png">
   <img id="enemy" class="char"
-   src="https://i.imgur.com/7yUvePI.png">
-  <div id="effects">💥</div>
+   src="https://raw.githubusercontent.com/jakesgordon/javascript-racer/master/images/opponent.png">
+  <div id="effect">💥</div>
+  <div class="ground"></div>
 </div>
 
 <div id="controls">
@@ -150,97 +137,66 @@ button{
   <button class="skill-btn" onclick="skill()">🔥 SKILL</button>
 </div>
 
-<audio id="hitSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-punch-2152.mp3"></audio>
-<audio id="skillSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fireball-attack-2809.mp3"></audio>
-
 <script>
-let pHP=100, eHP=100;
-let coins=0;
-let skillReady=true;
+let pHP=100,eHP=100,coins=0,skillReady=true;
 
 function update(){
-  document.getElementById("php").style.width=pHP+"%";
-  document.getElementById("ehp").style.width=eHP+"%";
-  document.getElementById("coins").innerText=coins;
+  php.style.width=pHP+"%";
+  ehp.style.width=eHP+"%";
+  coinsEl.innerText=coins;
 }
+const php=document.getElementById("php");
+const ehp=document.getElementById("ehp");
+const coinsEl=document.getElementById("coins");
+const effect=document.getElementById("effect");
 
-function showEffect(icon){
-  let e=document.getElementById("effects");
-  e.innerText=icon;
-  e.classList.add("show-effect");
-  setTimeout(()=>e.classList.remove("show-effect"),600);
+function show(icon){
+  effect.innerText=icon;
+  effect.classList.add("show");
+  setTimeout(()=>effect.classList.remove("show"),600);
 }
 
 function attack(){
   if(pHP<=0||eHP<=0) return;
-
-  document.getElementById("hitSound").play();
-  let p=document.getElementById("player");
-  let e=document.getElementById("enemy");
-
-  p.classList.add("attack");
-  setTimeout(()=>p.classList.remove("attack"),200);
-
-  eHP-=15;
-  e.classList.add("hit");
-  showEffect("💥");
-  setTimeout(()=>e.classList.remove("hit"),200);
-
-  if(eHP<=0){
-    eHP=0;
-    coins+=10;
-    alert("🔥 YOU WIN!");
-    reset();
-    return;
-  }
-
-  setTimeout(enemyTurn,500);
+  player.classList.add("attack");
+  setTimeout(()=>player.classList.remove("attack"),200);
+  eHP-=15; show("💥");
+  enemy.classList.add("hit");
+  setTimeout(()=>enemy.classList.remove("hit"),200);
+  if(eHP<=0){win(10);return;}
+  setTimeout(enemyTurn,400);
   update();
 }
 
 function enemyTurn(){
-  let e=document.getElementById("enemy");
-  e.classList.add("enemy-attack");
-  setTimeout(()=>e.classList.remove("enemy-attack"),200);
-
+  enemy.classList.add("enemy-attack");
+  setTimeout(()=>enemy.classList.remove("enemy-attack"),200);
   pHP-=10;
-  document.getElementById("hitSound").play();
-
-  if(pHP<=0){
-    pHP=0;
-    alert("💀 YOU LOST!");
-    reset();
-  }
+  if(pHP<=0){lose();return;}
   update();
 }
 
 function skill(){
-  if(!skillReady || pHP<=0||eHP<=0) return;
-
+  if(!skillReady||pHP<=0||eHP<=0) return;
   skillReady=false;
-  document.getElementById("skillSound").play();
-  showEffect("🔥");
-
-  eHP-=35;
-  if(eHP<=0){
-    eHP=0;
-    coins+=20;
-    alert("🔥 SKILL FINISH! YOU WIN!");
-    reset();
-  }
-
+  eHP-=35; show("🔥");
+  if(eHP<=0){win(20);return;}
   update();
   setTimeout(()=>skillReady=true,4000);
 }
 
-function reset(){
-  setTimeout(()=>{
-    pHP=100;
-    eHP=100;
-    update();
-  },1000);
+function win(c){
+  coins+=c;
+  alert("🔥 YOU WIN!");
+  reset();
 }
-
+function lose(){
+  alert("💀 YOU LOST!");
+  reset();
+}
+function reset(){
+  setTimeout(()=>{pHP=100;eHP=100;update();},800);
+}
 update();
 </script>
 
