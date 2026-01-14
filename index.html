@@ -5,64 +5,117 @@
 <title>TON ASSAULT GAME</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
 body{
   margin:0;
-  background:#000;
+  background:#0b0b0b;
   color:#fff;
   font-family:Arial, sans-serif;
   text-align:center;
+  overflow:hidden;
 }
 
 h1{
-  margin-top:20px;
+  margin:10px 0;
 }
 
-#menu{
-  margin-top:40px;
-}
-
-#game{
-  display:none;
+#hud{
+  display:flex;
+  justify-content:space-around;
+  margin-top:10px;
 }
 
 .bar{
-  width:80%;
-  height:20px;
+  width:120px;
+  height:12px;
   background:#333;
-  margin:10px auto;
-  border-radius:10px;
+  border-radius:6px;
   overflow:hidden;
 }
 
 .hp{
   height:100%;
-  background:#00ff00;
+  background:#00ff55;
   width:100%;
 }
 
-.enemy .hp{
+.enemy-hp{
   background:#ff3333;
 }
 
+#arena{
+  position:relative;
+  height:280px;
+  margin-top:20px;
+}
+
+.char{
+  position:absolute;
+  bottom:20px;
+  width:120px;
+  transition:transform 0.2s;
+}
+
+#player{
+  left:30px;
+}
+
+#enemy{
+  right:30px;
+  transform:scaleX(-1);
+}
+
+.attack{
+  transform:translateX(40px);
+}
+
+.enemy-attack{
+  transform:translateX(-40px) scaleX(-1);
+}
+
+.hit{
+  animation:shake 0.2s;
+}
+
+@keyframes shake{
+  0%{transform:translateX(0)}
+  50%{transform:translateX(6px)}
+  100%{transform:translateX(0)}
+}
+
+#effects{
+  position:absolute;
+  top:120px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:30px;
+  opacity:0;
+}
+
+.show-effect{
+  animation:boom 0.6s;
+}
+
+@keyframes boom{
+  0%{opacity:1; transform:translate(-50%,0) scale(1)}
+  100%{opacity:0; transform:translate(-50%,-40px) scale(1.5)}
+}
+
+#controls{
+  margin-top:20px;
+}
+
 button{
-  padding:12px 25px;
-  margin:10px;
-  font-size:16px;
+  padding:12px 18px;
+  margin:6px;
+  font-size:15px;
   border:none;
   border-radius:8px;
   cursor:pointer;
 }
 
-.start{ background:#00c853; color:white; }
-.attack{ background:#ff4444; color:white; }
-
-.box{
-  margin:10px;
-  font-size:18px;
-}
+.attack-btn{background:#ff4444;color:#fff;}
+.skill-btn{background:#ff9800;color:#fff;}
 </style>
 </head>
 
@@ -70,78 +123,125 @@ button{
 
 <h1>🔥 TON ASSAULT GAME 🔥</h1>
 
-<div id="menu">
-  <p>⚔️ Fight • 💰 Earn Coins • 🔥 Level Up</p>
-  <button class="start" onclick="startGame()">▶️ PLAY</button>
-</div>
-
-<div id="game">
-
-  <div class="box">👤 Player HP</div>
-  <div class="bar"><div id="playerHp" class="hp"></div></div>
-
-  <div class="box">👹 Enemy HP</div>
-  <div class="bar enemy"><div id="enemyHp" class="hp"></div></div>
-
-  <button class="attack" onclick="attack()">⚔️ ATTACK</button>
-
-  <div class="box">
+<div id="hud">
+  <div>
+    👤 HP
+    <div class="bar"><div id="php" class="hp"></div></div>
+  </div>
+  <div>
     🪙 Coins: <span id="coins">0</span>
   </div>
-
-  <div class="box" id="status"></div>
-
+  <div>
+    👹 HP
+    <div class="bar"><div id="ehp" class="hp enemy-hp"></div></div>
+  </div>
 </div>
 
+<div id="arena">
+  <img id="player" class="char"
+   src="https://i.imgur.com/8QfQ8Zp.png">
+  <img id="enemy" class="char"
+   src="https://i.imgur.com/7yUvePI.png">
+  <div id="effects">💥</div>
+</div>
+
+<div id="controls">
+  <button class="attack-btn" onclick="attack()">⚔️ ATTACK</button>
+  <button class="skill-btn" onclick="skill()">🔥 SKILL</button>
+</div>
+
+<audio id="hitSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-punch-2152.mp3"></audio>
+<audio id="skillSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fireball-attack-2809.mp3"></audio>
+
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready();
+let pHP=100, eHP=100;
+let coins=0;
+let skillReady=true;
 
-let playerHP, enemyHP, coins = 0;
-
-function startGame(){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("game").style.display="block";
-  resetFight();
+function update(){
+  document.getElementById("php").style.width=pHP+"%";
+  document.getElementById("ehp").style.width=eHP+"%";
+  document.getElementById("coins").innerText=coins;
 }
 
-function resetFight(){
-  playerHP = 100;
-  enemyHP = 100;
-  document.getElementById("status").innerText="";
-  updateBars();
-}
-
-function updateBars(){
-  document.getElementById("playerHp").style.width = playerHP + "%";
-  document.getElementById("enemyHp").style.width = enemyHP + "%";
-  document.getElementById("coins").innerText = coins;
+function showEffect(icon){
+  let e=document.getElementById("effects");
+  e.innerText=icon;
+  e.classList.add("show-effect");
+  setTimeout(()=>e.classList.remove("show-effect"),600);
 }
 
 function attack(){
-  if(playerHP<=0 || enemyHP<=0) return;
+  if(pHP<=0||eHP<=0) return;
 
-  enemyHP -= Math.floor(Math.random()*20)+10;
-  if(enemyHP <= 0){
-    enemyHP = 0;
-    coins += 10;
-    document.getElementById("status").innerText="🔥 YOU WIN! +10 COINS";
-    updateBars();
-    setTimeout(resetFight,1500);
+  document.getElementById("hitSound").play();
+  let p=document.getElementById("player");
+  let e=document.getElementById("enemy");
+
+  p.classList.add("attack");
+  setTimeout(()=>p.classList.remove("attack"),200);
+
+  eHP-=15;
+  e.classList.add("hit");
+  showEffect("💥");
+  setTimeout(()=>e.classList.remove("hit"),200);
+
+  if(eHP<=0){
+    eHP=0;
+    coins+=10;
+    alert("🔥 YOU WIN!");
+    reset();
     return;
   }
 
-  playerHP -= Math.floor(Math.random()*15)+5;
-  if(playerHP <= 0){
-    playerHP = 0;
-    document.getElementById("status").innerText="💀 YOU LOST!";
-    updateBars();
-    setTimeout(resetFight,1500);
-    return;
-  }
-
-  updateBars();
+  setTimeout(enemyTurn,500);
+  update();
 }
+
+function enemyTurn(){
+  let e=document.getElementById("enemy");
+  e.classList.add("enemy-attack");
+  setTimeout(()=>e.classList.remove("enemy-attack"),200);
+
+  pHP-=10;
+  document.getElementById("hitSound").play();
+
+  if(pHP<=0){
+    pHP=0;
+    alert("💀 YOU LOST!");
+    reset();
+  }
+  update();
+}
+
+function skill(){
+  if(!skillReady || pHP<=0||eHP<=0) return;
+
+  skillReady=false;
+  document.getElementById("skillSound").play();
+  showEffect("🔥");
+
+  eHP-=35;
+  if(eHP<=0){
+    eHP=0;
+    coins+=20;
+    alert("🔥 SKILL FINISH! YOU WIN!");
+    reset();
+  }
+
+  update();
+  setTimeout(()=>skillReady=true,4000);
+}
+
+function reset(){
+  setTimeout(()=>{
+    pHP=100;
+    eHP=100;
+    update();
+  },1000);
+}
+
+update();
 </script>
 
 </body>
