@@ -1,204 +1,441 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>TON ASSAULT GAME</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+import React, { useState, useEffect, useRef } from 'react';
+import { Sword, Coins, Gem, Heart, Zap, Trophy, Gift } from 'lucide-react';
 
-<style>
-body{
-  margin:0;
-  background:linear-gradient(#0a0a0a,#000);
-  color:#fff;
-  font-family:Arial;
-  text-align:center;
-}
+const ZombieGame = () => {
+  const [player, setPlayer] = useState({
+    health: 100,
+    maxHealth: 100,
+    coins: 0,
+    gems: 0,
+    level: 1,
+    exp: 0,
+    damage: 10
+  });
+  
+  const [zombie, setZombie] = useState(null);
+  const [isAttacking, setIsAttacking] = useState(false);
+  const [zombieAttacking, setZombieAttacking] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [tasks, setTasks] = useState([
+    { id: 1, name: 'Kill 5 Zombies', progress: 0, target: 5, reward: { coins: 50, gems: 5 }, completed: false },
+    { id: 2, name: 'Collect 100 Coins', progress: 0, target: 100, reward: { gems: 10 }, completed: false },
+    { id: 3, name: 'Reach Level 3', progress: 1, target: 3, reward: { coins: 100, gems: 20 }, completed: false }
+  ]);
+  const [showTasks, setShowTasks] = useState(false);
+  const [kills, setKills] = useState(0);
+  
+  const audioContext = useRef(null);
 
-h1{margin:10px 0;}
+  useEffect(() => {
+    audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
+  }, []);
 
-#hud{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 20px;
-}
+  const playSound = (type) => {
+    if (!audioContext.current) return;
+    
+    const ctx = audioContext.current;
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    switch(type) {
+      case 'attack':
+        oscillator.frequency.value = 200;
+        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.1);
+        break;
+      case 'hit':
+        oscillator.frequency.value = 100;
+        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.15);
+        break;
+      case 'coin':
+        oscillator.frequency.value = 800;
+        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.2);
+        break;
+      case 'gem':
+        oscillator.frequency.value = 1200;
+        gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.3);
+        break;
+      case 'levelup':
+        oscillator.frequency.value = 600;
+        gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.5);
+        break;
+    }
+  };
 
-.hp-box{
-  width:120px;
-}
+  const addNotification = (message, type = 'info') => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 2000);
+  };
 
-.bar{
-  height:10px;
-  background:#333;
-  border-radius:5px;
-  overflow:hidden;
-}
+  const spawnZombie = () => {
+    const zombieHealth = 30 + (player.level * 10);
+    setZombie({
+      health: zombieHealth,
+      maxHealth: zombieHealth,
+      damage: 5 + (player.level * 2)
+    });
+  };
 
-.hp{
-  height:100%;
-  background:#00ff55;
-}
+  const attackZombie = () => {
+    if (!zombie || isAttacking) return;
+    
+    setIsAttacking(true);
+    playSound('attack');
+    
+    setTimeout(() => {
+      const damage = player.damage + Math.floor(Math.random() * 5);
+      const newHealth = Math.max(0, zombie.health - damage);
+      
+      setZombie(prev => ({ ...prev, health: newHealth }));
+      playSound('hit');
+      
+      if (newHealth <= 0) {
+        const coinsEarned = 10 + Math.floor(Math.random() * 10) + (player.level * 5);
+        const gemsEarned = Math.random() < 0.3 ? Math.floor(Math.random() * 3) + 1 : 0;
+        const expGained = 20;
+        
+        setPlayer(prev => ({
+          ...prev,
+          coins: prev.coins + coinsEarned,
+          gems: prev.gems + gemsEarned,
+          exp: prev.exp + expGained
+        }));
+        
+        setKills(prev => prev + 1);
+        updateTaskProgress(1, 1);
+        
+        playSound('coin');
+        if (gemsEarned > 0) playSound('gem');
+        
+        addNotification(`+${coinsEarned} Coins${gemsEarned > 0 ? ` +${gemsEarned} Gems` : ''}`, 'success');
+        
+        setTimeout(() => spawnZombie(), 500);
+      } else {
+        setTimeout(() => zombieCounterAttack(), 300);
+      }
+      
+      setIsAttacking(false);
+    }, 200);
+  };
 
-.enemy-hp{background:#ff3333;}
+  const zombieCounterAttack = () => {
+    if (!zombie) return;
+    
+    setZombieAttacking(true);
+    playSound('attack');
+    
+    setTimeout(() => {
+      const damage = zombie.damage;
+      setPlayer(prev => ({
+        ...prev,
+        health: Math.max(0, prev.health - damage)
+      }));
+      
+      playSound('hit');
+      addNotification(`-${damage} HP`, 'danger');
+      setZombieAttacking(false);
+    }, 300);
+  };
 
-#arena{
-  position:relative;
-  height:260px;
-  margin-top:10px;
-  background:radial-gradient(circle at center,#1a1a1a,#000);
-  border-top:2px solid #222;
-  border-bottom:2px solid #222;
-}
+  const heal = () => {
+    if (player.coins < 20) {
+      addNotification('Not enough coins!', 'danger');
+      return;
+    }
+    
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins - 20,
+      health: Math.min(prev.maxHealth, prev.health + 30)
+    }));
+    
+    playSound('gem');
+    addNotification('+30 HP', 'success');
+  };
 
-.ground{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  height:40px;
-  background:#111;
-}
+  const updateTaskProgress = (taskId, amount) => {
+    setTasks(prev => prev.map(task => {
+      if (task.id === taskId && !task.completed) {
+        const newProgress = task.progress + amount;
+        if (newProgress >= task.target) {
+          claimTaskReward(task);
+          return { ...task, progress: task.target, completed: true };
+        }
+        return { ...task, progress: newProgress };
+      }
+      return task;
+    }));
+  };
 
-.char{
-  position:absolute;
-  bottom:40px;
-  width:110px;
-  transition:transform 0.2s;
-}
+  const claimTaskReward = (task) => {
+    setPlayer(prev => ({
+      ...prev,
+      coins: prev.coins + (task.reward.coins || 0),
+      gems: prev.gems + (task.reward.gems || 0)
+    }));
+    
+    playSound('gem');
+    addNotification(`Task Completed! +${task.reward.coins || 0} Coins +${task.reward.gems || 0} Gems`, 'success');
+  };
 
-#player{left:40px;}
-#enemy{right:40px; transform:scaleX(-1);}
+  useEffect(() => {
+    updateTaskProgress(2, player.coins - (tasks[1]?.progress || 0));
+  }, [player.coins]);
 
-.attack{transform:translateX(30px);}
-.enemy-attack{transform:translateX(-30px) scaleX(-1);}
+  useEffect(() => {
+    const expNeeded = player.level * 100;
+    if (player.exp >= expNeeded) {
+      setPlayer(prev => ({
+        ...prev,
+        level: prev.level + 1,
+        exp: prev.exp - expNeeded,
+        maxHealth: prev.maxHealth + 20,
+        health: prev.maxHealth + 20,
+        damage: prev.damage + 5
+      }));
+      
+      playSound('levelup');
+      addNotification(`Level Up! Now Level ${player.level + 1}`, 'success');
+      updateTaskProgress(3, 1);
+    }
+  }, [player.exp]);
 
-.hit{animation:shake 0.2s;}
-@keyframes shake{
-  0%{transform:translateX(0)}
-  50%{transform:translateX(6px)}
-  100%{transform:translateX(0)}
-}
+  useEffect(() => {
+    if (player.health <= 0) {
+      addNotification('Game Over! Starting new game...', 'danger');
+      setTimeout(() => {
+        setPlayer({
+          health: 100,
+          maxHealth: 100,
+          coins: 0,
+          gems: 0,
+          level: 1,
+          exp: 0,
+          damage: 10
+        });
+        setZombie(null);
+        setGameStarted(false);
+        setKills(0);
+      }, 2000);
+    }
+  }, [player.health]);
 
-#effect{
-  position:absolute;
-  top:120px;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:32px;
-  opacity:0;
-}
+  const startGame = () => {
+    setGameStarted(true);
+    spawnZombie();
+  };
 
-.show{animation:boom 0.6s;}
-@keyframes boom{
-  0%{opacity:1; transform:translate(-50%,0) scale(1)}
-  100%{opacity:0; transform:translate(-50%,-40px) scale(1.4)}
-}
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-indigo-900 text-white p-4">
+      {/* Notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {notifications.map(notif => (
+          <div
+            key={notif.id}
+            className={`px-4 py-2 rounded-lg shadow-lg animate-pulse ${
+              notif.type === 'success' ? 'bg-green-500' :
+              notif.type === 'danger' ? 'bg-red-500' :
+              'bg-blue-500'
+            }`}
+          >
+            {notif.message}
+          </div>
+        ))}
+      </div>
 
-#controls{margin:15px;}
-button{
-  padding:12px 22px;
-  margin:6px;
-  font-size:15px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
+      {/* Header Stats */}
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-black bg-opacity-50 rounded-lg p-4 mb-4">
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="text-yellow-400" size={20} />
+              <span className="font-bold">Level {player.level}</span>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1">
+                <Coins className="text-yellow-400" size={20} />
+                <span className="font-bold">{player.coins}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Gem className="text-cyan-400" size={20} />
+                <span className="font-bold">{player.gems}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="flex items-center gap-1">
+                  <Heart className="text-red-500" size={16} />
+                  HP: {player.health}/{player.maxHealth}
+                </span>
+                <span>Kills: {kills}</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-red-500 to-pink-500 h-3 rounded-full transition-all"
+                  style={{ width: `${(player.health / player.maxHealth) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="flex items-center gap-1">
+                  <Zap className="text-yellow-400" size={16} />
+                  EXP
+                </span>
+                <span>{player.exp}/{player.level * 100}</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all"
+                  style={{ width: `${(player.exp / (player.level * 100)) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-.attack-btn{background:#ff3b3b;color:#fff;}
-.skill-btn{background:#ff9800;color:#fff;}
-</style>
-</head>
+        {/* Game Area */}
+        {!gameStarted ? (
+          <div className="text-center py-20">
+            <h1 className="text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+              Zombie Fighter
+            </h1>
+            <p className="text-xl mb-8">Fight zombies, earn coins and gems!</p>
+            <button
+              onClick={startGame}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 rounded-lg text-xl font-bold hover:scale-105 transition-transform shadow-lg"
+            >
+              Start Game
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Battle Area */}
+            <div className="bg-black bg-opacity-50 rounded-lg p-6 mb-4 min-h-64">
+              <div className="flex justify-between items-center">
+                {/* Player */}
+                <div className="text-center">
+                  <div className={`text-6xl transition-transform ${isAttacking ? 'scale-125' : 'scale-100'}`}>
+                    🦸‍♂️
+                  </div>
+                  <div className="mt-2 font-bold">You</div>
+                  <div className="text-sm">DMG: {player.damage}</div>
+                </div>
 
-<body>
+                {/* VS */}
+                <div className="text-4xl font-bold text-red-500">⚔️</div>
 
-<h1>🔥 TON ASSAULT GAME 🔥</h1>
+                {/* Zombie */}
+                {zombie && (
+                  <div className="text-center">
+                    <div className={`text-6xl transition-transform ${zombieAttacking ? 'scale-125' : 'scale-100'}`}>
+                      🧟
+                    </div>
+                    <div className="mt-2 font-bold text-red-400">Zombie</div>
+                    <div className="w-32 bg-gray-700 rounded-full h-2 mt-2">
+                      <div
+                        className="bg-red-500 h-2 rounded-full transition-all"
+                        style={{ width: `${(zombie.health / zombie.maxHealth) * 100}%` }}
+                      />
+                    </div>
+                    <div className="text-sm mt-1">{zombie.health}/{zombie.maxHealth}</div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-<div id="hud">
-  <div class="hp-box">
-    👤 HP
-    <div class="bar"><div id="php" class="hp"></div></div>
-  </div>
-  <div>🪙 <span id="coins">0</span></div>
-  <div class="hp-box">
-    👹 HP
-    <div class="bar"><div id="ehp" class="hp enemy-hp"></div></div>
-  </div>
-</div>
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <button
+                onClick={attackZombie}
+                disabled={!zombie || isAttacking || player.health <= 0}
+                className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 rounded-lg font-bold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Sword size={20} />
+                Attack
+              </button>
+              
+              <button
+                onClick={heal}
+                disabled={player.health >= player.maxHealth || player.coins < 20}
+                className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-lg font-bold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Heart size={20} />
+                Heal (20 💰)
+              </button>
+            </div>
 
-<div id="arena">
-  <img id="player" class="char"
-   src="https://raw.githubusercontent.com/jakesgordon/javascript-racer/master/images/player.png">
-  <img id="enemy" class="char"
-   src="https://raw.githubusercontent.com/jakesgordon/javascript-racer/master/images/opponent.png">
-  <div id="effect">💥</div>
-  <div class="ground"></div>
-</div>
+            {/* Tasks Button */}
+            <button
+              onClick={() => setShowTasks(!showTasks)}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 rounded-lg font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2 mb-4"
+            >
+              <Gift size={20} />
+              Tasks {tasks.filter(t => !t.completed).length > 0 && `(${tasks.filter(t => !t.completed).length})`}
+            </button>
 
-<div id="controls">
-  <button class="attack-btn" onclick="attack()">⚔️ ATTACK</button>
-  <button class="skill-btn" onclick="skill()">🔥 SKILL</button>
-</div>
+            {/* Tasks Panel */}
+            {showTasks && (
+              <div className="bg-black bg-opacity-50 rounded-lg p-4 space-y-3">
+                {tasks.map(task => (
+                  <div
+                    key={task.id}
+                    className={`bg-gray-800 p-3 rounded-lg ${task.completed ? 'opacity-50' : ''}`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="font-bold">{task.name}</div>
+                        <div className="text-sm text-gray-400">
+                          Reward: {task.reward.coins && `${task.reward.coins} 💰`} {task.reward.gems && `${task.reward.gems} 💎`}
+                        </div>
+                      </div>
+                      {task.completed && (
+                        <span className="text-green-400 font-bold">✓</span>
+                      )}
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all"
+                        style={{ width: `${(task.progress / task.target) * 100}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {task.progress}/{task.target}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
-<script>
-let pHP=100,eHP=100,coins=0,skillReady=true;
-
-function update(){
-  php.style.width=pHP+"%";
-  ehp.style.width=eHP+"%";
-  coinsEl.innerText=coins;
-}
-const php=document.getElementById("php");
-const ehp=document.getElementById("ehp");
-const coinsEl=document.getElementById("coins");
-const effect=document.getElementById("effect");
-
-function show(icon){
-  effect.innerText=icon;
-  effect.classList.add("show");
-  setTimeout(()=>effect.classList.remove("show"),600);
-}
-
-function attack(){
-  if(pHP<=0||eHP<=0) return;
-  player.classList.add("attack");
-  setTimeout(()=>player.classList.remove("attack"),200);
-  eHP-=15; show("💥");
-  enemy.classList.add("hit");
-  setTimeout(()=>enemy.classList.remove("hit"),200);
-  if(eHP<=0){win(10);return;}
-  setTimeout(enemyTurn,400);
-  update();
-}
-
-function enemyTurn(){
-  enemy.classList.add("enemy-attack");
-  setTimeout(()=>enemy.classList.remove("enemy-attack"),200);
-  pHP-=10;
-  if(pHP<=0){lose();return;}
-  update();
-}
-
-function skill(){
-  if(!skillReady||pHP<=0||eHP<=0) return;
-  skillReady=false;
-  eHP-=35; show("🔥");
-  if(eHP<=0){win(20);return;}
-  update();
-  setTimeout(()=>skillReady=true,4000);
-}
-
-function win(c){
-  coins+=c;
-  alert("🔥 YOU WIN!");
-  reset();
-}
-function lose(){
-  alert("💀 YOU LOST!");
-  reset();
-}
-function reset(){
-  setTimeout(()=>{pHP=100;eHP=100;update();},800);
-}
-update();
-</script>
-
-</body>
-</html>
+export default ZombieGame;
