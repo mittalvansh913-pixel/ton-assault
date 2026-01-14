@@ -10,24 +10,15 @@ body{margin:0;font-family:Arial;background:linear-gradient(#2b1055,#1a043a);colo
 .container{max-width:420px;margin:auto;padding:15px;text-align:center}
 .top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center}
 .stat{font-weight:bold}
-.profile{cursor:pointer}
-
-/* BARS */
 .bar{background:#444;border-radius:8px;overflow:hidden;height:10px}
 .bar div{height:100%}
-
-/* GAME */
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between}
-
-/* BUTTONS */
 button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
-.attack{background:#e53935;color:#fff}
-.heal{background:#43a047;color:#fff}
 
 /* SIDE MENU */
 .side-menu{
-position:fixed;right:10px;top:35%;
+position:fixed;right:10px;top:30%;
 display:flex;flex-direction:column;gap:10px;z-index:99
 }
 .side-btn{
@@ -40,7 +31,7 @@ font-size:20px;cursor:pointer
 /* MODALS */
 .modal{
 position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.7);
+background:rgba(0,0,0,.75);
 display:none;align-items:center;justify-content:center;
 z-index:200
 }
@@ -48,16 +39,14 @@ z-index:200
 background:#222;padding:20px;border-radius:12px;
 width:300px;text-align:center
 }
-.modal-box input{
-width:100%;padding:8px;border-radius:8px;border:none;margin:6px 0
-}
+.lock{opacity:.4}
 
 /* TOAST */
 #toast{
 position:fixed;bottom:20px;left:50%;
 transform:translateX(-50%);
 background:#000;padding:10px 20px;border-radius:20px;
-opacity:0;transition:.3s;z-index:300
+opacity:0;transition:.3s
 }
 #toast.show{opacity:1}
 </style>
@@ -66,19 +55,15 @@ opacity:0;transition:.3s;z-index:300
 <body>
 
 <div class="container">
-
 <div class="top">
 <div class="stat">👤 <span id="playerName">Player</span></div>
 <div class="stat">⭐ <span id="level">1</span></div>
 <div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
-<div class="profile" onclick="openProfile()">⚙️</div>
 </div>
 
 <div>
 ❤️ HP <span id="hp">100</span>/<span id="hpmax">100</span>
 <div class="bar"><div id="hpbar" style="width:100%;background:red"></div></div>
-⚡ Energy <span id="energy">10</span>/10
-<div class="bar"><div id="ebar" style="width:100%;background:cyan"></div></div>
 </div>
 
 <div class="game">
@@ -87,175 +72,112 @@ opacity:0;transition:.3s;z-index:300
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<button class="attack" onclick="attack()">Attack</button>
-<button class="heal" onclick="heal()">Heal (20💰)</button>
-</div>
-
+<button onclick="attack()">⚔️ Attack</button>
 </div>
 
 <!-- SIDE MENU -->
 <div class="side-menu">
-<div class="side-btn" onclick="watchAd()">📺</div>
-<div class="side-btn" onclick="spin()">🎡</div>
-<div class="side-btn" onclick="daily()">🎁</div>
-<div class="side-btn" onclick="openReferral()">👥</div>
-<div class="side-btn" onclick="withdraw()">🏦</div>
+<div class="side-btn" onclick="openWeapons()">⚔️</div>
+<div class="side-btn" onclick="openSkills()">✨</div>
+<div class="side-btn" onclick="openCharacters()">🧙</div>
+<div class="side-btn" onclick="openSupport()">🆘</div>
 </div>
 
-<!-- PROFILE -->
-<div class="modal" id="profileModal">
+<!-- SUPPORT PAGE -->
+<div class="modal" id="supportModal">
 <div class="modal-box">
-<h3>Profile</h3>
-<input id="nameInput" placeholder="Enter name">
-<button onclick="saveProfile()">Save</button>
-<button onclick="closeProfile()">Close</button>
+<h3>Support</h3>
+<p>If you face any issue, contact us on Telegram.</p>
+<p>We reply within 24 hours.</p>
+<p>🔹 Payment issues<br>🔹 Game bugs<br>🔹 Referral problems</p>
+<a href="https://t.me/bitcondde" target="_blank" style="color:#00e5ff">
+📨 @bitcondde
+</a><br><br>
+<button onclick="closeAll()">Close</button>
 </div>
 </div>
 
-<!-- REFERRAL PAGE -->
-<div class="modal" id="refModal">
+<!-- WEAPONS -->
+<div class="modal" id="weaponModal">
 <div class="modal-box">
-<h3>Referral Program</h3>
+<h3>Weapons</h3>
+<p>🗡 Sword (Free)</p>
+<p class="lock">🪓 Axe – 200 Coins</p>
+<p class="lock">🔥 Fire Blade – Level 5</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
 
-<p><b>Your Invite Code</b></p>
-<div id="refCode" style="font-size:18px;margin-bottom:6px"></div>
+<!-- SKILLS -->
+<div class="modal" id="skillModal">
+<div class="modal-box">
+<h3>Skill Packs</h3>
+<p>⚡ Double Damage</p>
+<p>❤️ Extra HP</p>
+<p>🎯 Critical Chance</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
 
-<p><b>Your Invite Link</b></p>
-<input id="refLink" readonly>
-
-<p>👥 Invites: <span id="refCount">0</span></p>
-<p>💰 Earned: <span id="refCoins">0</span></p>
-
-<button onclick="confirmInvite()">Confirm Invite (Demo)</button>
-<button onclick="closeReferral()">Close</button>
+<!-- CHARACTERS -->
+<div class="modal" id="charModal">
+<div class="modal-box">
+<h3>Characters</h3>
+<p>🦸 Default Hero</p>
+<p class="lock">🥷 Ninja – Level 3</p>
+<p class="lock">🛡 Warrior – 500 Coins</p>
+<button onclick="closeAll()">Close</button>
 </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-let player={
-name:"Player",
-hp:100,max:100,
-coins:0,gems:0,
-level:1,damage:10,exp:0,energy:10,
-refCode:"",refCount:0,refCoins:0
-};
-let zombie={hp:30,max:30,damage:5};
-let lastAd=0;
+let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10};
+let zombie={hp:30,max:30};
 
-/* SAVE */
-function save(){localStorage.setItem("zf",JSON.stringify(player))}
-function load(){
-let d=localStorage.getItem("zf");
-if(d)player=JSON.parse(d);
-if(!player.refCode){
-player.refCode="ZF-"+Math.random().toString(36).substr(2,5).toUpperCase();
-}
-}
-
-/* UI */
 function update(){
 playerName.textContent=player.name;
+level.textContent=player.level;
 coins.textContent=player.coins;
 gems.textContent=player.gems;
-level.textContent=player.level;
 hp.textContent=player.hp;
 hpmax.textContent=player.max;
-energy.textContent=player.energy;
 hpbar.style.width=(player.hp/player.max*100)+"%";
-ebar.style.width=(player.energy/10*100)+"%";
 zhp.textContent=zombie.hp+"/"+zombie.max;
 zbar.style.width=(zombie.hp/zombie.max*100)+"%";
-save();
+localStorage.setItem("zf",JSON.stringify(player));
 }
 
-/* GAME */
-function spawn(){
-zombie.max=30+player.level*10;
-zombie.hp=zombie.max;
-zombie.damage=5+player.level*2;
-toastMsg("🧟 Zombie Spawned");
-}
 function attack(){
-if(player.energy<=0)return toastMsg("⚡ No Energy");
-player.energy--;
 zombie.hp-=player.damage;
 if(zombie.hp<=0){
-player.coins+=10;player.exp+=20;spawn();
-}else setTimeout(()=>player.hp-=zombie.damage,300);
-levelUp();update();
+player.coins+=10;
+zombie.hp=zombie.max;
+toastMsg("Zombie Defeated +10💰");
 }
-function heal(){
-if(player.coins<20)return toastMsg("No coins");
-player.coins-=20;player.hp=Math.min(player.max,player.hp+30);update();
-}
-function levelUp(){
-if(player.exp>=player.level*100){
-player.exp=0;player.level++;
-player.max+=20;player.hp=player.max;player.damage+=5;
-toastMsg("⭐ Level Up");
-}
-}
-
-/* ENERGY */
-setInterval(()=>{if(player.energy<10)player.energy++;update();},5000);
-
-/* EARNING */
-function watchAd(){
-let now=Date.now();
-if(now-lastAd<30000)return toastMsg("⏳ Wait 30s");
-lastAd=now;player.coins+=20;toastMsg("+20💰 Ad");update();
-}
-function spin(){
-if(player.gems<1)return toastMsg("Need 1💎");
-player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];
-player.coins+=r;toastMsg("🎡 Won "+r+"💰");update();
-}
-function daily(){
-let last=localStorage.getItem("daily")||0;
-let now=Date.now();
-if(now-last<86400000)return toastMsg("⏳ Tomorrow");
-player.coins+=50;localStorage.setItem("daily",now);
-toastMsg("🎁 +50💰");update();
-}
-function withdraw(){
-if(player.gems<10)return toastMsg("❌ Min 10💎 required");
-player.gems-=10;toastMsg("🏦 Withdraw Requested (Demo)");update();
-}
-
-/* PROFILE */
-function openProfile(){profileModal.style.display="flex";nameInput.value=player.name}
-function closeProfile(){profileModal.style.display="none"}
-function saveProfile(){player.name=nameInput.value||"Player";closeProfile();update()}
-
-/* REFERRAL */
-function openReferral(){
-refModal.style.display="flex";
-refCode.textContent=player.refCode;
-refLink.value="https://yourgame.site/?ref="+player.refCode;
-refCount.textContent=player.refCount;
-refCoins.textContent=player.refCoins;
-}
-function closeReferral(){refModal.style.display="none"}
-function confirmInvite(){
-player.refCount++;
-player.coins+=50;
-player.refCoins+=50;
-toastMsg("👥 Invite confirmed +50💰");
-openReferral();
 update();
 }
 
-/* TOAST */
+/* MODALS */
+function closeAll(){
+document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+}
+function openWeapons(){weaponModal.style.display="flex"}
+function openSkills(){skillModal.style.display="flex"}
+function openCharacters(){charModal.style.display="flex"}
+function openSupport(){supportModal.style.display="flex"}
+
 function toastMsg(t){
 toast.textContent=t;
 toast.classList.add("show");
 setTimeout(()=>toast.classList.remove("show"),1500);
 }
 
-load();spawn();update();
+let save=localStorage.getItem("zf");
+if(save)player=JSON.parse(save);
+update();
 </script>
+
 </body>
 </html>
