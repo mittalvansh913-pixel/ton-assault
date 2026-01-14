@@ -1,441 +1,163 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Sword, Coins, Gem, Heart, Zap, Trophy, Gift } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TON ASSAULT GAME</title>
 
-const ZombieGame = () => {
-  const [player, setPlayer] = useState({
-    health: 100,
-    maxHealth: 100,
-    coins: 0,
-    gems: 0,
-    level: 1,
-    exp: 0,
-    damage: 10
-  });
-  
-  const [zombie, setZombie] = useState(null);
-  const [isAttacking, setIsAttacking] = useState(false);
-  const [zombieAttacking, setZombieAttacking] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [tasks, setTasks] = useState([
-    { id: 1, name: 'Kill 5 Zombies', progress: 0, target: 5, reward: { coins: 50, gems: 5 }, completed: false },
-    { id: 2, name: 'Collect 100 Coins', progress: 0, target: 100, reward: { gems: 10 }, completed: false },
-    { id: 3, name: 'Reach Level 3', progress: 1, target: 3, reward: { coins: 100, gems: 20 }, completed: false }
-  ]);
-  const [showTasks, setShowTasks] = useState(false);
-  const [kills, setKills] = useState(0);
-  
-  const audioContext = useRef(null);
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  useEffect(() => {
-    audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
-  }, []);
+<style>
+body{
+  margin:0;
+  background:#000;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+}
+canvas{display:block}
 
-  const playSound = (type) => {
-    if (!audioContext.current) return;
-    
-    const ctx = audioContext.current;
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    switch(type) {
-      case 'attack':
-        oscillator.frequency.value = 200;
-        gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.1);
-        break;
-      case 'hit':
-        oscillator.frequency.value = 100;
-        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.15);
-        break;
-      case 'coin':
-        oscillator.frequency.value = 800;
-        gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.2);
-        break;
-      case 'gem':
-        oscillator.frequency.value = 1200;
-        gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.3);
-        break;
-      case 'levelup':
-        oscillator.frequency.value = 600;
-        gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + 0.5);
-        break;
-    }
-  };
+#controls{
+  position:fixed;
+  bottom:10px;
+  left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+}
+.btn{
+  padding:14px 20px;
+  font-weight:bold;
+  border-radius:14px;
+  border:none;
+  color:#fff;
+}
+.move{background:#3f51b5}
+.attack{background:#e53935}
+.skill{background:#ff9800}
+</style>
+</head>
 
-  const addNotification = (message, type = 'info') => {
-    const id = Date.now();
-    setNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 2000);
-  };
+<body>
 
-  const spawnZombie = () => {
-    const zombieHealth = 30 + (player.level * 10);
-    setZombie({
-      health: zombieHealth,
-      maxHealth: zombieHealth,
-      damage: 5 + (player.level * 2)
-    });
-  };
+<canvas id="game"></canvas>
 
-  const attackZombie = () => {
-    if (!zombie || isAttacking) return;
-    
-    setIsAttacking(true);
-    playSound('attack');
-    
-    setTimeout(() => {
-      const damage = player.damage + Math.floor(Math.random() * 5);
-      const newHealth = Math.max(0, zombie.health - damage);
-      
-      setZombie(prev => ({ ...prev, health: newHealth }));
-      playSound('hit');
-      
-      if (newHealth <= 0) {
-        const coinsEarned = 10 + Math.floor(Math.random() * 10) + (player.level * 5);
-        const gemsEarned = Math.random() < 0.3 ? Math.floor(Math.random() * 3) + 1 : 0;
-        const expGained = 20;
-        
-        setPlayer(prev => ({
-          ...prev,
-          coins: prev.coins + coinsEarned,
-          gems: prev.gems + gemsEarned,
-          exp: prev.exp + expGained
-        }));
-        
-        setKills(prev => prev + 1);
-        updateTaskProgress(1, 1);
-        
-        playSound('coin');
-        if (gemsEarned > 0) playSound('gem');
-        
-        addNotification(`+${coinsEarned} Coins${gemsEarned > 0 ? ` +${gemsEarned} Gems` : ''}`, 'success');
-        
-        setTimeout(() => spawnZombie(), 500);
-      } else {
-        setTimeout(() => zombieCounterAttack(), 300);
-      }
-      
-      setIsAttacking(false);
-    }, 200);
-  };
+<div id="controls">
+  <button class="btn move" id="moveBtn">◀ MOVE ▶</button>
+  <div>
+    <button class="btn attack" id="attackBtn">ATTACK</button><br><br>
+    <button class="btn skill" id="skillBtn">SKILL</button>
+  </div>
+</div>
 
-  const zombieCounterAttack = () => {
-    if (!zombie) return;
-    
-    setZombieAttacking(true);
-    playSound('attack');
-    
-    setTimeout(() => {
-      const damage = zombie.damage;
-      setPlayer(prev => ({
-        ...prev,
-        health: Math.max(0, prev.health - damage)
-      }));
-      
-      playSound('hit');
-      addNotification(`-${damage} HP`, 'danger');
-      setZombieAttacking(false);
-    }, 300);
-  };
+<script>
+// ================= TELEGRAM =================
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.expand(); tg.ready(); }
 
-  const heal = () => {
-    if (player.coins < 20) {
-      addNotification('Not enough coins!', 'danger');
-      return;
-    }
-    
-    setPlayer(prev => ({
-      ...prev,
-      coins: prev.coins - 20,
-      health: Math.min(prev.maxHealth, prev.health + 30)
-    }));
-    
-    playSound('gem');
-    addNotification('+30 HP', 'success');
-  };
+// ================= CANVAS =================
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+function resize(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize(); window.addEventListener("resize",resize);
 
-  const updateTaskProgress = (taskId, amount) => {
-    setTasks(prev => prev.map(task => {
-      if (task.id === taskId && !task.completed) {
-        const newProgress = task.progress + amount;
-        if (newProgress >= task.target) {
-          claimTaskReward(task);
-          return { ...task, progress: task.target, completed: true };
-        }
-        return { ...task, progress: newProgress };
-      }
-      return task;
-    }));
-  };
+// ================= SOUNDS =================
+const sounds={
+ attack:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-quick-punch-2152.mp3"),
+ hit:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-hit-213.wav"),
+ skill:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-fireball-attack-2809.mp3"),
+ win:new Audio("https://assets.mixkit.co/sfx/preview/mixkit-video-game-win-2016.wav")
+};
+function play(n){ sounds[n].currentTime=0; sounds[n].play().catch(()=>{}); }
 
-  const claimTaskReward = (task) => {
-    setPlayer(prev => ({
-      ...prev,
-      coins: prev.coins + (task.reward.coins || 0),
-      gems: prev.gems + (task.reward.gems || 0)
-    }));
-    
-    playSound('gem');
-    addNotification(`Task Completed! +${task.reward.coins || 0} Coins +${task.reward.gems || 0} Gems`, 'success');
-  };
+// ================= IMAGES =================
+// Anime-style HERO
+const heroImg = new Image();
+heroImg.src = "https://raw.githubusercontent.com/Chalarangelo/mini-games-assets/main/fighter.png";
 
-  useEffect(() => {
-    updateTaskProgress(2, player.coins - (tasks[1]?.progress || 0));
-  }, [player.coins]);
+// Monster BOSS
+const enemyImg = new Image();
+enemyImg.src = "https://raw.githubusercontent.com/Chalarangelo/mini-games-assets/main/monster.png";
 
-  useEffect(() => {
-    const expNeeded = player.level * 100;
-    if (player.exp >= expNeeded) {
-      setPlayer(prev => ({
-        ...prev,
-        level: prev.level + 1,
-        exp: prev.exp - expNeeded,
-        maxHealth: prev.maxHealth + 20,
-        health: prev.maxHealth + 20,
-        damage: prev.damage + 5
-      }));
-      
-      playSound('levelup');
-      addNotification(`Level Up! Now Level ${player.level + 1}`, 'success');
-      updateTaskProgress(3, 1);
-    }
-  }, [player.exp]);
+// ================= GAME DATA =================
+let player={x:120,hp:100};
+let enemy={x:0,hp:100};
+let coins=0;
+let shake=0;
 
-  useEffect(() => {
-    if (player.health <= 0) {
-      addNotification('Game Over! Starting new game...', 'danger');
-      setTimeout(() => {
-        setPlayer({
-          health: 100,
-          maxHealth: 100,
-          coins: 0,
-          gems: 0,
-          level: 1,
-          exp: 0,
-          damage: 10
-        });
-        setZombie(null);
-        setGameStarted(false);
-        setKills(0);
-      }, 2000);
-    }
-  }, [player.health]);
+function reset(){
+  player.hp=100;
+  enemy.hp=100;
+  enemy.x=canvas.width-220;
+}
+reset();
 
-  const startGame = () => {
-    setGameStarted(true);
-    spawnZombie();
-  };
+// ================= INPUT =================
+let moveDir=0;
+document.getElementById("moveBtn").ontouchstart=e=>{
+ const r=e.target.getBoundingClientRect();
+ moveDir=(e.touches[0].clientX<r.left+r.width/2)?-1:1;
+};
+document.getElementById("moveBtn").ontouchend=()=>moveDir=0;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-indigo-900 text-white p-4">
-      {/* Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {notifications.map(notif => (
-          <div
-            key={notif.id}
-            className={`px-4 py-2 rounded-lg shadow-lg animate-pulse ${
-              notif.type === 'success' ? 'bg-green-500' :
-              notif.type === 'danger' ? 'bg-red-500' :
-              'bg-blue-500'
-            }`}
-          >
-            {notif.message}
-          </div>
-        ))}
-      </div>
-
-      {/* Header Stats */}
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-black bg-opacity-50 rounded-lg p-4 mb-4">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-2">
-              <Trophy className="text-yellow-400" size={20} />
-              <span className="font-bold">Level {player.level}</span>
-            </div>
-            <div className="flex gap-4">
-              <div className="flex items-center gap-1">
-                <Coins className="text-yellow-400" size={20} />
-                <span className="font-bold">{player.coins}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Gem className="text-cyan-400" size={20} />
-                <span className="font-bold">{player.gems}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="flex items-center gap-1">
-                  <Heart className="text-red-500" size={16} />
-                  HP: {player.health}/{player.maxHealth}
-                </span>
-                <span>Kills: {kills}</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
-                <div
-                  className="bg-gradient-to-r from-red-500 to-pink-500 h-3 rounded-full transition-all"
-                  style={{ width: `${(player.health / player.maxHealth) * 100}%` }}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="flex items-center gap-1">
-                  <Zap className="text-yellow-400" size={16} />
-                  EXP
-                </span>
-                <span>{player.exp}/{player.level * 100}</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all"
-                  style={{ width: `${(player.exp / (player.level * 100)) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Game Area */}
-        {!gameStarted ? (
-          <div className="text-center py-20">
-            <h1 className="text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-              Zombie Fighter
-            </h1>
-            <p className="text-xl mb-8">Fight zombies, earn coins and gems!</p>
-            <button
-              onClick={startGame}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 rounded-lg text-xl font-bold hover:scale-105 transition-transform shadow-lg"
-            >
-              Start Game
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Battle Area */}
-            <div className="bg-black bg-opacity-50 rounded-lg p-6 mb-4 min-h-64">
-              <div className="flex justify-between items-center">
-                {/* Player */}
-                <div className="text-center">
-                  <div className={`text-6xl transition-transform ${isAttacking ? 'scale-125' : 'scale-100'}`}>
-                    🦸‍♂️
-                  </div>
-                  <div className="mt-2 font-bold">You</div>
-                  <div className="text-sm">DMG: {player.damage}</div>
-                </div>
-
-                {/* VS */}
-                <div className="text-4xl font-bold text-red-500">⚔️</div>
-
-                {/* Zombie */}
-                {zombie && (
-                  <div className="text-center">
-                    <div className={`text-6xl transition-transform ${zombieAttacking ? 'scale-125' : 'scale-100'}`}>
-                      🧟
-                    </div>
-                    <div className="mt-2 font-bold text-red-400">Zombie</div>
-                    <div className="w-32 bg-gray-700 rounded-full h-2 mt-2">
-                      <div
-                        className="bg-red-500 h-2 rounded-full transition-all"
-                        style={{ width: `${(zombie.health / zombie.maxHealth) * 100}%` }}
-                      />
-                    </div>
-                    <div className="text-sm mt-1">{zombie.health}/{zombie.maxHealth}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <button
-                onClick={attackZombie}
-                disabled={!zombie || isAttacking || player.health <= 0}
-                className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 rounded-lg font-bold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Sword size={20} />
-                Attack
-              </button>
-              
-              <button
-                onClick={heal}
-                disabled={player.health >= player.maxHealth || player.coins < 20}
-                className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-lg font-bold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Heart size={20} />
-                Heal (20 💰)
-              </button>
-            </div>
-
-            {/* Tasks Button */}
-            <button
-              onClick={() => setShowTasks(!showTasks)}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 rounded-lg font-bold hover:scale-105 transition-transform flex items-center justify-center gap-2 mb-4"
-            >
-              <Gift size={20} />
-              Tasks {tasks.filter(t => !t.completed).length > 0 && `(${tasks.filter(t => !t.completed).length})`}
-            </button>
-
-            {/* Tasks Panel */}
-            {showTasks && (
-              <div className="bg-black bg-opacity-50 rounded-lg p-4 space-y-3">
-                {tasks.map(task => (
-                  <div
-                    key={task.id}
-                    className={`bg-gray-800 p-3 rounded-lg ${task.completed ? 'opacity-50' : ''}`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="font-bold">{task.name}</div>
-                        <div className="text-sm text-gray-400">
-                          Reward: {task.reward.coins && `${task.reward.coins} 💰`} {task.reward.gems && `${task.reward.gems} 💎`}
-                        </div>
-                      </div>
-                      {task.completed && (
-                        <span className="text-green-400 font-bold">✓</span>
-                      )}
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all"
-                        style={{ width: `${(task.progress / task.target) * 100}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {task.progress}/{task.target}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
+document.getElementById("attackBtn").onclick=()=>{
+ play("attack");
+ enemy.hp-=15; shake=12; play("hit");
+ if(enemy.hp<=0){ coins+=10; play("win"); reset(); }
 };
 
-export default ZombieGame;
+document.getElementById("skillBtn").onclick=()=>{
+ play("skill");
+ enemy.hp-=35; shake=18;
+ if(enemy.hp<=0){ coins+=20; play("win"); reset(); }
+};
+
+// ================= LOOP =================
+function loop(){
+ ctx.save();
+
+ // background
+ const g=ctx.createLinearGradient(0,0,0,canvas.height);
+ g.addColorStop(0,"#0f2027");
+ g.addColorStop(1,"#203a43");
+ ctx.fillStyle=g;
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ if(shake>0){
+   ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
+   shake*=0.85;
+ }
+
+ // move
+ player.x+=moveDir*5;
+ player.x=Math.max(40,Math.min(canvas.width/2-60,player.x));
+
+ const ground=canvas.height*0.72;
+
+ // ground line
+ ctx.strokeStyle="#444"; ctx.lineWidth=3;
+ ctx.beginPath(); ctx.moveTo(0,ground); ctx.lineTo(canvas.width,ground); ctx.stroke();
+
+ // HERO
+ ctx.drawImage(heroImg,player.x,ground-140,120,140);
+
+ // ENEMY
+ ctx.drawImage(enemyImg,enemy.x,ground-160,150,160);
+
+ // HUD
+ ctx.fillStyle="#fff"; ctx.font="16px Arial";
+ ctx.fillText("PLAYER HP: "+player.hp,20,30);
+ ctx.fillText("ENEMY HP: "+enemy.hp,canvas.width-160,30);
+ ctx.fillText("COINS: "+coins,canvas.width/2-40,30);
+
+ ctx.restore();
+ requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>
