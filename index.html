@@ -11,11 +11,10 @@
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:#0f2027;
+  background:#000;
   color:#fff;
   text-align:center;
 }
-.hidden{display:none}
 
 /* LOADING */
 #loading{
@@ -26,6 +25,7 @@ body{
   align-items:center;
   justify-content:center;
   flex-direction:column;
+  z-index:10;
 }
 .logo{
   font-size:42px;
@@ -56,8 +56,9 @@ body{
   to{width:100%}
 }
 
-/* GAME UI */
-.container{
+/* GAME */
+#game{
+  display:none;
   padding:25px;
 }
 .card{
@@ -75,10 +76,7 @@ button{
   font-weight:bold;
 }
 button:active{transform:scale(0.95)}
-.small{
-  font-size:14px;
-  color:#ccc;
-}
+.small{font-size:14px;color:#ccc}
 </style>
 </head>
 
@@ -91,9 +89,8 @@ button:active{transform:scale(0.95)}
   <div class="loader"><div></div></div>
 </div>
 
-<!-- GAME -->
-<div id="game" class="hidden container">
-
+<!-- GAME SCREEN -->
+<div id="game">
   <h1>💰 TON ASSAULT</h1>
   <p class="small">Tap • Watch Ads • Earn</p>
 
@@ -106,7 +103,7 @@ button:active{transform:scale(0.95)}
 
   <div class="card">
     <h3>🎥 Watch Ad</h3>
-    <p class="small">Watch a short ad and earn coins</p>
+    <p class="small">Watch ad and earn coins</p>
     <button onclick="watchAd()">WATCH AD</button>
   </div>
 
@@ -123,63 +120,58 @@ button:active{transform:scale(0.95)}
 const tg = window.Telegram?.WebApp;
 if(tg){ tg.expand(); tg.ready(); }
 
-let coins = 0;
-let level = 1;
-let nextLevel = 20;
-
-// fake loading
-setTimeout(()=>{
-  document.getElementById("loading").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
-},2000);
+let coins=0, level=1, nextLevel=20;
 
 function update(){
-  document.getElementById("coins").innerText = coins;
-  document.getElementById("level").innerText = level;
+  coinsEl.textContent=coins;
+  levelEl.textContent=level;
 }
 
 function tap(){
-  coins += level;
+  coins+=level;
   checkLevel();
   update();
 }
 
 function watchAd(){
-  document.getElementById("msg").innerText = "🎥 Watching Ad...";
+  msg.textContent="🎥 Watching Ad...";
   setTimeout(()=>{
-    const reward = 10 + level*2;
-    coins += reward;
-    document.getElementById("msg").innerText =
-      "✅ Ad Completed! +" + reward + " coins";
+    const reward=10+level*2;
+    coins+=reward;
+    msg.textContent="✅ Ad Completed! +"+reward+" coins";
     checkLevel();
     update();
   },2000);
 }
 
 function checkLevel(){
-  if(coins >= nextLevel){
+  if(coins>=nextLevel){
     level++;
-    nextLevel += level*20;
-    document.getElementById("msg").innerText =
-      "🔥 Level Up! Level " + level;
+    nextLevel+=level*20;
+    msg.textContent="🔥 Level Up! Level "+level;
   }
 }
 
 function withdraw(){
-  if(coins < 2){
-    alert("Minimum withdraw is 2 coins");
-    return;
-  }
-  const fee = coins*0.5;
-  const receive = coins-fee;
-  alert(
-    "Withdraw Requested\n\nCoins: "+coins+
-    "\nFee (50%): "+fee+
-    "\nYou Receive: "+receive
-  );
-  coins = 0;
+  if(coins<2){alert("Minimum withdraw is 2 coins");return;}
+  const fee=coins*0.5;
+  alert("Withdraw Requested\nCoins:"+coins+"\nFee:"+fee);
+  coins=0;
   update();
 }
+
+/* ===== LOADING FIX ===== */
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{
+    document.getElementById("loading").style.display="none";
+    document.getElementById("game").style.display="block";
+  },2200);
+});
+
+/* CACHE ELEMENTS */
+const coinsEl=document.getElementById("coins");
+const levelEl=document.getElementById("level");
+const msg=document.getElementById("msg");
 </script>
 
 </body>
