@@ -1,40 +1,654 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TON ASSAULT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
             color: white;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             touch-action: manipulation;
         }
 
-        #loading-screen {
+        /* Loading Screen */
+        #loadingScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            flex-direction: column;
+            transition: opacity 0.5s;
         }
+
+        .loading-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-bar {
+            width: 80%;
+            max-width: 300px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            animation: load 2s ease-in-out forwards;
+        }
+
+        @keyframes load {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Main Container */
+        .container {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .coin-display {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 50px;
+        }
+
+        .coin-display i {
+            color: #ffd700;
+            margin-right: 8px;
+        }
+
+        .level-display {
+            font-size: 1.1rem;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 6px 12px;
+            border-radius: 50px;
+        }
+
+        /* Icons Bar */
+        .icons-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .icon-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 5px;
+            color: white;
+            font-size: 1.8rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover, .icon-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .icon-label {
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        /* Main Tap Area */
+        .tap-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .coin {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            cursor: pointer;
+            box-shadow: 
+                0 0 40px rgba(255, 215, 0, 0.5),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.3),
+                inset 0 10px 20px rgba(255, 255, 255, 0.3);
+            transition: transform 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin:active {
+            transform: scale(0.95);
+        }
+
+        .coin::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.4), transparent 70%);
+            border-radius: 50%;
+        }
+
+        .tap-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tap-per-second {
+            margin-top: 5px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #2d2b55 0%, #1a1a2e 100%);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        /* Spin Wheel */
+        .wheel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .wheel {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+
+        .wheel-slice {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border: none;
+            border-radius: 50px;
+            color: #1a237e;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .spin-btn:hover, .spin-btn:active {
+            transform: scale(1.05);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            color: #1a237e;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover, .btn:active {
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-top: 10px;
+        }
+
+        /* Daily Rewards */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .reward-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px 5px;
+            font-size: 0.9rem;
+        }
+
+        .reward-day.active {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+        }
+
+        .reward-amount {
+            font-weight: bold;
+            margin-top: 5px;
+            color: #ffd700;
+        }
+
+        /* Withdraw Info */
+        .withdraw-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="loading-title">TON ASSAULT</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="coin-display">
+                <i class="fas fa-coins"></i>
+                <span id="coins">0</span>
+            </div>
+            <div class="level-display">
+                Level <span id="level">1</span>
+            </div>
+        </div>
+
+        <!-- Icons Bar -->
+        <div class="icons-bar">
+            <button class="icon-btn" id="profileBtn">
+                <i class="fas fa-user"></i>
+                <span class="icon-label">Profile</span>
+            </button>
+            <button class="icon-btn" id="dailyBtn">
+                <i class="fas fa-gift"></i>
+                <span class="icon-label">Daily</span>
+            </button>
+            <button class="icon-btn" id="wheelBtn">
+                <i class="fas fa-sync-alt"></i>
+                <span class="icon-label">Spin</span>
+            </button>
+            <button class="icon-btn" id="withdrawBtn">
+                <i class="fas fa-wallet"></i>
+                <span class="icon-label">Withdraw</span>
+            </button>
+        </div>
+
+        <!-- Tap Area -->
+        <div class="tap-area">
+            <div class="coin" id="tapCoin">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="tap-text">Tap to earn coins!</div>
+            <div class="tap-per-second" id="perSecond">0 coins/sec</div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Profile</div>
+                <button class="close-btn" data-modal="profileModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="input-group">
+                    <label class="input-label" for="playerName">Player Name</label>
+                    <input type="text" id="playerName" class="input-field" placeholder="Enter your name" maxlength="20">
+                </div>
+                <div class="input-group">
+                    <div class="info-row">
+                        <span>Total Coins Earned:</span>
+                        <span class="info-value" id="totalEarned">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Total Taps:</span>
+                        <span class="info-value" id="totalTaps">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Play Time:</span>
+                        <span class="info-value" id="playTime">0m</span>
+                    </div>
+                </div>
+                <button class="btn" id="saveProfile">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Reward Modal -->
+    <div class="modal-overlay" id="dailyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Daily Reward</div>
+                <button class="close-btn" data-modal="dailyModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="dailyStatus">Claim your daily reward!</div>
+                    <div style="font-size: 3rem; color: #ffd700; margin: 10px 0;">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div id="dailyAmount" style="font-size: 2rem; font-weight: bold; color: #ffd700;">100</div>
+                    <div style="color: rgba(255,255,255,0.7); margin-top: 5px;">coins today</div>
+                </div>
+                <div class="rewards-grid" id="rewardsGrid"></div>
+                <button class="btn" id="claimDaily">Claim Reward</button>
+                <div style="text-align: center; margin-top: 15px; color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                    Next reward in: <span id="nextRewardTime">24h</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spin Wheel Modal -->
+    <div class="modal-overlay" id="wheelModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Lucky Wheel</div>
+                <button class="close-btn" data-modal="wheelModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="wheel-container">
+                    <div class="wheel" id="wheel">
+                        <!-- Wheel slices generated by JS -->
+                    </div>
+                    <button class="spin-btn" id="spinBtn">SPIN (1 coin)</button>
+                    <div id="wheelResult" style="margin-top: 20px; text-align: center; font-size: 1.2rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Withdraw</div>
+                <button class="close-btn" data-modal="withdrawModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="withdraw-info">
+                    <div class="info-row">
+                        <span>Available Coins:</span>
+                        <span class="info-value" id="availableCoins">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Minimum Withdraw:</span>
+                        <span class="info-value">2 coins</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Fee (50%):</span>
+                        <span class="info-value" id="withdrawFee">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>You Will Receive:</span>
+                        <span class="info-value" id="willReceive">0</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="withdrawAmount">Amount to Withdraw</label>
+                    <input type="number" id="withdrawAmount" class="input-field" min="2" step="1" placeholder="Min 2 coins">
+                </div>
+                <button class="btn" id="withdrawBtnAction">Withdraw (DEMO)</button>
+                <div style="text-align: center; margin-top: 15px; color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                    This is a demo. Real withdrawals require Telegram integration.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Game State
+        const gameState = {
+            coins: 0,
+            level: 1,
+            coinsPerTap: 1,
+            coinsPerSecond: 0,
+            totalTaps: 0,
+            totalEarned: 0,
+            playerName: "Player",
+            lastDaily: 0,
+            streak: 0,
+            lastSpin: 0,
+            playTime: 0,
+            autoClickers: 0
+        };
+
+        // DOM Elements
+        const loadingScreen = document.getElementById('loadingScreen');
+        const container = document.querySelector('.container');
+        const coinsEl = document.getElementById('coins');
+        const levelEl = document.getElementById('level');
+        const tapCoin = document.getElementById('tapCoin');
+        const perSecondEl = document.getElementById('perSecond');
+        const toast = document.getElementById('toast');
+
+        // Initialize
+        function init() {
+            loadGame();
+            setupEventListeners();
+            createWheel();
+            updateDailyRewardsGrid();
+            
+            // Simulate loading
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    container.style.display = 'flex';
+                    updateUI();
+                }, 500);
+            }, 2000);
+
+            // Auto-save every 30 seconds
+            setInterval(saveGame, 30000);
+            
+           }
 
         .loading-text {
             font-size: 2.5rem;
