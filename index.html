@@ -1,115 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TON ASSAULT</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#000;
-  color:#fff;
-  text-align:center;
-}
+body{margin:0;font-family:Arial;background:#0f2027;color:#fff;text-align:center}
+.hidden{display:none}
+.card{background:#203a43;margin:12px;padding:15px;border-radius:12px}
+button{padding:14px 24px;border:none;border-radius:12px;background:#ff9800;font-weight:bold}
+.small{font-size:13px;color:#ccc}
 
-/* LOADING */
-#loading{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  z-index:10;
-}
-.logo{
-  font-size:42px;
-  font-weight:bold;
-  color:#ff9800;
-  animation:pulse 1.5s infinite;
-}
-@keyframes pulse{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.1)}
-  100%{transform:scale(1)}
-}
-.loader{
-  margin-top:20px;
-  width:200px;
-  height:10px;
-  background:#333;
-  border-radius:10px;
-  overflow:hidden;
-}
-.loader div{
-  height:100%;
-  width:0%;
-  background:#ff9800;
-  animation:load 2s forwards;
-}
-@keyframes load{
-  to{width:100%}
-}
-
-/* GAME */
-#game{
-  display:none;
-  padding:25px;
-}
-.card{
-  background:#203a43;
-  border-radius:14px;
-  padding:15px;
-  margin:15px 0;
-}
-button{
-  padding:15px 25px;
-  font-size:18px;
-  border:none;
-  border-radius:12px;
-  background:#ff9800;
-  font-weight:bold;
-}
-button:active{transform:scale(0.95)}
-.small{font-size:14px;color:#ccc}
+/* loading */
+#loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.logo{font-size:40px;color:#ff9800;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.1)}}
 </style>
 </head>
 
 <body>
 
-<!-- LOADING SCREEN -->
 <div id="loading">
   <div class="logo">TON ASSAULT</div>
-  <div class="small">Loading Game...</div>
-  <div class="loader"><div></div></div>
+  <p class="small">Loading Game...</p>
 </div>
 
-<!-- GAME SCREEN -->
-<div id="game">
-  <h1>💰 TON ASSAULT</h1>
-  <p class="small">Tap • Watch Ads • Earn</p>
+<div id="game" class="hidden">
+  <h2>💰 TON ASSAULT</h2>
 
   <div class="card">
-    🪙 Coins: <b><span id="coins">0</span></b><br>
-    ⭐ Level: <b><span id="level">1</span></b>
+    🪙 Coins: <b id="coins">0</b><br>
+    ⚡ Energy: <b id="energy">10</b>/10<br>
+    ⭐ Level: <b id="level">1</b>
   </div>
 
   <button onclick="tap()">TAP TO EARN</button>
 
   <div class="card">
     <h3>🎥 Watch Ad</h3>
-    <p class="small">Watch ad and earn coins</p>
-    <button onclick="watchAd()">WATCH AD</button>
+    <button onclick="watchAd()">WATCH AD (+Energy)</button>
   </div>
 
   <div class="card">
-    <p>Minimum Withdraw: 2 Coins</p>
-    <p>Withdraw Fee: 50%</p>
+    <h3>🎁 Daily Reward</h3>
+    <button onclick="daily()">CLAIM</button>
+    <p class="small" id="dailyMsg"></p>
+  </div>
+
+  <div class="card">
+    <h3>🎡 Spin & Win</h3>
+    <button onclick="spin()">SPIN</button>
+    <p class="small" id="spinMsg"></p>
+  </div>
+
+  <div class="card">
+    <h3>📋 Tasks</h3>
+    <p class="small">Watch 2 ads → +20 coins</p>
+    <p class="small">Tap 20 times → +20 coins</p>
+  </div>
+
+  <div class="card">
+    <h3>👥 Referral</h3>
+    <p class="small">Invite friends (demo)</p>
+    <button onclick="ref()">INVITE</button>
+  </div>
+
+  <div class="card">
+    <h3>💸 Withdraw</h3>
+    <p class="small">Min 2 coins | Fee 50%</p>
     <button onclick="withdraw()">WITHDRAW</button>
   </div>
 
@@ -117,62 +77,80 @@ button:active{transform:scale(0.95)}
 </div>
 
 <script>
-const tg = window.Telegram?.WebApp;
-if(tg){ tg.expand(); tg.ready(); }
+const tg=window.Telegram?.WebApp;
+if(tg){tg.expand();tg.ready();}
 
-let coins=0, level=1, nextLevel=20;
+let coins=0,energy=10,level=1;
+let taps=0,ads=0;
+let lastDaily=localStorage.getItem("daily")||0;
+
+// loading fix
+document.addEventListener("DOMContentLoaded",()=>{
+ setTimeout(()=>{
+  loading.style.display="none";
+  game.classList.remove("hidden");
+ },1500);
+});
 
 function update(){
-  coinsEl.textContent=coins;
-  levelEl.textContent=level;
+ coinsEl.textContent=coins;
+ energyEl.textContent=energy;
+ levelEl.textContent=level;
 }
+const coinsEl=coins,energyEl=energy,levelEl=level;
 
 function tap(){
-  coins+=level;
-  checkLevel();
-  update();
+ if(energy<=0){msg.textContent="⚡ Energy empty!";return;}
+ energy--; coins+=level; taps++;
+ if(taps%20==0){coins+=20;}
+ checkLevel(); update();
 }
 
 function watchAd(){
-  msg.textContent="🎥 Watching Ad...";
-  setTimeout(()=>{
-    const reward=10+level*2;
-    coins+=reward;
-    msg.textContent="✅ Ad Completed! +"+reward+" coins";
-    checkLevel();
-    update();
-  },2000);
+ ads++; energy=Math.min(10,energy+5);
+ if(ads%2==0){coins+=20;}
+ msg.textContent="🎥 Ad watched!";
+ update();
 }
 
-function checkLevel(){
-  if(coins>=nextLevel){
-    level++;
-    nextLevel+=level*20;
-    msg.textContent="🔥 Level Up! Level "+level;
-  }
+function daily(){
+ const now=Date.now();
+ if(now-lastDaily<86400000){
+  dailyMsg.textContent="Come tomorrow!";
+  return;
+ }
+ coins+=50;
+ lastDaily=now;
+ localStorage.setItem("daily",now);
+ dailyMsg.textContent="✅ 50 coins added!";
+ update();
+}
+
+function spin(){
+ const rewards=[5,10,20,50];
+ const r=rewards[Math.floor(Math.random()*rewards.length)];
+ coins+=r;
+ spinMsg.textContent="🎉 You won "+r+" coins";
+ update();
+}
+
+function ref(){
+ coins+=30;
+ msg.textContent="👥 Friend joined! +30 coins (demo)";
+ update();
 }
 
 function withdraw(){
-  if(coins<2){alert("Minimum withdraw is 2 coins");return;}
-  const fee=coins*0.5;
-  alert("Withdraw Requested\nCoins:"+coins+"\nFee:"+fee);
-  coins=0;
-  update();
+ if(coins<2){alert("Min withdraw 2");return;}
+ const fee=coins*0.5;
+ alert("Withdraw\nCoins:"+coins+"\nFee:"+fee);
+ coins=0; update();
 }
 
-/* ===== LOADING FIX ===== */
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>{
-    document.getElementById("loading").style.display="none";
-    document.getElementById("game").style.display="block";
-  },2200);
-});
-
-/* CACHE ELEMENTS */
-const coinsEl=document.getElementById("coins");
-const levelEl=document.getElementById("level");
-const msg=document.getElementById("msg");
+function checkLevel(){
+ if(coins>=level*50){level++;}
+}
 </script>
 
 </body>
-</html>
+    </html>
