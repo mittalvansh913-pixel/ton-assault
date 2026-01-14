@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TON ASSAULT GAME</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Arial, sans-serif;
+  text-align:center;
+}
+
+h1{
+  margin-top:20px;
+}
+
+#menu{
+  margin-top:40px;
+}
+
+#game{
+  display:none;
+}
+
+.bar{
+  width:80%;
+  height:20px;
+  background:#333;
+  margin:10px auto;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.hp{
+  height:100%;
+  background:#00ff00;
+  width:100%;
+}
+
+.enemy .hp{
+  background:#ff3333;
+}
+
+button{
+  padding:12px 25px;
+  margin:10px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.start{ background:#00c853; color:white; }
+.attack{ background:#ff4444; color:white; }
+
+.box{
+  margin:10px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 TON ASSAULT GAME 🔥</h1>
+
+<div id="menu">
+  <p>⚔️ Fight • 💰 Earn Coins • 🔥 Level Up</p>
+  <button class="start" onclick="startGame()">▶️ PLAY</button>
+</div>
+
+<div id="game">
+
+  <div class="box">👤 Player HP</div>
+  <div class="bar"><div id="playerHp" class="hp"></div></div>
+
+  <div class="box">👹 Enemy HP</div>
+  <div class="bar enemy"><div id="enemyHp" class="hp"></div></div>
+
+  <button class="attack" onclick="attack()">⚔️ ATTACK</button>
+
+  <div class="box">
+    🪙 Coins: <span id="coins">0</span>
+  </div>
+
+  <div class="box" id="status"></div>
+
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+
+let playerHP, enemyHP, coins = 0;
+
+function startGame(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("game").style.display="block";
+  resetFight();
+}
+
+function resetFight(){
+  playerHP = 100;
+  enemyHP = 100;
+  document.getElementById("status").innerText="";
+  updateBars();
+}
+
+function updateBars(){
+  document.getElementById("playerHp").style.width = playerHP + "%";
+  document.getElementById("enemyHp").style.width = enemyHP + "%";
+  document.getElementById("coins").innerText = coins;
+}
+
+function attack(){
+  if(playerHP<=0 || enemyHP<=0) return;
+
+  enemyHP -= Math.floor(Math.random()*20)+10;
+  if(enemyHP <= 0){
+    enemyHP = 0;
+    coins += 10;
+    document.getElementById("status").innerText="🔥 YOU WIN! +10 COINS";
+    updateBars();
+    setTimeout(resetFight,1500);
+    return;
+  }
+
+  playerHP -= Math.floor(Math.random()*15)+5;
+  if(playerHP <= 0){
+    playerHP = 0;
+    document.getElementById("status").innerText="💀 YOU LOST!";
+    updateBars();
+    setTimeout(resetFight,1500);
+    return;
+  }
+
+  updateBars();
+}
+</script>
+
+</body>
+</html>
