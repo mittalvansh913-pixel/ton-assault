@@ -16,11 +16,10 @@ body{margin:0;font-family:Arial;background:linear-gradient(#2b1055,#1a043a);colo
 .fighters{font-size:48px;display:flex;justify-content:space-between}
 button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
 
-/* SIDE MENU */
-.side-menu{
-position:fixed;right:10px;top:30%;
-display:flex;flex-direction:column;gap:10px;z-index:99
-}
+/* SIDE MENUS */
+.side-menu{position:fixed;top:30%;display:flex;flex-direction:column;gap:10px;z-index:99}
+.side-menu.left{left:10px}
+.side-menu.right{right:10px}
 .side-btn{
 width:50px;height:50px;border-radius:50%;
 background:#1e88e5;color:#fff;
@@ -75,24 +74,28 @@ opacity:0;transition:.3s
 <button onclick="attack()">⚔️ Attack</button>
 </div>
 
-<!-- SIDE MENU -->
-<div class="side-menu">
+<!-- LEFT EARNING MENU -->
+<div class="side-menu left">
+<div class="side-btn" onclick="watchAd()">📺</div>
+<div class="side-btn" onclick="daily()">🎁</div>
+<div class="side-btn" onclick="openReferral()">👥</div>
+<div class="side-btn" onclick="spin()">🎡</div>
+</div>
+
+<!-- RIGHT GAME MENU -->
+<div class="side-menu right">
 <div class="side-btn" onclick="openWeapons()">⚔️</div>
 <div class="side-btn" onclick="openSkills()">✨</div>
 <div class="side-btn" onclick="openCharacters()">🧙</div>
 <div class="side-btn" onclick="openSupport()">🆘</div>
 </div>
 
-<!-- SUPPORT PAGE -->
+<!-- SUPPORT -->
 <div class="modal" id="supportModal">
 <div class="modal-box">
 <h3>Support</h3>
-<p>If you face any issue, contact us on Telegram.</p>
-<p>We reply within 24 hours.</p>
-<p>🔹 Payment issues<br>🔹 Game bugs<br>🔹 Referral problems</p>
-<a href="https://t.me/bitcondde" target="_blank" style="color:#00e5ff">
-📨 @bitcondde
-</a><br><br>
+<p>For any issue contact us on Telegram</p>
+<a href="https://t.me/bitcondde" target="_blank" style="color:#00e5ff">@bitcondde</a><br><br>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -111,10 +114,9 @@ opacity:0;transition:.3s
 <!-- SKILLS -->
 <div class="modal" id="skillModal">
 <div class="modal-box">
-<h3>Skill Packs</h3>
+<h3>Skills</h3>
 <p>⚡ Double Damage</p>
 <p>❤️ Extra HP</p>
-<p>🎯 Critical Chance</p>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -123,9 +125,20 @@ opacity:0;transition:.3s
 <div class="modal" id="charModal">
 <div class="modal-box">
 <h3>Characters</h3>
-<p>🦸 Default Hero</p>
+<p>🦸 Default</p>
 <p class="lock">🥷 Ninja – Level 3</p>
-<p class="lock">🛡 Warrior – 500 Coins</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
+
+<!-- REFERRAL -->
+<div class="modal" id="refModal">
+<div class="modal-box">
+<h3>Referral</h3>
+<p>Code: <b id="refCode"></b></p>
+<input id="refLink" readonly>
+<p>Invites: <span id="refCount">0</span></p>
+<button onclick="confirmInvite()">Confirm Invite</button>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -133,8 +146,18 @@ opacity:0;transition:.3s
 <div id="toast"></div>
 
 <script>
-let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10};
+let player={
+name:"Player",hp:100,max:100,
+coins:0,gems:0,level:1,damage:10,
+refCode:"",refCount:0
+};
 let zombie={hp:30,max:30};
+let lastAd=0;
+
+/* INIT */
+let save=localStorage.getItem("zf");
+if(save)player=JSON.parse(save);
+if(!player.refCode)player.refCode="ZF"+Math.random().toString(36).substr(2,5).toUpperCase();
 
 function update(){
 playerName.textContent=player.name;
@@ -154,15 +177,42 @@ zombie.hp-=player.damage;
 if(zombie.hp<=0){
 player.coins+=10;
 zombie.hp=zombie.max;
-toastMsg("Zombie Defeated +10💰");
+toastMsg("+10💰");
 }
 update();
 }
 
-/* MODALS */
-function closeAll(){
-document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+/* EARNING */
+function watchAd(){
+let now=Date.now();
+if(now-lastAd<30000)return toastMsg("⏳ Wait");
+lastAd=now;player.coins+=20;toastMsg("+20💰");update();
 }
+function daily(){
+let d=localStorage.getItem("daily")||0;
+if(Date.now()-d<86400000)return toastMsg("Tomorrow");
+player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update();
+}
+function spin(){
+if(player.gems<1)return toastMsg("Need 1💎");
+player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];
+player.coins+=r;toastMsg("Won "+r+"💰");update();
+}
+
+/* REFERRAL */
+function openReferral(){
+refModal.style.display="flex";
+refCode.textContent=player.refCode;
+refLink.value="https://yourgame.site/?ref="+player.refCode;
+refCount.textContent=player.refCount;
+}
+function confirmInvite(){
+player.refCount++;player.coins+=50;
+toastMsg("+50💰 Referral");update();openReferral();
+}
+
+/* MODALS */
+function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
 function openWeapons(){weaponModal.style.display="flex"}
 function openSkills(){skillModal.style.display="flex"}
 function openCharacters(){charModal.style.display="flex"}
@@ -174,10 +224,7 @@ toast.classList.add("show");
 setTimeout(()=>toast.classList.remove("show"),1500);
 }
 
-let save=localStorage.getItem("zf");
-if(save)player=JSON.parse(save);
 update();
 </script>
-
 </body>
 </html>
