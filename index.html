@@ -1,112 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>TON ASSAULT GAME</title>
-    <style>
-        body { margin: 0; overflow: hidden; touch-action: none; }
-        canvas { background: #000; display: block; margin: auto; }
-        #gameOver { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 48px; display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TON ASSAULT – Earn Game</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f2027;
+  color:#fff;
+  text-align:center;
+}
+.container{
+  padding:30px;
+}
+button{
+  padding:18px 30px;
+  font-size:20px;
+  border:none;
+  border-radius:12px;
+  background:#ff9800;
+  color:#000;
+  font-weight:bold;
+}
+.stats{
+  margin:20px 0;
+  font-size:18px;
+}
+.box{
+  background:#203a43;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+</style>
 </head>
+
 <body>
-    <canvas id="gameCanvas" width="600" height="400"></canvas>
-    <div id="gameOver">Game Over</div>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let player, enemy, coins = 0, gameOver = false;
 
-        // Load sounds
-        const attackSound = new Audio('https://example.com/attack.wav');
-        const hitSound = new Audio('https://example.com/hit.wav');
-        const winSound = new Audio('https://example.com/win.wav');
+<div class="container">
+  <h1>💰 TON ASSAULT</h1>
+  <p>Tap • Earn • Level Up</p>
 
-        function preloadImages() {
-            playerImg = new Image();
-            playerImg.src = 'https://example.com/player.png'; 
-            enemyImg = new Image();
-            enemyImg.src = 'https://example.com/enemy.png'; 
-        }
+  <div class="stats">
+    🪙 Coins: <span id="coins">0</span><br>
+    ⭐ Level: <span id="level">1</span>
+  </div>
 
-        class Character {
-            constructor(x, y, width, height, health, img) {
-                this.x = x;
-                this.y = y;
-                this.width = width;
-                this.height = height;
-                this.health = health;
-                this.img = img;
-            }
-            draw() {
-                ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-            }
-        }
+  <button onclick="tap()">TAP TO EARN</button>
 
-        function resetGame() {
-            player = new Character(50, canvas.height - 100, 50, 100, 100, playerImg);
-            enemy = new Character(canvas.width - 100, canvas.height - 100, 50, 100, 100, enemyImg);
-            gameOver = false;
-            document.getElementById('gameOver').style.display = 'none';
-            coins = 0;
-            mainLoop();
-        }
+  <div class="box">
+    <p>Next Level at <span id="next">20</span> coins</p>
+  </div>
 
-        function handleInput(e) {
-            if (gameOver) return;
-            if (e.type === "keydown") {
-                if (e.key === "ArrowRight") player.x += 5;
-                if (e.key === "ArrowLeft") player.x -= 5;
-                if (e.key === " ") attack();
-            }
-        }
+  <div class="box">
+    <p>Minimum Withdraw: 2 Coins</p>
+    <p>Withdraw Fee: 50%</p>
+    <button onclick="withdraw()">WITHDRAW</button>
+  </div>
 
-        function attack() {
-            if (player.x + player.width > enemy.x && player.x < enemy.x + enemy.width) {
-                hitSound.play();
-                enemy.health -= 20;
-                if (enemy.health <= 0) {
-                    coins += 10;
-                    winSound.play();
-                    resetGame();
-                }
-            }
-            attackSound.play();
-        }
+  <p id="msg"></p>
+</div>
 
-        function enemyAI() {
-            if (enemy.x + enemy.width < player.x) enemy.x += 1;
-            else if (enemy.x > player.x + player.width) enemy.x -= 1;
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.expand(); tg.ready(); }
 
-            if (Math.abs(player.x - enemy.x) < 50) {
-                player.health -= 1;
-                if (player.health <= 0) {
-                    gameOver = true;
-                    document.getElementById('gameOver').style.display = 'block';
-                }
-            }
-        }
+let coins = 0;
+let level = 1;
+let nextLevel = 20;
 
-        function mainLoop() {
-            if (gameOver) return;
+function tap(){
+  coins += level;
+  if(coins >= nextLevel){
+    level++;
+    nextLevel += level * 20;
+    document.getElementById("msg").innerText =
+      "🔥 Level Up! Now Level " + level;
+  }
+  update();
+}
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            player.draw();
-            enemy.draw();
-            enemyAI();
+function withdraw(){
+  if(coins < 2){
+    alert("Minimum withdraw is 2 coins");
+    return;
+  }
+  const fee = coins * 0.5;
+  const receive = coins - fee;
+  alert(
+    "Withdraw Requested\n\n" +
+    "Coins: " + coins +
+    "\nFee (50%): " + fee +
+    "\nYou Receive: " + receive
+  );
+  coins = 0;
+  update();
+}
 
-            requestAnimationFrame(mainLoop);
-        }
+function update(){
+  document.getElementById("coins").innerText = coins;
+  document.getElementById("level").innerText = level;
+  document.getElementById("next").innerText = nextLevel;
+}
+</script>
 
-        window.addEventListener('keydown', handleInput);
-        window.addEventListener('touchstart', (e) => {
-            const touchX = e.touches[0].clientX;
-            if (touchX > canvas.width / 2) attack();
-            else player.x += 5;
-        });
-
-        preloadImages();
-        resetGame();
-    </script>
 </body>
 </html>
