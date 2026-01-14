@@ -8,72 +8,174 @@
 <style>
 body{
 margin:0;font-family:Arial;background:linear-gradient(#2b1055,#1a043a);
-color:#fff;text-align:center}
-.container{max-width:420px;margin:auto;padding:15px}
-.top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;
-display:flex;justify-content:space-between}
+color:#fff}
+.container{max-width:420px;margin:auto;padding:15px;text-align:center}
+
+/* TOP BAR */
+.top{
+background:rgba(0,0,0,.4);
+border-radius:12px;padding:12px;
+display:flex;justify-content:space-between;align-items:center
+}
 .stat{font-weight:bold}
+.profile{cursor:pointer}
+
+/* BARS */
 .bar{background:#444;border-radius:8px;overflow:hidden;height:10px}
 .bar div{height:100%}
-.game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
+
+/* GAME */
+.game{
+background:rgba(0,0,0,.4);
+border-radius:12px;padding:20px;margin:10px 0
+}
 .fighters{font-size:48px;display:flex;justify-content:space-between}
-button{padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+
+/* BUTTONS */
+button{
+padding:12px;border:none;border-radius:10px;
+font-weight:bold;cursor:pointer
+}
 .attack{background:#e53935;color:#fff}
 .heal{background:#43a047;color:#fff}
-.earn{background:#1e88e5;color:#fff;width:100%}
-.shop{background:#ff9800;color:#000;width:100%}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s}
+
+/* SIDE MENU */
+.side-menu{
+position:fixed;
+right:10px;
+top:35%;
+display:flex;
+flex-direction:column;
+gap:10px;
+z-index:99
+}
+.side-btn{
+width:50px;height:50px;
+border-radius:50%;
+background:#1e88e5;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+cursor:pointer
+}
+
+/* PROFILE MODAL */
+.modal{
+position:fixed;
+top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.7);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:200
+}
+.modal-box{
+background:#222;
+padding:20px;
+border-radius:12px;
+width:260px;
+text-align:center
+}
+.modal-box input{
+width:100%;
+padding:8px;
+border-radius:8px;
+border:none;
+margin:10px 0
+}
+
+/* TOAST */
+#toast{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#000;
+padding:10px 20px;
+border-radius:20px;
+opacity:0;
+transition:.3s;
+z-index:300
+}
 #toast.show{opacity:1}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
+<!-- TOP -->
 <div class="top">
+<div class="stat">👤 <span id="playerName">Player</span></div>
 <div class="stat">⭐ <span id="level">1</span></div>
-<div class="stat">💰 <span id="coins">0</span></div>
-<div class="stat">💎 <span id="gems">0</span></div>
+<div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
+<div class="profile" onclick="openProfile()">⚙️</div>
 </div>
 
-<div>❤️ HP <span id="hp">100</span>/<span id="hpmax">100</span>
+<!-- STATS -->
+<div>
+❤️ HP <span id="hp">100</span>/<span id="hpmax">100</span>
 <div class="bar"><div id="hpbar" style="width:100%;background:red"></div></div>
 ⚡ Energy <span id="energy">10</span>/10
 <div class="bar"><div id="ebar" style="width:100%;background:cyan"></div></div>
 </div>
 
+<!-- GAME -->
 <div class="game">
 <div class="fighters">🦸‍♂️ ⚔️ 🧟</div>
 <div id="zhp">30/30</div>
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
 
+<!-- ACTIONS -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
 <button class="attack" onclick="attack()">Attack</button>
 <button class="heal" onclick="heal()">Heal (20💰)</button>
 </div>
 
-<button class="earn" onclick="watchAd()">📺 Watch Ad (+20💰)</button>
-<button class="shop" onclick="spin()">🎡 Spin (1💎)</button>
-<button class="shop" onclick="daily()">🎁 Daily Bonus</button>
-<button class="shop" onclick="refer()">👥 Invite Friend</button>
-<button class="shop" onclick="withdraw()">🏦 Withdraw</button>
+</div>
 
+<!-- SIDE MENU -->
+<div class="side-menu">
+<div class="side-btn" onclick="watchAd()">📺</div>
+<div class="side-btn" onclick="spin()">🎡</div>
+<div class="side-btn" onclick="daily()">🎁</div>
+<div class="side-btn" onclick="refer()">👥</div>
+<div class="side-btn" onclick="withdraw()">🏦</div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal" id="profileModal">
+<div class="modal-box">
+<h3>Profile</h3>
+<input id="nameInput" placeholder="Enter name">
+<button onclick="saveProfile()">Save</button>
+<button onclick="closeProfile()">Close</button>
+</div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-let player={hp:100,max:100,coins:0,gems:0,level:1,damage:10,exp:0,energy:10};
+let player={
+name:"Player",
+hp:100,max:100,
+coins:0,gems:0,
+level:1,damage:10,exp:0,energy:10
+};
 let zombie={hp:30,max:30,damage:5};
-let lastAd=0,sound=true;
+let lastAd=0;
 
 /* SAVE */
 function save(){localStorage.setItem("zf",JSON.stringify(player))}
 function load(){let d=localStorage.getItem("zf");if(d)player=JSON.parse(d)}
 
+/* UI */
 function update(){
+playerName.textContent=player.name;
 coins.textContent=player.coins;
 gems.textContent=player.gems;
 level.textContent=player.level;
@@ -117,13 +219,16 @@ update();
 
 function levelUp(){
 if(player.exp>=player.level*100){
-player.exp=0;player.level++;
-player.max+=20;player.hp=player.max;player.damage+=5;
+player.exp=0;
+player.level++;
+player.max+=20;
+player.hp=player.max;
+player.damage+=5;
 toastMsg("⭐ Level Up");
 }
 }
 
-/* ENERGY REGEN */
+/* ENERGY */
 setInterval(()=>{
 if(player.energy<10)player.energy++;
 update();
@@ -135,15 +240,14 @@ let now=Date.now();
 if(now-lastAd<30000)return toastMsg("⏳ Wait 30s");
 lastAd=now;
 player.coins+=20;
-toastMsg("+20💰 Ad Reward");
+toastMsg("+20💰 Ad");
 update();
 }
 
 function spin(){
 if(player.gems<1)return toastMsg("Need 1💎");
 player.gems--;
-let rewards=[10,20,50,0];
-let r=rewards[Math.floor(Math.random()*rewards.length)];
+let r=[10,20,50,0][Math.floor(Math.random()*4)];
 player.coins+=r;
 toastMsg("🎡 Won "+r+"💰");
 update();
@@ -161,18 +265,30 @@ update();
 
 function refer(){
 player.coins+=50;
-toastMsg("👥 Friend Joined +50💰");
+toastMsg("👥 Friend Joined");
 update();
 }
 
 function withdraw(){
-if(player.coins<200)return toastMsg("Min 200💰");
-let r=Math.floor(player.coins*0.5);
-player.coins-=r;
-toastMsg("🏦 Withdraw "+r+"💰 (Demo)");
+if(player.gems<10)return toastMsg("❌ Min 10💎 required");
+player.gems-=10;
+toastMsg("🏦 Withdraw Requested (Demo)");
 update();
 }
 
+/* PROFILE */
+function openProfile(){
+profileModal.style.display="flex";
+nameInput.value=player.name;
+}
+function closeProfile(){profileModal.style.display="none"}
+function saveProfile(){
+player.name=nameInput.value||"Player";
+closeProfile();
+update();
+}
+
+/* TOAST */
 function toastMsg(t){
 toast.textContent=t;
 toast.classList.add("show");
