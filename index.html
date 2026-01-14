@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TON ASSAULT – Earn Game</title>
+<title>TON ASSAULT</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -15,49 +15,102 @@ body{
   color:#fff;
   text-align:center;
 }
+.hidden{display:none}
+
+/* LOADING */
+#loading{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+.logo{
+  font-size:42px;
+  font-weight:bold;
+  color:#ff9800;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.1)}
+  100%{transform:scale(1)}
+}
+.loader{
+  margin-top:20px;
+  width:200px;
+  height:10px;
+  background:#333;
+  border-radius:10px;
+  overflow:hidden;
+}
+.loader div{
+  height:100%;
+  width:0%;
+  background:#ff9800;
+  animation:load 2s forwards;
+}
+@keyframes load{
+  to{width:100%}
+}
+
+/* GAME UI */
 .container{
-  padding:30px;
+  padding:25px;
+}
+.card{
+  background:#203a43;
+  border-radius:14px;
+  padding:15px;
+  margin:15px 0;
 }
 button{
-  padding:18px 30px;
-  font-size:20px;
+  padding:15px 25px;
+  font-size:18px;
   border:none;
   border-radius:12px;
   background:#ff9800;
-  color:#000;
   font-weight:bold;
 }
-.stats{
-  margin:20px 0;
-  font-size:18px;
-}
-.box{
-  background:#203a43;
-  padding:15px;
-  border-radius:12px;
-  margin-top:15px;
+button:active{transform:scale(0.95)}
+.small{
+  font-size:14px;
+  color:#ccc;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>💰 TON ASSAULT</h1>
-  <p>Tap • Earn • Level Up</p>
+<!-- LOADING SCREEN -->
+<div id="loading">
+  <div class="logo">TON ASSAULT</div>
+  <div class="small">Loading Game...</div>
+  <div class="loader"><div></div></div>
+</div>
 
-  <div class="stats">
-    🪙 Coins: <span id="coins">0</span><br>
-    ⭐ Level: <span id="level">1</span>
+<!-- GAME -->
+<div id="game" class="hidden container">
+
+  <h1>💰 TON ASSAULT</h1>
+  <p class="small">Tap • Watch Ads • Earn</p>
+
+  <div class="card">
+    🪙 Coins: <b><span id="coins">0</span></b><br>
+    ⭐ Level: <b><span id="level">1</span></b>
   </div>
 
   <button onclick="tap()">TAP TO EARN</button>
 
-  <div class="box">
-    <p>Next Level at <span id="next">20</span> coins</p>
+  <div class="card">
+    <h3>🎥 Watch Ad</h3>
+    <p class="small">Watch a short ad and earn coins</p>
+    <button onclick="watchAd()">WATCH AD</button>
   </div>
 
-  <div class="box">
+  <div class="card">
     <p>Minimum Withdraw: 2 Coins</p>
     <p>Withdraw Fee: 50%</p>
     <button onclick="withdraw()">WITHDRAW</button>
@@ -74,15 +127,42 @@ let coins = 0;
 let level = 1;
 let nextLevel = 20;
 
+// fake loading
+setTimeout(()=>{
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+},2000);
+
+function update(){
+  document.getElementById("coins").innerText = coins;
+  document.getElementById("level").innerText = level;
+}
+
 function tap(){
   coins += level;
+  checkLevel();
+  update();
+}
+
+function watchAd(){
+  document.getElementById("msg").innerText = "🎥 Watching Ad...";
+  setTimeout(()=>{
+    const reward = 10 + level*2;
+    coins += reward;
+    document.getElementById("msg").innerText =
+      "✅ Ad Completed! +" + reward + " coins";
+    checkLevel();
+    update();
+  },2000);
+}
+
+function checkLevel(){
   if(coins >= nextLevel){
     level++;
-    nextLevel += level * 20;
+    nextLevel += level*20;
     document.getElementById("msg").innerText =
-      "🔥 Level Up! Now Level " + level;
+      "🔥 Level Up! Level " + level;
   }
-  update();
 }
 
 function withdraw(){
@@ -90,22 +170,15 @@ function withdraw(){
     alert("Minimum withdraw is 2 coins");
     return;
   }
-  const fee = coins * 0.5;
-  const receive = coins - fee;
+  const fee = coins*0.5;
+  const receive = coins-fee;
   alert(
-    "Withdraw Requested\n\n" +
-    "Coins: " + coins +
-    "\nFee (50%): " + fee +
-    "\nYou Receive: " + receive
+    "Withdraw Requested\n\nCoins: "+coins+
+    "\nFee (50%): "+fee+
+    "\nYou Receive: "+receive
   );
   coins = 0;
   update();
-}
-
-function update(){
-  document.getElementById("coins").innerText = coins;
-  document.getElementById("level").innerText = level;
-  document.getElementById("next").innerText = nextLevel;
 }
 </script>
 
