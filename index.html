@@ -32,8 +32,10 @@ to{transform:translateY(-10vh)}
 
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between}
+
 #playerChar.attack{animation:attack .2s}
 #zombieChar.hit{animation:hit .2s}
+
 @keyframes attack{50%{transform:translateX(20px)}}
 @keyframes hit{50%{transform:translateX(-15px)}}
 
@@ -58,9 +60,16 @@ display:none;align-items:center;justify-content:center;z-index:200
 }
 .modal-box{background:#222;padding:20px;border-radius:12px;width:300px}
 
-/* FLOAT */
-.float{position:absolute;color:#ff5252;font-weight:bold;animation:floatUp 1s forwards}
-@keyframes floatUp{to{transform:translateY(-40px);opacity:0}}
+/* FLOAT DAMAGE */
+.float{
+position:absolute;
+color:#ff5252;
+font-weight:bold;
+animation:floatUp 1s forwards;
+}
+@keyframes floatUp{
+to{transform:translateY(-40px);opacity:0}
+}
 
 /* TOAST */
 #toast{
@@ -128,7 +137,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button onclick="attack()">⚔️ Attack</button>
 </div>
 
-<!-- LEFT MENU -->
+<!-- SIDE MENUS -->
 <div class="side-menu left">
 <div class="side-btn" onclick="watchAd()">📺</div>
 <div class="side-btn" onclick="daily()">🎁</div>
@@ -136,7 +145,6 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="side-btn" onclick="spin()">🎡</div>
 </div>
 
-<!-- RIGHT MENU -->
 <div class="side-menu right">
 <div class="side-btn" onclick="openWeapons()">⚔️</div>
 <div class="side-btn" onclick="openSkills()">✨</div>
@@ -152,106 +160,75 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bottom-btn" onclick="openSkills()">✨ Skills</div>
 </div>
 
-<!-- MODALS -->
-<div class="modal" id="weaponModal">
-<div class="modal-box">
-<h3>⚔️ Weapons</h3>
-<p onclick="buyWeapon('sword')">🗡 Sword (Free)</p>
-<p onclick="buyWeapon('axe')">🪓 Axe – 200💰</p>
-<p onclick="buyWeapon('gun')">🔫 Gun – 500💰</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="charModal">
-<div class="modal-box">
-<h3>🧙 Characters</h3>
-<p onclick="selectChar('hero')">🦸 Hero</p>
-<p onclick="selectChar('ninja')">🥷 Ninja – Lvl 3</p>
-<p onclick="selectChar('slayer')">🧔‍♂️ Slayer – Lvl 5</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
 <div id="toast"></div>
 
 <script>
-let sound=true;
-let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10,weapon:"sword",char:"hero"};
+let player={hp:100,max:100,coins:0,gems:0,level:1,weapon:"sword",char:"hero"};
+let zombie={hp:30,max:30};
 
 let weapons={
-sword:{dmg:10,price:0,owned:true},
-axe:{dmg:20,price:200,owned:false},
-gun:{dmg:35,price:500,owned:false}
+sword:{dmg:10},
+axe:{dmg:20},
+gun:{dmg:35}
 };
 
 let characters={
-hero:{hp:100,icon:"🦸‍♂️",lvl:1},
-ninja:{hp:90,icon:"🥷",lvl:3},
-slayer:{hp:130,icon:"🧔‍♂️",lvl:5}
+hero:{icon:"🦸‍♂️"},
+ninja:{icon:"🥷"},
+slayer:{icon:"🧔‍♂️"}
 };
 
-let zombie={hp:30,max:30};
-
-let save=localStorage.getItem("zf");
-if(save)player=JSON.parse(save);
-
 function update(){
-playerName.textContent=player.name;
-level.textContent=player.level;
-coins.textContent=player.coins;
-gems.textContent=player.gems;
 hp.textContent=player.hp;
 hpmax.textContent=player.max;
 hpbar.style.width=(player.hp/player.max*100)+"%";
 zhp.textContent=zombie.hp+"/"+zombie.max;
 zbar.style.width=(zombie.hp/zombie.max*100)+"%";
 playerChar.textContent=characters[player.char].icon;
-localStorage.setItem("zf",JSON.stringify(player));
+coins.textContent=player.coins;
+level.textContent=player.level;
 }
 
 function attack(){
-player.damage = weapons[player.weapon].dmg;
-zombie.hp -= player.damage;
+playerChar.classList.add("attack");
+zombieChar.classList.add("hit");
+
+let dmg = weapons[player.weapon].dmg;
+zombie.hp -= dmg;
+floatText("-"+dmg, zombieChar);
+
 if(zombie.hp<=0){
 player.coins+=10;
 player.level++;
 zombie.hp=zombie.max;
 toastMsg("+10💰 Level Up");
 }
+
+setTimeout(()=>{
+playerChar.classList.remove("attack");
+zombieChar.classList.remove("hit");
+},200);
+
 update();
 }
 
-function buyWeapon(w){
-if(!weapons[w].owned){
-if(player.coins < weapons[w].price) return toastMsg("Not enough coins");
-player.coins -= weapons[w].price;
-weapons[w].owned=true;
-}
-player.weapon=w;
-toastMsg("Weapon Equipped");
-update();
+function floatText(text,el){
+let d=document.createElement("div");
+d.className="float";
+d.textContent=text;
+el.appendChild(d);
+setTimeout(()=>d.remove(),1000);
 }
 
-function selectChar(c){
-if(player.level < characters[c].lvl) return toastMsg("Reach Level "+characters[c].lvl);
-player.char=c;
-player.max=characters[c].hp;
-player.hp=player.max;
-toastMsg("Character Selected");
-update();
-}
-
-function openWeapons(){weaponModal.style.display="flex"}
-function openCharacters(){charModal.style.display="flex"}
+function watchAd(){player.coins+=20;toastMsg("+20💰");update()}
+function daily(){player.coins+=50;toastMsg("+50💰");update()}
+function spin(){toastMsg("Spin later")}
+function openWeapons(){toastMsg("Weapons OK")}
+function openCharacters(){toastMsg("Characters OK")}
 function openSkills(){toastMsg("Skills coming soon")}
 function openStats(){toastMsg("Stats OK")}
 function openSettings(){toastMsg("Settings OK")}
 function openReferral(){toastMsg("Referral OK")}
-function watchAd(){player.coins+=20;toastMsg("+20💰");update()}
-function daily(){player.coins+=50;toastMsg("+50💰");update()}
-function spin(){toastMsg("Spin later")}
-function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
 function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500)}
 
 update();
