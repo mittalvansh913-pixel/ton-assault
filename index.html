@@ -11,10 +11,9 @@ margin:0;font-family:Arial;color:#fff;overflow:hidden;
 background:linear-gradient(#2b1055,#1a043a);
 }
 
-/* BACKGROUND ANIMATION */
+/* BACKGROUND */
 .bg span{
-position:fixed;
-width:10px;height:10px;
+position:fixed;width:10px;height:10px;
 background:rgba(255,255,255,0.15);
 border-radius:50%;
 animation:float 15s linear infinite;
@@ -33,9 +32,8 @@ to{transform:translateY(-10vh)}
 
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between}
-#playerChar.attack{animation:attack 0.2s}
-#zombieChar.hit{animation:hit 0.2s}
-
+#playerChar.attack{animation:attack .2s}
+#zombieChar.hit{animation:hit .2s}
 @keyframes attack{50%{transform:translateX(20px)}}
 @keyframes hit{50%{transform:translateX(-15px)}}
 
@@ -60,16 +58,9 @@ display:none;align-items:center;justify-content:center;z-index:200
 }
 .modal-box{background:#222;padding:20px;border-radius:12px;width:300px}
 
-/* FLOATING TEXT */
-.float{
-position:absolute;
-color:#ff5252;
-font-weight:bold;
-animation:floatUp 1s forwards;
-}
-@keyframes floatUp{
-to{transform:translateY(-40px);opacity:0}
-}
+/* FLOAT */
+.float{position:absolute;color:#ff5252;font-weight:bold;animation:floatUp 1s forwards}
+@keyframes floatUp{to{transform:translateY(-40px);opacity:0}}
 
 /* TOAST */
 #toast{
@@ -84,7 +75,6 @@ opacity:0;transition:.3s;z-index:300
 
 <body>
 
-<!-- BACKGROUND PARTICLES -->
 <div class="bg">
 <script>
 for(let i=0;i<40;i++){
@@ -107,9 +97,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 
 <div class="game">
 <div class="fighters">
-<div id="playerChar">🦸‍♂️</div>
-⚔️
-<div id="zombieChar">🧟</div>
+<div id="playerChar">🦸‍♂️</div> ⚔️ <div id="zombieChar">🧟</div>
 </div>
 <div id="zhp">30/30</div>
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
@@ -126,37 +114,69 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="side-btn" onclick="spin()">🎡</div>
 </div>
 
-<!-- RIGHT MENU (ONLY SETTINGS) -->
+<!-- RIGHT MENU -->
 <div class="side-menu right">
+<div class="side-btn" onclick="openWeapons()">⚔️</div>
+<div class="side-btn" onclick="openSkills()">✨</div>
+<div class="side-btn" onclick="openCharacters()">🧙</div>
+<div class="side-btn" onclick="openStats()">📊</div>
 <div class="side-btn" onclick="openSettings()">⚙️</div>
 </div>
 
-<!-- SETTINGS MODAL -->
+<!-- MODALS -->
 <div class="modal" id="settingsModal">
 <div class="modal-box">
 <h3>⚙️ Settings</h3>
-
-<p><b>Username</b></p>
-<input id="nameInput" placeholder="Enter name">
-
-<p style="margin-top:10px">
-<button onclick="toggleSound()">🔊 Toggle Sound</button>
-</p>
-
-<br>
+<input id="nameInput" placeholder="Username">
+<button onclick="toggleSound()">🔊 Toggle Sound</button><br><br>
 <button onclick="saveSettings()">Save</button>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
 
-<!-- REFERRAL -->
+<div class="modal" id="weaponModal">
+<div class="modal-box">
+<h3>⚔️ Weapons</h3>
+<p>🗡 Sword (Active)</p>
+<p style="opacity:.5">🪓 Axe – 200💰</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
+
+<div class="modal" id="skillModal">
+<div class="modal-box">
+<h3>✨ Skills</h3>
+<p>⚡ Double Damage</p>
+<p>❤️ Extra HP</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
+
+<div class="modal" id="charModal">
+<div class="modal-box">
+<h3>🧙 Characters</h3>
+<p>🦸 Hero</p>
+<p style="opacity:.5">🥷 Ninja – Lvl 3</p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
+
+<div class="modal" id="statsModal">
+<div class="modal-box">
+<h3>📊 Stats</h3>
+<p>Level: <span id="sLevel"></span></p>
+<p>Coins: <span id="sCoins"></span></p>
+<button onclick="closeAll()">Close</button>
+</div>
+</div>
+
 <div class="modal" id="refModal">
 <div class="modal-box">
 <h3>Referral</h3>
-<p>Code: <b id="refCode"></b></p>
+<p id="refCode"></p>
 <input id="refLink" readonly>
 <p>Invites: <span id="refCount">0</span></p>
-<button onclick="confirmInvite()">Confirm Invite</button>
+<button onclick="confirmInvite()">Confirm</button>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -169,12 +189,10 @@ let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10,refCod
 let zombie={hp:30,max:30};
 let lastAd=0;
 
-/* INIT */
 let save=localStorage.getItem("zf");
 if(save)player=JSON.parse(save);
 if(!player.refCode)player.refCode="ZF"+Math.random().toString(36).substr(2,5).toUpperCase();
 
-/* UPDATE */
 function update(){
 playerName.textContent=player.name;
 level.textContent=player.level;
@@ -188,85 +206,42 @@ zbar.style.width=(zombie.hp/zombie.max*100)+"%";
 localStorage.setItem("zf",JSON.stringify(player));
 }
 
-/* ATTACK */
 function attack(){
 playerChar.classList.add("attack");
 zombieChar.classList.add("hit");
 zombie.hp-=player.damage;
 floatText("-"+player.damage,zombieChar);
-
 if(zombie.hp<=0){
 player.coins+=10;
 coinSound();
 toastMsg("+10💰");
 zombie.hp=zombie.max;
 }
-setTimeout(()=>{
-playerChar.classList.remove("attack");
-zombieChar.classList.remove("hit");
-},200);
+setTimeout(()=>{playerChar.classList.remove("attack");zombieChar.classList.remove("hit")},200);
 update();
 }
 
-/* FLOAT DAMAGE */
-function floatText(txt,el){
-let d=document.createElement("div");
-d.className="float";
-d.textContent=txt;
-el.appendChild(d);
-setTimeout(()=>d.remove(),1000);
-}
+function floatText(t,e){let d=document.createElement("div");d.className="float";d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),1000)}
 
-/* EARNING */
-function watchAd(){if(Date.now()-lastAd<30000)return toastMsg("⏳ Wait");lastAd=Date.now();player.coins+=20;toastMsg("+20💰");update();}
-function daily(){let d=localStorage.getItem("daily")||0;if(Date.now()-d<86400000)return toastMsg("Tomorrow");player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update();}
-function spin(){if(player.gems<1)return toastMsg("Need 1💎");player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];player.coins+=r;toastMsg("Won "+r+"💰");update();}
+function watchAd(){if(Date.now()-lastAd<30000)return toastMsg("⏳ Wait");lastAd=Date.now();player.coins+=20;toastMsg("+20💰");update()}
+function daily(){let d=localStorage.getItem("daily")||0;if(Date.now()-d<86400000)return toastMsg("Tomorrow");player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update()}
+function spin(){if(player.gems<1)return toastMsg("Need 1💎");player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];player.coins+=r;toastMsg("Won "+r+"💰");update()}
 
-/* REFERRAL */
-function openReferral(){
-refModal.style.display="flex";
-refCode.textContent=player.refCode;
-refLink.value="https://yourgame.site/?ref="+player.refCode;
-refCount.textContent=player.refCount;
-}
-function confirmInvite(){
-player.refCount++;
-player.coins+=50;
-toastMsg("+50💰 Referral");
-update();
-}
+function openReferral(){refModal.style.display="flex";refCode.textContent=player.refCode;refLink.value="https://yourgame.site/?ref="+player.refCode;refCount.textContent=player.refCount}
+function confirmInvite(){player.refCount++;player.coins+=50;toastMsg("+50💰");update()}
 
-/* SETTINGS */
-function openSettings(){
-settingsModal.style.display="flex";
-nameInput.value=player.name;
-}
-function saveSettings(){
-player.name=nameInput.value||"Player";
-toastMsg("⚙️ Settings Saved");
-closeAll();
-update();
-}
+function openSettings(){settingsModal.style.display="flex";nameInput.value=player.name}
+function saveSettings(){player.name=nameInput.value||"Player";toastMsg("Saved");closeAll();update()}
+function toggleSound(){sound=!sound;toastMsg(sound?"Sound ON":"Sound OFF")}
+function coinSound(){if(sound)new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play()}
 
-/* SOUND */
-function toggleSound(){
-sound=!sound;
-toastMsg(sound?"🔊 Sound ON":"🔇 Sound OFF");
-}
-function coinSound(){
-if(!sound)return;
-new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play();
-}
+function openWeapons(){weaponModal.style.display="flex"}
+function openSkills(){skillModal.style.display="flex"}
+function openCharacters(){charModal.style.display="flex"}
+function openStats(){statsModal.style.display="flex";sLevel.textContent=player.level;sCoins.textContent=player.coins}
 
-/* UTILS */
-function closeAll(){
-document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
-}
-function toastMsg(t){
-toast.textContent=t;
-toast.classList.add("show");
-setTimeout(()=>toast.classList.remove("show"),1500);
-}
+function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
+function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500)}
 
 update();
 </script>
