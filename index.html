@@ -25,13 +25,13 @@ to{transform:translateY(-10vh)}
 
 .container{max-width:420px;margin:auto;padding:15px;text-align:center;position:relative;z-index:5}
 .top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;display:flex;justify-content:space-between}
-.stat{font-weight:bold}
+.stat{font-weight:bold;font-size:13px}
 
-.bar{background:#444;border-radius:8px;overflow:hidden;height:10px}
-.bar div{height:100%}
+.bar{background:#444;border-radius:8px;overflow:hidden;height:10px;margin-top:5px}
+.bar div{height:100%;transition:width 0.3s}
 
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
-.fighters{font-size:48px;display:flex;justify-content:space-between}
+.fighters{font-size:48px;display:flex;justify-content:space-between;align-items:center}
 
 #playerChar.attack{animation:attack .2s}
 #zombieChar.hit{animation:hit .2s}
@@ -39,7 +39,8 @@ to{transform:translateY(-10vh)}
 @keyframes attack{50%{transform:translateX(20px)}}
 @keyframes hit{50%{transform:translateX(-15px)}}
 
-button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+button{padding:10px 20px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;background:#1e88e5;color:#fff;font-size:16px}
+button:active{transform:scale(0.95)}
 
 /* SIDE MENUS */
 .side-menu{position:fixed;top:30%;display:flex;flex-direction:column;gap:10px;z-index:99}
@@ -49,23 +50,98 @@ button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:point
 width:50px;height:50px;border-radius:50%;
 background:#1e88e5;color:#fff;
 display:flex;align-items:center;justify-content:center;
-font-size:20px;cursor:pointer
+font-size:20px;cursor:pointer;
+box-shadow:0 4px 8px rgba(0,0,0,0.3);
 }
+.side-btn:active{transform:scale(0.9)}
 
 /* MODALS */
 .modal{
 position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.75);
-display:none;align-items:center;justify-content:center;z-index:200
+background:rgba(0,0,0,.85);
+display:none;align-items:center;justify-content:center;z-index:200;
+overflow-y:auto;padding:20px;box-sizing:border-box;
 }
-.modal-box{background:#222;padding:20px;border-radius:12px;width:300px}
+.modal.show{display:flex}
+.modal-box{
+background:#1a1a2e;padding:20px;border-radius:12px;width:100%;max-width:380px;
+max-height:90vh;overflow-y:auto;
+}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-header h2{margin:0;font-size:20px}
+.close-btn{background:#ff5252;color:#fff;border:none;padding:5px 15px;border-radius:8px;cursor:pointer;font-size:18px}
+
+/* ITEM CARDS */
+.item-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.item-card{
+background:rgba(255,255,255,0.05);border-radius:10px;padding:15px;
+border:2px solid #444;position:relative;
+}
+.item-card.owned{border-color:#4caf50}
+.item-card.equipped{border-color:#ffc107;background:rgba(255,193,7,0.1)}
+.item-card .icon{font-size:40px}
+.item-card .name{font-weight:bold;margin:5px 0}
+.item-card .desc{font-size:12px;color:#aaa}
+.item-card .price{color:#ffc107;margin-top:8px}
+.item-card button{padding:6px 12px;font-size:12px;margin-top:8px;width:100%}
+.item-card .badge{
+position:absolute;top:5px;right:5px;
+background:#ffc107;color:#000;padding:2px 6px;
+border-radius:5px;font-size:10px;font-weight:bold;
+}
+
+/* SKILL ITEMS */
+.skill-item{
+background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;
+border:2px solid #444;margin-bottom:10px;
+}
+.skill-item .skill-header{display:flex;justify-content:space-between;align-items:center}
+.skill-item .skill-name{font-weight:bold;font-size:16px}
+.skill-item .skill-level{color:#4caf50;font-size:14px}
+.skill-item .skill-desc{font-size:13px;color:#aaa;margin:5px 0}
+.skill-item button{padding:6px 12px;font-size:12px;width:100%;margin-top:5px}
+
+/* STATS PAGE */
+.stat-row{
+display:flex;justify-content:space-between;
+background:rgba(255,255,255,0.05);padding:12px;
+border-radius:8px;margin-bottom:8px;
+}
+.stat-row .label{color:#aaa}
+.stat-row .value{font-weight:bold;color:#4caf50}
+
+/* SETTINGS */
+.setting-item{
+background:rgba(255,255,255,0.05);padding:12px;
+border-radius:8px;margin-bottom:10px;
+}
+.setting-item label{display:flex;justify-content:space-between;align-items:center}
+.setting-item input[type="text"]{
+width:100%;padding:8px;border-radius:6px;border:1px solid #444;
+background:#0f0f1e;color:#fff;margin-top:5px;
+}
+.setting-item input[type="checkbox"]{
+width:40px;height:20px;cursor:pointer;
+}
+
+/* REFERRAL */
+.referral-code{
+background:rgba(255,255,255,0.1);padding:15px;
+border-radius:8px;text-align:center;margin:10px 0;
+}
+.referral-code .code{
+font-size:24px;font-weight:bold;letter-spacing:2px;
+color:#ffc107;margin:10px 0;
+}
 
 /* FLOAT DAMAGE */
 .float{
 position:absolute;
 color:#ff5252;
 font-weight:bold;
+font-size:20px;
 animation:floatUp 1s forwards;
+pointer-events:none;
 }
 @keyframes floatUp{
 to{transform:translateY(-40px);opacity:0}
@@ -76,7 +152,7 @@ to{transform:translateY(-40px);opacity:0}
 position:fixed;bottom:80px;left:50%;
 transform:translateX(-50%);
 background:#000;padding:10px 20px;border-radius:20px;
-opacity:0;transition:.3s;z-index:300
+opacity:0;transition:.3s;z-index:300;
 }
 #toast.show{opacity:1}
 
@@ -101,6 +177,16 @@ text-align:center;
 font-size:14px;
 cursor:pointer;
 }
+.bottom-btn:active{background:#222}
+
+/* CONFIRM DIALOG */
+.confirm-dialog{
+background:#1a1a2e;padding:20px;border-radius:12px;
+text-align:center;max-width:300px;
+}
+.confirm-dialog h3{margin-top:0}
+.confirm-dialog .buttons{display:flex;gap:10px;margin-top:15px}
+.confirm-dialog button{flex:1;padding:10px}
 </style>
 </head>
 
@@ -160,78 +246,610 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bottom-btn" onclick="openSkills()">✨ Skills</div>
 </div>
 
+<!-- WEAPONS MODAL -->
+<div id="weaponsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>⚔️ Weapons</h2>
+<button class="close-btn" onclick="closeModal('weaponsModal')">✕</button>
+</div>
+<div id="weaponsList" class="item-grid"></div>
+</div>
+</div>
+
+<!-- CHARACTERS MODAL -->
+<div id="charactersModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🧙 Characters</h2>
+<button class="close-btn" onclick="closeModal('charactersModal')">✕</button>
+</div>
+<div id="charactersList" class="item-grid"></div>
+</div>
+</div>
+
+<!-- SKILLS MODAL -->
+<div id="skillsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>✨ Skills</h2>
+<button class="close-btn" onclick="closeModal('skillsModal')">✕</button>
+</div>
+<div id="skillsList"></div>
+</div>
+</div>
+
+<!-- STATS MODAL -->
+<div id="statsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>📊 Statistics</h2>
+<button class="close-btn" onclick="closeModal('statsModal')">✕</button>
+</div>
+<div id="statsList"></div>
+</div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>⚙️ Settings</h2>
+<button class="close-btn" onclick="closeModal('settingsModal')">✕</button>
+</div>
+<div id="settingsList"></div>
+</div>
+</div>
+
+<!-- REFERRAL MODAL -->
+<div id="referralModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>👥 Referrals</h2>
+<button class="close-btn" onclick="closeModal('referralModal')">✕</button>
+</div>
+<div id="referralContent"></div>
+</div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div id="confirmModal" class="modal">
+<div class="confirm-dialog">
+<h3>⚠️ Reset Game?</h3>
+<p>This will delete all progress!</p>
+<div class="buttons">
+<button onclick="closeModal('confirmModal')">Cancel</button>
+<button onclick="confirmReset()" style="background:#ff5252">Reset</button>
+</div>
+</div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-let player={hp:100,max:100,coins:0,gems:0,level:1,weapon:"sword",char:"hero"};
-let zombie={hp:30,max:30};
-
-let weapons={
-sword:{dmg:10},
-axe:{dmg:20},
-gun:{dmg:35}
-};
-
-let characters={
-hero:{icon:"🦸‍♂️"},
-ninja:{icon:"🥷"},
-slayer:{icon:"🧔‍♂️"}
-};
-
-function update(){
-hp.textContent=player.hp;
-hpmax.textContent=player.max;
-hpbar.style.width=(player.hp/player.max*100)+"%";
-zhp.textContent=zombie.hp+"/"+zombie.max;
-zbar.style.width=(zombie.hp/zombie.max*100)+"%";
-playerChar.textContent=characters[player.char].icon;
-coins.textContent=player.coins;
-level.textContent=player.level;
+// Initialize Telegram WebApp
+let tg = window.Telegram?.WebApp;
+if(tg){
+tg.ready();
+tg.expand();
 }
 
+// Game State
+let player = {
+hp: 100,
+max: 100,
+coins: 0,
+gems: 0,
+level: 1,
+weapon: "sword",
+char: "hero",
+name: "Player",
+kills: 0,
+coinsEarned: 0,
+referrals: 0,
+referralCode: "",
+ownedWeapons: ["sword"],
+ownedChars: ["hero"],
+soundEnabled: true
+};
+
+let zombie = {hp: 30, max: 30};
+
+// Skills State
+let skills = {
+damage: {level: 0, max: 5},
+hp: {level: 0, max: 5},
+crit: {level: 0, max: 3}
+};
+
+// Weapons Data
+let weapons = {
+sword: {name: "Basic Sword", dmg: 10, price: 0, icon: "⚔️", desc: "Starter weapon"},
+axe: {name: "Battle Axe", dmg: 20, price: 100, icon: "🪓", desc: "+10 damage"},
+gun: {name: "Power Gun", dmg: 35, price: 300, icon: "🔫", desc: "+25 damage"},
+laser: {name: "Laser Sword", dmg: 50, price: 600, icon: "🗡️", desc: "+40 damage"},
+hammer: {name: "Thunder Hammer", dmg: 75, price: 1000, icon: "🔨", desc: "+65 damage"}
+};
+
+// Characters Data
+let characters = {
+hero: {name: "Hero", icon: "🦸‍♂️", hp: 100, level: 1, price: 0, desc: "Balanced fighter"},
+ninja: {name: "Ninja", icon: "🥷", hp: 80, level: 5, price: 200, desc: "Fast attacks"},
+slayer: {name: "Slayer", icon: "🧔‍♂️", hp: 150, level: 10, price: 500, desc: "High HP tank"},
+wizard: {name: "Wizard", icon: "🧙‍♂️", hp: 90, level: 15, price: 800, desc: "Magic damage"},
+knight: {name: "Knight", icon: "🛡️", hp: 200, level: 20, price: 1200, desc: "Ultimate defense"}
+};
+
+// Load saved data
+function loadGame(){
+let saved = localStorage.getItem("zombieFighterSave");
+if(saved){
+let data = JSON.parse(saved);
+Object.assign(player, data.player);
+Object.assign(skills, data.skills);
+}
+// Get Telegram username
+if(tg && tg.initDataUnsafe?.user){
+player.name = tg.initDataUnsafe.user.first_name || "Player";
+}
+// Generate referral code if not exists
+if(!player.referralCode){
+player.referralCode = "ZF" + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+update();
+}
+
+// Save game
+function saveGame(){
+localStorage.setItem("zombieFighterSave", JSON.stringify({
+player: player,
+skills: skills
+}));
+}
+
+// Update UI
+function update(){
+hp.textContent = player.hp;
+hpmax.textContent = player.max;
+hpbar.style.width = (player.hp / player.max * 100) + "%";
+zhp.textContent = zombie.hp + "/" + zombie.max;
+zbar.style.width = (zombie.hp / zombie.max * 100) + "%";
+playerChar.textContent = characters[player.char].icon;
+coins.textContent = player.coins;
+gems.textContent = player.gems;
+level.textContent = player.level;
+playerName.textContent = player.name;
+saveGame();
+}
+
+// Attack Function
 function attack(){
+if(player.hp <= 0){
+toastMsg("❌ You are dead! Heal first!");
+return;
+}
+
 playerChar.classList.add("attack");
 zombieChar.classList.add("hit");
 
+// Calculate damage
 let dmg = weapons[player.weapon].dmg;
-zombie.hp -= dmg;
-floatText("-"+dmg, zombieChar);
+dmg += skills.damage.level * 5; // Damage skill bonus
 
-if(zombie.hp<=0){
-player.coins+=10;
-player.level++;
-zombie.hp=zombie.max;
-toastMsg("+10💰 Level Up");
+// Critical hit chance
+if(Math.random() < (skills.crit.level * 0.1)){
+dmg *= 2;
+floatText("💥 CRIT -" + dmg, zombieChar);
+} else {
+floatText("-" + dmg, zombieChar);
 }
 
-setTimeout(()=>{
+zombie.hp -= dmg;
+
+if(zombie.hp <= 0){
+player.kills++;
+player.coins += 10;
+player.coinsEarned += 10;
+player.level++;
+zombie.hp = zombie.max + (player.level * 5); // Increase zombie HP
+zombie.max = zombie.hp;
+toastMsg("🎉 +10💰 Level " + player.level);
+}
+
+// Zombie counter attack
+setTimeout(() => {
+let zombieDmg = 5 + Math.floor(player.level / 3);
+player.hp = Math.max(0, player.hp - zombieDmg);
+if(player.hp > 0){
+floatText("-" + zombieDmg, playerChar);
+}
+if(player.hp === 0){
+toastMsg("💀 You died! Watching ad to revive...");
+setTimeout(() => {
+player.hp = player.max;
+update();
+toastMsg("✅ Revived!");
+}, 2000);
+}
+update();
+}, 400);
+
+setTimeout(() => {
 playerChar.classList.remove("attack");
 zombieChar.classList.remove("hit");
-},200);
+}, 200);
 
 update();
 }
 
-function floatText(text,el){
-let d=document.createElement("div");
-d.className="float";
-d.textContent=text;
-el.appendChild(d);
-setTimeout(()=>d.remove(),1000);
+// Floating Damage Text
+function floatText(text, el){
+let d = document.createElement("div");
+d.className = "float";
+d.textContent = text;
+d.style.left = (Math.random() * 30 + 35) + "%";
+d.style.top = "50%";
+el.parentElement.style.position = "relative";
+el.parentElement.appendChild(d);
+setTimeout(() => d.remove(), 1000);
 }
 
-function watchAd(){player.coins+=20;toastMsg("+20💰");update()}
-function daily(){player.coins+=50;toastMsg("+50💰");update()}
-function spin(){toastMsg("Spin later")}
-function openWeapons(){toastMsg("Weapons OK")}
-function openCharacters(){toastMsg("Characters OK")}
-function openSkills(){toastMsg("Skills coming soon")}
-function openStats(){toastMsg("Stats OK")}
-function openSettings(){toastMsg("Settings OK")}
-function openReferral(){toastMsg("Referral OK")}
-function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500)}
+// Toast Notification
+function toastMsg(t){
+toast.textContent = t;
+toast.classList.add("show");
+setTimeout(() => toast.classList.remove("show"), 2000);
+}
 
+// Open/Close Modals
+function openModal(id){
+document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id){
+document.getElementById(id).classList.remove("show");
+}
+
+// WEAPONS PAGE
+function openWeapons(){
+let html = "";
+for(let key in weapons){
+let w = weapons[key];
+let owned = player.ownedWeapons.includes(key);
+let equipped = player.weapon === key;
+let canBuy = player.coins >= w.price;
+
+html += `<div class="item-card ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}">
+${equipped ? '<span class="badge">EQUIPPED</span>' : ''}
+<div class="icon">${w.icon}</div>
+<div class="name">${w.name}</div>
+<div class="desc">${w.desc}</div>
+<div class="desc">💥 Damage: ${w.dmg}</div>`;
+
+if(!owned){
+html += `<div class="price">💰 ${w.price}</div>
+<button onclick="buyWeapon('${key}')" ${!canBuy ? 'disabled' : ''}>
+${canBuy ? 'Buy' : 'Not enough coins'}
+</button>`;
+} else if(!equipped){
+html += `<button onclick="equipWeapon('${key}')">Equip</button>`;
+} else {
+html += `<button style="background:#4caf50" disabled>Equipped</button>`;
+}
+
+html += `</div>`;
+}
+weaponsList.innerHTML = html;
+openModal("weaponsModal");
+}
+
+function buyWeapon(key){
+let w = weapons[key];
+if(player.coins >= w.price && !player.ownedWeapons.includes(key)){
+player.coins -= w.price;
+player.ownedWeapons.push(key);
+toastMsg(`✅ Bought ${w.name}!`);
 update();
+openWeapons(); // Refresh
+}
+}
+
+function equipWeapon(key){
+if(player.ownedWeapons.includes(key)){
+player.weapon = key;
+toastMsg(`⚔️ Equipped ${weapons[key].name}!`);
+update();
+openWeapons(); // Refresh
+}
+}
+
+// CHARACTERS PAGE
+function openCharacters(){
+let html = "";
+for(let key in characters){
+let c = characters[key];
+let owned = player.ownedChars.includes(key);
+let equipped = player.char === key;
+let unlocked = player.level >= c.level;
+let canBuy = player.coins >= c.price && unlocked;
+
+html += `<div class="item-card ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}">
+${equipped ? '<span class="badge">ACTIVE</span>' : ''}
+<div class="icon">${c.icon}</div>
+<div class="name">${c.name}</div>
+<div class="desc">${c.desc}</div>
+<div class="desc">❤️ HP: ${c.hp}</div>`;
+
+if(!owned){
+if(!unlocked){
+html += `<div class="price">🔒 Level ${c.level}</div>
+<button disabled>Locked</button>`;
+} else {
+html += `<div class="price">💰 ${c.price}</div>
+<button onclick="buyCharacter('${key}')" ${!canBuy ? 'disabled' : ''}>
+${canBuy ? 'Buy' : 'Not enough coins'}
+</button>`;
+}
+} else if(!equipped){
+html += `<button onclick="equipCharacter('${key}')">Select</button>`;
+} else {
+html += `<button style="background:#4caf50" disabled>Active</button>`;
+}
+
+html += `</div>`;
+}
+charactersList.innerHTML = html;
+openModal("charactersModal");
+}
+
+function buyCharacter(key){
+let c = characters[key];
+if(player.coins >= c.price && player.level >= c.level && !player.ownedChars.includes(key)){
+player.coins -= c.price;
+player.ownedChars.push(key);
+toastMsg(`✅ Unlocked ${c.name}!`);
+update();
+openCharacters(); // Refresh
+}
+}
+
+function equipCharacter(key){
+if(player.ownedChars.includes(key)){
+player.char = key;
+player.max = characters[key].hp + (skills.hp.level * 20);
+player.hp = Math.min(player.hp, player.max);
+toastMsg(`✅ Selected ${characters[key].name}!`);
+update();
+openCharacters(); // Refresh
+}
+}
+
+// SKILLS PAGE
+function openSkills(){
+let html = `
+<div class="skill-item">
+<div class="skill-header">
+<span class="skill-name">💥 Damage Boost</span>
+<span class="skill-level">Lv ${skills.damage.level}/${skills.damage.max}</span>
+</div>
+<div class="skill-desc">+5 damage per level</div>
+<div class="skill-desc">Cost: ${(skills.damage.level + 1) * 50} 💰</div>
+<button onclick="upgradeSkill('damage')" ${skills.damage.level >= skills.damage.max ? 'disabled' : ''}>
+${skills.damage.level >= skills.damage.max ? 'MAX' : 'Upgrade'}
+</button>
+</div>
+
+<div class="skill-item">
+<div class="skill-header">
+<span class="skill-name">❤️ HP Boost</span>
+<span class="skill-level">Lv ${skills.hp.level}/${skills.hp.max}</span>
+</div>
+<div class="skill-desc">+20 max HP per level</div>
+<div class="skill-desc">Cost: ${(skills.hp.level + 1) * 60} 💰</div>
+<button onclick="upgradeSkill('hp')" ${skills.hp.level >= skills.hp.max ? 'disabled' : ''}>
+${skills.hp.level >= skills.hp.max ? 'MAX' : 'Upgrade'}
+</button>
+</div>
+
+<div class="skill-item">
+<div class="skill-header">
+<span class="skill-name">⚡ Critical Hit</span>
+<span class="skill-level">Lv ${skills.crit.level}/${skills.crit.max}</span>
+</div>
+<div class="skill-desc">+10% crit chance (2x damage)</div>
+<div class="skill-desc">Cost: ${(skills.crit.level + 1) * 100} 💎</div>
+<button onclick="upgradeSkill('crit')" ${skills.crit.level >= skills.crit.max ? 'disabled' : ''}>
+${skills.crit.level >= skills.crit.max ? 'MAX' : 'Upgrade'}
+</button>
+</div>
+`;
+skillsList.innerHTML = html;
+openModal("skillsModal");
+}
+
+function upgradeSkill(type){
+let cost = (skills[type].level + 1) * (type === 'crit' ? 100 : (type === 'hp' ? 60 : 50));
+let currency = type === 'crit' ? 'gems' : 'coins';
+
+if(player[currency] >= cost && skills[type].level < skills[type].max){
+player[currency] -= cost;
+skills[type].level++;
+
+if(type === 'hp'){
+player.max = characters[player.char].hp + (skills.hp.level * 20);
+player.hp = player.max; // Heal on upgrade
+}
+
+toastMsg(`✅ Skill upgraded!`);
+update();
+openSkills(); // Refresh
+}
+}
+
+// STATS PAGE
+function openStats(){
+let html = `
+<div class="stat-row">
+<span class="label">⭐ Level</span>
+<span class="value">${player.level}</span>
+</div>
+<div class="stat-row">
+<span class="label">☠️ Total Kills</span>
+<span class="value">${player.kills}</span>
+</div>
+<div class="stat-row">
+<span class="label">💰 Coins Earned</span>
+<span class="value">${player.coinsEarned}</span>
+</div>
+<div class="stat-row">
+<span class="label">💎 Gems</span>
+<span class="value">${player.gems}</span>
+</div>
+<div class="stat-row">
+<span class="label">⚔️ Weapons Owned</span>
+<span class="value">${player.ownedWeapons.length}/${Object.keys(weapons).length}</span>
+</div>
+<div class="stat-row">
+<span class="label">🧙 Characters Unlocked</span>
+<span class="value">${player.ownedChars.length}/${Object.keys(characters).length}</span>
+</div>
+<div class="stat-row">
+<span class="label">👥 Referrals</span>
+<span class="value">${player.referrals}</span>
+</div>
+`;
+statsList.innerHTML = html;
+openModal("statsModal");
+}
+
+// SETTINGS PAGE
+function openSettings(){
+let html = `
+<div class="setting-item">
+<label>
+<span>👤 Player Name</span>
+</label>
+<input type="text" id="nameInput" value="${player.name}" onchange="changeName(this.value)">
+</div>
+
+<div class="setting-item">
+<label>
+<span>🔊 Sound Effects</span>
+<input type="checkbox" ${player.soundEnabled ? 'checked' : ''} onchange="toggleSound(this.checked)">
+</label>
+</div>
+
+<div class="setting-item">
+<button onclick="showResetConfirm()" style="width:100%;background:#ff5252;padding:12px">
+🗑️ Reset Game Progress
+</button>
+</div>
+`;
+settingsList.innerHTML = html;
+openModal("settingsModal");
+}
+
+function changeName(name){
+if(name.trim()){
+player.name = name.trim();
+update();
+toastMsg("✅ Name updated!");
+}
+}
+
+function toggleSound(enabled){
+player.soundEnabled = enabled;
+saveGame();
+toastMsg(enabled ? "🔊 Sound ON" : "🔇 Sound OFF");
+}
+
+function showResetConfirm(){
+closeModal("settingsModal");
+openModal("confirmModal");
+}
+
+function confirmReset(){
+localStorage.removeItem("zombieFighterSave");
+location.reload();
+}
+
+// REFERRAL PAGE
+function openReferral(){
+let botUsername = "YourBotUsername"; // Change this to your bot username
+let referralLink = `https://t.me/${botUsername}?start=${player.referralCode}`;
+
+let html = `
+<div class="referral-code">
+<div>Your Referral Code</div>
+<div class="code">${player.referralCode}</div>
+<div style="font-size:12px;color:#aaa;margin-top:10px">
+Share with friends to earn rewards!
+</div>
+</div>
+
+<div class="stat-row">
+<span class="label">👥 Total Referrals</span>
+<span class="value">${player.referrals}</span>
+</div>
+
+<div class="stat-row">
+<span class="label">🎁 Reward per Friend</span>
+<span class="value">50 💰 + 5 💎</span>
+</div>
+
+<button onclick="shareReferral('${referralLink}')" style="width:100%;padding:12px;margin-top:15px">
+📤 Share on Telegram
+</button>
+
+<div style="margin-top:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px;color:#aaa">
+💡 How it works:<br>
+1. Share your code with friends<br>
+2. They join using your link<br>
+3. You both get rewards!
+</div>
+`;
+referralContent.innerHTML = html;
+openModal("referralModal");
+}
+
+function shareReferral(link){
+if(tg){
+tg.openTelegramLink(link);
+toastMsg("📤 Opening Telegram...");
+} else {
+navigator.clipboard.writeText(link);
+toastMsg("📋 Link copied to clipboard!");
+}
+}
+
+// Reward Functions
+function watchAd(){
+player.coins += 20;
+player.gems += 2;
+player.coinsEarned += 20;
+toastMsg("📺 +20💰 +2💎");
+update();
+}
+
+function daily(){
+player.coins += 50;
+player.gems += 5;
+player.coinsEarned += 50;
+toastMsg("🎁 Daily Reward: +50💰 +5💎");
+update();
+}
+
+function spin(){
+let rewards = [10, 20, 30, 50, 100];
+let reward = rewards[Math.floor(Math.random() * rewards.length)];
+player.coins += reward;
+player.coinsEarned += reward;
+toastMsg(`🎡 Spin: +${reward}💰`);
+update();
+}
+
+// Initialize Game
+loadGame();
 </script>
 </body>
 </html>
