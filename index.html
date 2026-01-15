@@ -6,14 +6,39 @@
 <title>Zombie Fighter</title>
 
 <style>
-body{margin:0;font-family:Arial;background:linear-gradient(#2b1055,#1a043a);color:#fff}
-.container{max-width:420px;margin:auto;padding:15px;text-align:center}
-.top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+body{
+margin:0;font-family:Arial;color:#fff;overflow:hidden;
+background:linear-gradient(#2b1055,#1a043a);
+}
+
+/* BACKGROUND ANIMATION */
+.bg span{
+position:fixed;
+width:10px;height:10px;
+background:rgba(255,255,255,0.15);
+border-radius:50%;
+animation:float 15s linear infinite;
+}
+@keyframes float{
+from{transform:translateY(110vh)}
+to{transform:translateY(-10vh)}
+}
+
+.container{max-width:420px;margin:auto;padding:15px;text-align:center;position:relative;z-index:5}
+.top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;display:flex;justify-content:space-between}
 .stat{font-weight:bold}
+
 .bar{background:#444;border-radius:8px;overflow:hidden;height:10px}
 .bar div{height:100%}
+
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between}
+#playerChar.attack{animation:attack 0.2s}
+#zombieChar.hit{animation:hit 0.2s}
+
+@keyframes attack{50%{transform:translateX(20px)}}
+@keyframes hit{50%{transform:translateX(-15px)}}
+
 button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
 
 /* SIDE MENUS */
@@ -31,27 +56,42 @@ font-size:20px;cursor:pointer
 .modal{
 position:fixed;top:0;left:0;width:100%;height:100%;
 background:rgba(0,0,0,.75);
-display:none;align-items:center;justify-content:center;
-z-index:200
+display:none;align-items:center;justify-content:center;z-index:200
 }
-.modal-box{
-background:#222;padding:20px;border-radius:12px;
-width:300px;text-align:center
+.modal-box{background:#222;padding:20px;border-radius:12px;width:300px}
+
+/* FLOATING TEXT */
+.float{
+position:absolute;
+color:#ff5252;
+font-weight:bold;
+animation:floatUp 1s forwards;
 }
-.lock{opacity:.4}
+@keyframes floatUp{
+to{transform:translateY(-40px);opacity:0}
+}
 
 /* TOAST */
 #toast{
 position:fixed;bottom:20px;left:50%;
 transform:translateX(-50%);
 background:#000;padding:10px 20px;border-radius:20px;
-opacity:0;transition:.3s
+opacity:0;transition:.3s;z-index:300
 }
 #toast.show{opacity:1}
 </style>
 </head>
 
 <body>
+
+<!-- BACKGROUND PARTICLES -->
+<div class="bg">
+<script>
+for(let i=0;i<40;i++){
+document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.random()*10}s"></span>`);
+}
+</script>
+</div>
 
 <div class="container">
 <div class="top">
@@ -66,7 +106,11 @@ opacity:0;transition:.3s
 </div>
 
 <div class="game">
-<div class="fighters">🦸‍♂️ ⚔️ 🧟</div>
+<div class="fighters">
+<div id="playerChar">🦸‍♂️</div>
+⚔️
+<div id="zombieChar">🧟</div>
+</div>
 <div id="zhp">30/30</div>
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
@@ -74,7 +118,7 @@ opacity:0;transition:.3s
 <button onclick="attack()">⚔️ Attack</button>
 </div>
 
-<!-- LEFT EARNING MENU -->
+<!-- SIDE MENUS -->
 <div class="side-menu left">
 <div class="side-btn" onclick="watchAd()">📺</div>
 <div class="side-btn" onclick="daily()">🎁</div>
@@ -82,51 +126,17 @@ opacity:0;transition:.3s
 <div class="side-btn" onclick="spin()">🎡</div>
 </div>
 
-<!-- RIGHT GAME MENU -->
 <div class="side-menu right">
-<div class="side-btn" onclick="openWeapons()">⚔️</div>
-<div class="side-btn" onclick="openSkills()">✨</div>
-<div class="side-btn" onclick="openCharacters()">🧙</div>
-<div class="side-btn" onclick="openSupport()">🆘</div>
+<div class="side-btn" onclick="openProfile()">👤</div>
+<div class="side-btn" onclick="toggleSound()">🔊</div>
 </div>
 
-<!-- SUPPORT -->
-<div class="modal" id="supportModal">
+<!-- PROFILE -->
+<div class="modal" id="profileModal">
 <div class="modal-box">
-<h3>Support</h3>
-<p>For any issue contact us on Telegram</p>
-<a href="https://t.me/bitcondde" target="_blank" style="color:#00e5ff">@bitcondde</a><br><br>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<!-- WEAPONS -->
-<div class="modal" id="weaponModal">
-<div class="modal-box">
-<h3>Weapons</h3>
-<p>🗡 Sword (Free)</p>
-<p class="lock">🪓 Axe – 200 Coins</p>
-<p class="lock">🔥 Fire Blade – Level 5</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<!-- SKILLS -->
-<div class="modal" id="skillModal">
-<div class="modal-box">
-<h3>Skills</h3>
-<p>⚡ Double Damage</p>
-<p>❤️ Extra HP</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<!-- CHARACTERS -->
-<div class="modal" id="charModal">
-<div class="modal-box">
-<h3>Characters</h3>
-<p>🦸 Default</p>
-<p class="lock">🥷 Ninja – Level 3</p>
+<h3>Profile</h3>
+<input id="nameInput" placeholder="Enter name">
+<button onclick="saveProfile()">Save</button>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -146,11 +156,8 @@ opacity:0;transition:.3s
 <div id="toast"></div>
 
 <script>
-let player={
-name:"Player",hp:100,max:100,
-coins:0,gems:0,level:1,damage:10,
-refCode:"",refCount:0
-};
+let sound=true;
+let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10,refCode:"",refCount:0};
 let zombie={hp:30,max:30};
 let lastAd=0;
 
@@ -159,6 +166,7 @@ let save=localStorage.getItem("zf");
 if(save)player=JSON.parse(save);
 if(!player.refCode)player.refCode="ZF"+Math.random().toString(36).substr(2,5).toUpperCase();
 
+/* UPDATE */
 function update(){
 playerName.textContent=player.name;
 level.textContent=player.level;
@@ -172,57 +180,55 @@ zbar.style.width=(zombie.hp/zombie.max*100)+"%";
 localStorage.setItem("zf",JSON.stringify(player));
 }
 
+/* ATTACK */
 function attack(){
+playerChar.classList.add("attack");
+zombieChar.classList.add("hit");
 zombie.hp-=player.damage;
+floatText("-"+player.damage,zombieChar);
+
 if(zombie.hp<=0){
 player.coins+=10;
-zombie.hp=zombie.max;
+coinSound();
 toastMsg("+10💰");
+zombie.hp=zombie.max;
 }
+setTimeout(()=>{
+playerChar.classList.remove("attack");
+zombieChar.classList.remove("hit");
+},200);
 update();
 }
 
+/* FLOAT DAMAGE */
+function floatText(txt,el){
+let d=document.createElement("div");
+d.className="float";
+d.textContent=txt;
+el.appendChild(d);
+setTimeout(()=>d.remove(),1000);
+}
+
 /* EARNING */
-function watchAd(){
-let now=Date.now();
-if(now-lastAd<30000)return toastMsg("⏳ Wait");
-lastAd=now;player.coins+=20;toastMsg("+20💰");update();
-}
-function daily(){
-let d=localStorage.getItem("daily")||0;
-if(Date.now()-d<86400000)return toastMsg("Tomorrow");
-player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update();
-}
-function spin(){
-if(player.gems<1)return toastMsg("Need 1💎");
-player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];
-player.coins+=r;toastMsg("Won "+r+"💰");update();
-}
+function watchAd(){if(Date.now()-lastAd<30000)return toastMsg("⏳ Wait");lastAd=Date.now();player.coins+=20;toastMsg("+20💰");update();}
+function daily(){let d=localStorage.getItem("daily")||0;if(Date.now()-d<86400000)return toastMsg("Tomorrow");player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update();}
+function spin(){if(player.gems<1)return toastMsg("Need 1💎");player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];player.coins+=r;toastMsg("Won "+r+"💰");update();}
 
 /* REFERRAL */
-function openReferral(){
-refModal.style.display="flex";
-refCode.textContent=player.refCode;
-refLink.value="https://yourgame.site/?ref="+player.refCode;
-refCount.textContent=player.refCount;
-}
-function confirmInvite(){
-player.refCount++;player.coins+=50;
-toastMsg("+50💰 Referral");update();openReferral();
-}
+function openReferral(){refModal.style.display="flex";refCode.textContent=player.refCode;refLink.value="https://yourgame.site/?ref="+player.refCode;refCount.textContent=player.refCount;}
+function confirmInvite(){player.refCount++;player.coins+=50;toastMsg("+50💰 Referral");update();}
 
-/* MODALS */
+/* PROFILE */
+function openProfile(){profileModal.style.display="flex";nameInput.value=player.name}
+function saveProfile(){player.name=nameInput.value||"Player";closeAll();update();}
+
+/* SOUND */
+function toggleSound(){sound=!sound;toastMsg(sound?"🔊 Sound ON":"🔇 Sound OFF")}
+function coinSound(){if(!sound)return;new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play();}
+
+/* UTILS */
 function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
-function openWeapons(){weaponModal.style.display="flex"}
-function openSkills(){skillModal.style.display="flex"}
-function openCharacters(){charModal.style.display="flex"}
-function openSupport(){supportModal.style.display="flex"}
-
-function toastMsg(t){
-toast.textContent=t;
-toast.classList.add("show");
-setTimeout(()=>toast.classList.remove("show"),1500);
-}
+function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500);}
 
 update();
 </script>
