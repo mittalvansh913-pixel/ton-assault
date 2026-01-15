@@ -30,17 +30,45 @@ to{transform:translateY(-10vh)}
 .bar{background:#444;border-radius:8px;overflow:hidden;height:10px;margin-top:5px}
 .bar div{height:100%;transition:width 0.3s}
 
+/* ✨ NEW: XP Bar styling */
+.xp-bar-container{margin:5px 0}
+.xp-bar{background:#444;border-radius:8px;overflow:hidden;height:8px;margin-top:3px}
+.xp-bar div{height:100%;background:linear-gradient(90deg, #ffc107, #ff9800);transition:width 0.5s}
+
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between;align-items:center}
 
 #playerChar.attack{animation:attack .2s}
 #zombieChar.hit{animation:hit .2s}
 
+/* ✨ NEW: Screen shake on crit */
+.game.shake{animation:shake 0.3s}
+@keyframes shake{
+0%, 100%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+75%{transform:translateX(5px)}
+}
+
+/* ✨ NEW: Level up glow effect */
+.game.levelup{animation:levelupGlow 0.8s}
+@keyframes levelupGlow{
+0%, 100%{box-shadow:0 0 0 rgba(255,193,7,0)}
+50%{box-shadow:0 0 30px rgba(255,193,7,0.8)}
+}
+
+/* ✨ NEW: Low HP warning */
+.hp-low{animation:hpWarning 1s infinite}
+@keyframes hpWarning{
+0%, 100%{color:#fff}
+50%{color:#ff5252}
+}
+
 @keyframes attack{50%{transform:translateX(20px)}}
 @keyframes hit{50%{transform:translateX(-15px)}}
 
 button{padding:10px 20px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;background:#1e88e5;color:#fff;font-size:16px}
 button:active{transform:scale(0.95)}
+button:disabled{opacity:0.5;cursor:not-allowed}
 
 /* SIDE MENUS */
 .side-menu{position:fixed;top:30%;display:flex;flex-direction:column;gap:10px;z-index:99}
@@ -134,6 +162,70 @@ font-size:24px;font-weight:bold;letter-spacing:2px;
 color:#ffc107;margin:10px 0;
 }
 
+/* ✨ NEW: SPIN WHEEL STYLES */
+.wheel-container{
+position:relative;
+width:280px;
+height:280px;
+margin:20px auto;
+}
+.wheel{
+width:100%;
+height:100%;
+border-radius:50%;
+position:relative;
+overflow:hidden;
+box-shadow:0 0 20px rgba(255,193,7,0.5);
+transition:transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+.wheel-slice{
+position:absolute;
+width:50%;
+height:50%;
+transform-origin:100% 100%;
+clip-path:polygon(0 0, 100% 0, 100% 100%);
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+font-size:18px;
+}
+.wheel-pointer{
+position:absolute;
+top:-10px;
+left:50%;
+transform:translateX(-50%);
+width:0;
+height:0;
+border-left:15px solid transparent;
+border-right:15px solid transparent;
+border-top:25px solid #ff5252;
+z-index:10;
+}
+.wheel-center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%, -50%);
+width:60px;
+height:60px;
+background:#1a1a2e;
+border-radius:50%;
+border:3px solid #ffc107;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:24px;
+z-index:5;
+}
+.spin-result{
+font-size:20px;
+font-weight:bold;
+color:#ffc107;
+margin-top:15px;
+min-height:30px;
+}
+
 /* FLOAT DAMAGE */
 .float{
 position:absolute;
@@ -207,12 +299,18 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
 </div>
 
-<div>
-❤️ HP <span id="hp">100</span>/<span id="hpmax">100</span>
+<!-- ✨ NEW: XP Progress Bar -->
+<div class="xp-bar-container">
+⚡ XP <span id="xp">0</span>/<span id="xpmax">100</span>
+<div class="xp-bar"><div id="xpbar" style="width:0%;background:linear-gradient(90deg, #ffc107, #ff9800)"></div></div>
+</div>
+
+<div id="hpContainer">
+<span id="hpLabel">❤️ HP</span> <span id="hp">100</span>/<span id="hpmax">100</span>
 <div class="bar"><div id="hpbar" style="width:100%;background:red"></div></div>
 </div>
 
-<div class="game">
+<div class="game" id="gameContainer">
 <div class="fighters">
 <div id="playerChar">🦸‍♂️</div> ⚔️ <div id="zombieChar">🧟</div>
 </div>
@@ -228,7 +326,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="side-btn" onclick="watchAd()">📺</div>
 <div class="side-btn" onclick="daily()">🎁</div>
 <div class="side-btn" onclick="openReferral()">👥</div>
-<div class="side-btn" onclick="spin()">🎡</div>
+<div class="side-btn" onclick="openSpinWheel()">🎡</div>
 </div>
 
 <div class="side-menu right">
@@ -272,7 +370,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="skillsModal" class="modal">
 <div class="modal-box">
 <div class="modal-header">
-<h2>✨ Skills</h2>
+<h2>✨ Skills & Upgrades</h2>
 <button class="close-btn" onclick="closeModal('skillsModal')">✕</button>
 </div>
 <div id="skillsList"></div>
@@ -312,6 +410,25 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 </div>
 </div>
 
+<!-- ✨ NEW: SPIN WHEEL MODAL -->
+<div id="spinModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🎡 Spin the Wheel</h2>
+<button class="close-btn" onclick="closeModal('spinModal')">✕</button>
+</div>
+<div class="wheel-container">
+<div class="wheel-pointer"></div>
+<div class="wheel" id="wheel"></div>
+<div class="wheel-center">🎡</div>
+</div>
+<div class="spin-result" id="spinResult"></div>
+<button id="spinButton" onclick="spinWheel()" style="width:100%;padding:12px;margin-top:10px">
+🎰 SPIN (Free)
+</button>
+</div>
+</div>
+
 <!-- CONFIRM DIALOG -->
 <div id="confirmModal" class="modal">
 <div class="confirm-dialog">
@@ -327,6 +444,82 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="toast"></div>
 
 <script>
+// ✨ NEW: Sound Effects System
+const sounds = {
+attack: null,
+hit: null,
+death: null,
+coin: null,
+levelup: null,
+spin: null
+};
+
+// Initialize sound effects (using data URIs for lightweight sounds)
+function initSounds(){
+// Simple beep sounds using Web Audio API
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+sounds.play = function(type){
+if(!player.soundEnabled) return;
+
+const ctx = audioContext;
+const oscillator = ctx.createOscillator();
+const gainNode = ctx.createGain();
+
+oscillator.connect(gainNode);
+gainNode.connect(ctx.destination);
+
+switch(type){
+case 'attack':
+oscillator.frequency.value = 300;
+gainNode.gain.value = 0.1;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.1);
+break;
+case 'hit':
+oscillator.frequency.value = 150;
+gainNode.gain.value = 0.15;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.15);
+break;
+case 'death':
+oscillator.frequency.value = 100;
+gainNode.gain.value = 0.2;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.3);
+break;
+case 'coin':
+oscillator.frequency.value = 800;
+gainNode.gain.value = 0.08;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.1);
+break;
+case 'levelup':
+oscillator.frequency.value = 600;
+gainNode.gain.value = 0.12;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.2);
+setTimeout(() => {
+const osc2 = ctx.createOscillator();
+const gain2 = ctx.createGain();
+osc2.connect(gain2);
+gain2.connect(ctx.destination);
+osc2.frequency.value = 800;
+gain2.gain.value = 0.12;
+osc2.start();
+osc2.stop(ctx.currentTime + 0.2);
+}, 100);
+break;
+case 'spin':
+oscillator.frequency.value = 400;
+gainNode.gain.value = 0.1;
+oscillator.start();
+oscillator.stop(ctx.currentTime + 0.05);
+break;
+}
+};
+}
+
 // Initialize Telegram WebApp
 let tg = window.Telegram?.WebApp;
 if(tg){
@@ -334,13 +527,17 @@ tg.ready();
 tg.expand();
 }
 
-// Game State
+// ✨ MODIFIED: Game State with XP system and HP upgrades
 let player = {
 hp: 100,
 max: 100,
+baseMax: 100, // ✨ NEW: Base max HP before upgrades
+hpUpgrades: 0, // ✨ NEW: Number of HP upgrades purchased
 coins: 0,
 gems: 0,
 level: 1,
+xp: 0, // ✨ NEW: Current XP
+xpMax: 100, // ✨ NEW: XP needed for next level
 weapon: "sword",
 char: "hero",
 name: "Player",
@@ -380,6 +577,11 @@ wizard: {name: "Wizard", icon: "🧙‍♂️", hp: 90, level: 15, price: 800, d
 knight: {name: "Knight", icon: "🛡️", hp: 200, level: 20, price: 1200, desc: "Ultimate defense"}
 };
 
+// ✨ NEW: Spin wheel prizes
+const wheelPrizes = [100, 50, 20, 10, 50, 0, 30, 20];
+const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336', '#00bcd4', '#8bc34a'];
+let isSpinning = false;
+
 // Load saved data
 function loadGame(){
 let saved = localStorage.getItem("zombieFighterSave");
@@ -387,6 +589,11 @@ if(saved){
 let data = JSON.parse(saved);
 Object.assign(player, data.player);
 Object.assign(skills, data.skills);
+// ✨ NEW: Ensure new properties exist
+if(!player.xp) player.xp = 0;
+if(!player.xpMax) player.xpMax = 100;
+if(!player.baseMax) player.baseMax = 100;
+if(!player.hpUpgrades) player.hpUpgrades = 0;
 }
 // Get Telegram username
 if(tg && tg.initDataUnsafe?.user){
@@ -407,11 +614,24 @@ skills: skills
 }));
 }
 
-// Update UI
+// ✨ MODIFIED: Update UI with XP bar and low HP warning
 function update(){
 hp.textContent = player.hp;
 hpmax.textContent = player.max;
 hpbar.style.width = (player.hp / player.max * 100) + "%";
+
+// ✨ NEW: XP bar update
+xp.textContent = player.xp;
+xpmax.textContent = player.xpMax;
+xpbar.style.width = (player.xp / player.xpMax * 100) + "%";
+
+// ✨ NEW: Low HP warning
+if(player.hp < player.max * 0.25){
+hpLabel.classList.add('hp-low');
+} else {
+hpLabel.classList.remove('hp-low');
+}
+
 zhp.textContent = zombie.hp + "/" + zombie.max;
 zbar.style.width = (zombie.hp / zombie.max * 100) + "%";
 playerChar.textContent = characters[player.char].icon;
@@ -422,7 +642,7 @@ playerName.textContent = player.name;
 saveGame();
 }
 
-// Attack Function
+// ✨ MODIFIED: Attack Function with improved progression and sound
 function attack(){
 if(player.hp <= 0){
 toastMsg("❌ You are dead! Heal first!");
@@ -431,29 +651,57 @@ return;
 
 playerChar.classList.add("attack");
 zombieChar.classList.add("hit");
+sounds.play('attack');
 
 // Calculate damage
 let dmg = weapons[player.weapon].dmg;
-dmg += skills.damage.level * 5; // Damage skill bonus
+dmg += skills.damage.level * 5;
 
 // Critical hit chance
-if(Math.random() < (skills.crit.level * 0.1)){
+let isCrit = Math.random() < (skills.crit.level * 0.1);
+if(isCrit){
 dmg *= 2;
 floatText("💥 CRIT -" + dmg, zombieChar);
+sounds.play('hit');
+// ✨ NEW: Screen shake on crit
+gameContainer.classList.add('shake');
+setTimeout(() => gameContainer.classList.remove('shake'), 300);
 } else {
 floatText("-" + dmg, zombieChar);
+sounds.play('hit');
 }
 
 zombie.hp -= dmg;
 
 if(zombie.hp <= 0){
 player.kills++;
+
+// ✨ NEW: XP-based leveling system
+let xpGain = 20 + Math.floor(player.level * 2); // XP scales with level
+player.xp += xpGain;
 player.coins += 10;
 player.coinsEarned += 10;
+sounds.play('coin');
+
+// Check for level up
+if(player.xp >= player.xpMax){
+player.xp -= player.xpMax;
 player.level++;
-zombie.hp = zombie.max + (player.level * 5); // Increase zombie HP
+// ✨ NEW: XP requirement increases gradually
+player.xpMax = Math.floor(100 + (player.level * 15));
+sounds.play('levelup');
+toastMsg("🎉 LEVEL UP! Level " + player.level);
+// ✨ NEW: Level up visual effect
+gameContainer.classList.add('levelup');
+setTimeout(() => gameContainer.classList.remove('levelup'), 800);
+} else {
+toastMsg(`+${xpGain}⚡ +10💰`);
+}
+
+sounds.play('death');
+// ✨ NEW: Zombie difficulty scales more gradually
+zombie.hp = zombie.max + Math.floor(player.level * 3);
 zombie.max = zombie.hp;
-toastMsg("🎉 +10💰 Level " + player.level);
 }
 
 // Zombie counter attack
@@ -548,9 +796,10 @@ let w = weapons[key];
 if(player.coins >= w.price && !player.ownedWeapons.includes(key)){
 player.coins -= w.price;
 player.ownedWeapons.push(key);
+sounds.play('coin');
 toastMsg(`✅ Bought ${w.name}!`);
 update();
-openWeapons(); // Refresh
+openWeapons();
 }
 }
 
@@ -559,7 +808,7 @@ if(player.ownedWeapons.includes(key)){
 player.weapon = key;
 toastMsg(`⚔️ Equipped ${weapons[key].name}!`);
 update();
-openWeapons(); // Refresh
+openWeapons();
 }
 }
 
@@ -607,26 +856,45 @@ let c = characters[key];
 if(player.coins >= c.price && player.level >= c.level && !player.ownedChars.includes(key)){
 player.coins -= c.price;
 player.ownedChars.push(key);
+sounds.play('coin');
 toastMsg(`✅ Unlocked ${c.name}!`);
 update();
-openCharacters(); // Refresh
+openCharacters();
 }
 }
 
 function equipCharacter(key){
 if(player.ownedChars.includes(key)){
 player.char = key;
-player.max = characters[key].hp + (skills.hp.level * 20);
+recalculateMaxHP();
 player.hp = Math.min(player.hp, player.max);
 toastMsg(`✅ Selected ${characters[key].name}!`);
 update();
-openCharacters(); // Refresh
+openCharacters();
 }
 }
 
-// SKILLS PAGE
+// ✨ NEW: Calculate max HP based on character, upgrades, and skills
+function recalculateMaxHP(){
+player.baseMax = characters[player.char].hp;
+player.max = player.baseMax + (player.hpUpgrades * 20) + (skills.hp.level * 20);
+}
+
+// ✨ MODIFIED: Skills page with HP upgrade option
 function openSkills(){
+let hpUpgradeCost = (player.hpUpgrades + 1) * 80;
 let html = `
+<!-- ✨ NEW: HP Upgrade Section -->
+<div class="skill-item" style="border-color:#ff5252">
+<div class="skill-header">
+<span class="skill-name">❤️ HP Upgrade</span>
+<span class="skill-level">+${player.hpUpgrades * 20} HP</span>
+</div>
+<div class="skill-desc">Permanently increase Max HP by 20</div>
+<div class="skill-desc">Cost: ${hpUpgradeCost} 💰</div>
+<button onclick="upgradeHP()">Upgrade Max HP</button>
+</div>
+
 <div class="skill-item">
 <div class="skill-header">
 <span class="skill-name">💥 Damage Boost</span>
@@ -667,6 +935,23 @@ skillsList.innerHTML = html;
 openModal("skillsModal");
 }
 
+// ✨ NEW: HP Upgrade Function
+function upgradeHP(){
+let cost = (player.hpUpgrades + 1) * 80;
+if(player.coins >= cost){
+player.coins -= cost;
+player.hpUpgrades++;
+recalculateMaxHP();
+player.hp = player.max; // Full heal on upgrade
+sounds.play('levelup');
+toastMsg(`✅ Max HP increased to ${player.max}!`);
+update();
+openSkills();
+} else {
+toastMsg("❌ Not enough coins!");
+}
+}
+
 function upgradeSkill(type){
 let cost = (skills[type].level + 1) * (type === 'crit' ? 100 : (type === 'hp' ? 60 : 50));
 let currency = type === 'crit' ? 'gems' : 'coins';
@@ -676,13 +961,14 @@ player[currency] -= cost;
 skills[type].level++;
 
 if(type === 'hp'){
-player.max = characters[player.char].hp + (skills.hp.level * 20);
-player.hp = player.max; // Heal on upgrade
+recalculateMaxHP();
+player.hp = player.max;
 }
 
+sounds.play('levelup');
 toastMsg(`✅ Skill upgraded!`);
 update();
-openSkills(); // Refresh
+openSkills();
 }
 }
 
@@ -692,6 +978,10 @@ let html = `
 <div class="stat-row">
 <span class="label">⭐ Level</span>
 <span class="value">${player.level}</span>
+</div>
+<div class="stat-row">
+<span class="label">⚡ XP Progress</span>
+<span class="value">${player.xp}/${player.xpMax}</span>
 </div>
 <div class="stat-row">
 <span class="label">☠️ Total Kills</span>
@@ -775,7 +1065,7 @@ location.reload();
 
 // REFERRAL PAGE
 function openReferral(){
-let botUsername = "YourBotUsername"; // Change this to your bot username
+let botUsername = "YourBotUsername";
 let referralLink = `https://t.me/${botUsername}?start=${player.referralCode}`;
 
 let html = `
@@ -822,11 +1112,80 @@ toastMsg("📋 Link copied to clipboard!");
 }
 }
 
+// ✨ NEW: Initialize and open spin wheel
+function openSpinWheel(){
+initWheel();
+openModal("spinModal");
+}
+
+function initWheel(){
+let wheel = document.getElementById('wheel');
+wheel.innerHTML = '';
+
+const sliceAngle = 360 / wheelPrizes.length;
+wheelPrizes.forEach((prize, i) => {
+let slice = document.createElement('div');
+slice.className = 'wheel-slice';
+slice.style.background = wheelColors[i];
+slice.style.transform = `rotate(${i * sliceAngle}deg)`;
+slice.innerHTML = `<span style="transform:rotate(22.5deg);display:inline-block">${prize === 0 ? '😅' : prize + '💰'}</span>`;
+wheel.appendChild(slice);
+});
+}
+
+// ✨ NEW: Spin wheel animation
+function spinWheel(){
+if(isSpinning) return;
+isSpinning = true;
+
+let wheel = document.getElementById('wheel');
+let button = document.getElementById('spinButton');
+let result = document.getElementById('spinResult');
+button.disabled = true;
+result.textContent = '';
+sounds.play('spin');
+
+// Random final position
+let extraSpins = 5 + Math.floor(Math.random() * 3);
+let randomSlice = Math.floor(Math.random() * wheelPrizes.length);
+let sliceAngle = 360 / wheelPrizes.length;
+let finalRotation = (extraSpins * 360) + (randomSlice * sliceAngle) + (sliceAngle / 2);
+
+wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+// Play tick sounds during spin
+let tickInterval = setInterval(() => {
+sounds.play('spin');
+}, 100);
+
+setTimeout(() => {
+clearInterval(tickInterval);
+let prizeIndex = (wheelPrizes.length - randomSlice) % wheelPrizes.length;
+let prize = wheelPrizes[prizeIndex];
+
+if(prize > 0){
+player.coins += prize;
+player.coinsEarned += prize;
+sounds.play('coin');
+result.textContent = `🎉 You won ${prize} coins!`;
+toastMsg(`🎡 +${prize}💰`);
+} else {
+result.textContent = `😅 Better luck next time!`;
+toastMsg(`🎡 No prize this time`);
+}
+
+update();
+isSpinning = false;
+button.disabled = false;
+}, 3000);
+}
+
 // Reward Functions
 function watchAd(){
 player.coins += 20;
 player.gems += 2;
 player.coinsEarned += 20;
+sounds.play('coin');
 toastMsg("📺 +20💰 +2💎");
 update();
 }
@@ -835,20 +1194,13 @@ function daily(){
 player.coins += 50;
 player.gems += 5;
 player.coinsEarned += 50;
+sounds.play('coin');
 toastMsg("🎁 Daily Reward: +50💰 +5💎");
 update();
 }
 
-function spin(){
-let rewards = [10, 20, 30, 50, 100];
-let reward = rewards[Math.floor(Math.random() * rewards.length)];
-player.coins += reward;
-player.coinsEarned += reward;
-toastMsg(`🎡 Spin: +${reward}💰`);
-update();
-}
-
 // Initialize Game
+initSounds();
 loadGame();
 </script>
 </body>
