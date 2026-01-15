@@ -118,7 +118,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button onclick="attack()">⚔️ Attack</button>
 </div>
 
-<!-- SIDE MENUS -->
+<!-- LEFT MENU -->
 <div class="side-menu left">
 <div class="side-btn" onclick="watchAd()">📺</div>
 <div class="side-btn" onclick="daily()">🎁</div>
@@ -126,17 +126,25 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="side-btn" onclick="spin()">🎡</div>
 </div>
 
+<!-- RIGHT MENU (ONLY SETTINGS) -->
 <div class="side-menu right">
-<div class="side-btn" onclick="openProfile()">👤</div>
-<div class="side-btn" onclick="toggleSound()">🔊</div>
+<div class="side-btn" onclick="openSettings()">⚙️</div>
 </div>
 
-<!-- PROFILE -->
-<div class="modal" id="profileModal">
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
 <div class="modal-box">
-<h3>Profile</h3>
+<h3>⚙️ Settings</h3>
+
+<p><b>Username</b></p>
 <input id="nameInput" placeholder="Enter name">
-<button onclick="saveProfile()">Save</button>
+
+<p style="margin-top:10px">
+<button onclick="toggleSound()">🔊 Toggle Sound</button>
+</p>
+
+<br>
+<button onclick="saveSettings()">Save</button>
 <button onclick="closeAll()">Close</button>
 </div>
 </div>
@@ -215,20 +223,50 @@ function daily(){let d=localStorage.getItem("daily")||0;if(Date.now()-d<86400000
 function spin(){if(player.gems<1)return toastMsg("Need 1💎");player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];player.coins+=r;toastMsg("Won "+r+"💰");update();}
 
 /* REFERRAL */
-function openReferral(){refModal.style.display="flex";refCode.textContent=player.refCode;refLink.value="https://yourgame.site/?ref="+player.refCode;refCount.textContent=player.refCount;}
-function confirmInvite(){player.refCount++;player.coins+=50;toastMsg("+50💰 Referral");update();}
+function openReferral(){
+refModal.style.display="flex";
+refCode.textContent=player.refCode;
+refLink.value="https://yourgame.site/?ref="+player.refCode;
+refCount.textContent=player.refCount;
+}
+function confirmInvite(){
+player.refCount++;
+player.coins+=50;
+toastMsg("+50💰 Referral");
+update();
+}
 
-/* PROFILE */
-function openProfile(){profileModal.style.display="flex";nameInput.value=player.name}
-function saveProfile(){player.name=nameInput.value||"Player";closeAll();update();}
+/* SETTINGS */
+function openSettings(){
+settingsModal.style.display="flex";
+nameInput.value=player.name;
+}
+function saveSettings(){
+player.name=nameInput.value||"Player";
+toastMsg("⚙️ Settings Saved");
+closeAll();
+update();
+}
 
 /* SOUND */
-function toggleSound(){sound=!sound;toastMsg(sound?"🔊 Sound ON":"🔇 Sound OFF")}
-function coinSound(){if(!sound)return;new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play();}
+function toggleSound(){
+sound=!sound;
+toastMsg(sound?"🔊 Sound ON":"🔇 Sound OFF");
+}
+function coinSound(){
+if(!sound)return;
+new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play();
+}
 
 /* UTILS */
-function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
-function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500);}
+function closeAll(){
+document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+}
+function toastMsg(t){
+toast.textContent=t;
+toast.classList.add("show");
+setTimeout(()=>toast.classList.remove("show"),1500);
+}
 
 update();
 </script>
