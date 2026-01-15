@@ -1,249 +1,218 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zombie Fighter</title>
-
-<style>
-body{
-margin:0;font-family:Arial;color:#fff;overflow:hidden;
-background:linear-gradient(#2b1055,#1a043a);
-}
-
-/* BACKGROUND */
-.bg span{
-position:fixed;width:10px;height:10px;
-background:rgba(255,255,255,0.15);
-border-radius:50%;
-animation:float 15s linear infinite;
-}
-@keyframes float{
-from{transform:translateY(110vh)}
-to{transform:translateY(-10vh)}
-}
-
-.container{max-width:420px;margin:auto;padding:15px;text-align:center;position:relative;z-index:5}
-.top{background:rgba(0,0,0,.4);border-radius:12px;padding:12px;display:flex;justify-content:space-between}
-.stat{font-weight:bold}
-
-.bar{background:#444;border-radius:8px;overflow:hidden;height:10px}
-.bar div{height:100%}
-
-.game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
-.fighters{font-size:48px;display:flex;justify-content:space-between}
-#playerChar.attack{animation:attack .2s}
-#zombieChar.hit{animation:hit .2s}
-@keyframes attack{50%{transform:translateX(20px)}}
-@keyframes hit{50%{transform:translateX(-15px)}}
-
-button{padding:10px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
-
-/* SIDE MENUS */
-.side-menu{position:fixed;top:30%;display:flex;flex-direction:column;gap:10px;z-index:99}
-.side-menu.left{left:10px}
-.side-menu.right{right:10px}
-.side-btn{
-width:50px;height:50px;border-radius:50%;
-background:#1e88e5;color:#fff;
-display:flex;align-items:center;justify-content:center;
-font-size:20px;cursor:pointer
-}
-
-/* MODALS */
-.modal{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.75);
-display:none;align-items:center;justify-content:center;z-index:200
-}
-.modal-box{background:#222;padding:20px;border-radius:12px;width:300px}
-
-/* FLOAT */
-.float{position:absolute;color:#ff5252;font-weight:bold;animation:floatUp 1s forwards}
-@keyframes floatUp{to{transform:translateY(-40px);opacity:0}}
-
-/* TOAST */
-#toast{
-position:fixed;bottom:20px;left:50%;
-transform:translateX(-50%);
-background:#000;padding:10px 20px;border-radius:20px;
-opacity:0;transition:.3s;z-index:300
-}
-#toast.show{opacity:1}
-</style>
-</head>
-
-<body>
-
-<div class="bg">
-<script>
-for(let i=0;i<40;i++){
-document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.random()*10}s"></span>`);
-}
-</script>
-</div>
-
-<div class="container">
-<div class="top">
-<div class="stat">👤 <span id="playerName">Player</span></div>
-<div class="stat">⭐ <span id="level">1</span></div>
-<div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
-</div>
-
-<div>
-❤️ HP <span id="hp">100</span>/<span id="hpmax">100</span>
-<div class="bar"><div id="hpbar" style="width:100%;background:red"></div></div>
-</div>
-
-<div class="game">
-<div class="fighters">
-<div id="playerChar">🦸‍♂️</div> ⚔️ <div id="zombieChar">🧟</div>
-</div>
-<div id="zhp">30/30</div>
-<div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
-</div>
-
-<button onclick="attack()">⚔️ Attack</button>
-</div>
-
-<!-- LEFT MENU -->
-<div class="side-menu left">
-<div class="side-btn" onclick="watchAd()">📺</div>
-<div class="side-btn" onclick="daily()">🎁</div>
-<div class="side-btn" onclick="openReferral()">👥</div>
-<div class="side-btn" onclick="spin()">🎡</div>
-</div>
-
-<!-- RIGHT MENU -->
-<div class="side-menu right">
-<div class="side-btn" onclick="openWeapons()">⚔️</div>
-<div class="side-btn" onclick="openSkills()">✨</div>
-<div class="side-btn" onclick="openCharacters()">🧙</div>
-<div class="side-btn" onclick="openStats()">📊</div>
-<div class="side-btn" onclick="openSettings()">⚙️</div>
-</div>
-
-<!-- MODALS -->
-<div class="modal" id="settingsModal">
-<div class="modal-box">
-<h3>⚙️ Settings</h3>
-<input id="nameInput" placeholder="Username">
-<button onclick="toggleSound()">🔊 Toggle Sound</button><br><br>
-<button onclick="saveSettings()">Save</button>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="weaponModal">
-<div class="modal-box">
-<h3>⚔️ Weapons</h3>
-<p>🗡 Sword (Active)</p>
-<p style="opacity:.5">🪓 Axe – 200💰</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="skillModal">
-<div class="modal-box">
-<h3>✨ Skills</h3>
-<p>⚡ Double Damage</p>
-<p>❤️ Extra HP</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="charModal">
-<div class="modal-box">
-<h3>🧙 Characters</h3>
-<p>🦸 Hero</p>
-<p style="opacity:.5">🥷 Ninja – Lvl 3</p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="statsModal">
-<div class="modal-box">
-<h3>📊 Stats</h3>
-<p>Level: <span id="sLevel"></span></p>
-<p>Coins: <span id="sCoins"></span></p>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div class="modal" id="refModal">
-<div class="modal-box">
-<h3>Referral</h3>
-<p id="refCode"></p>
-<input id="refLink" readonly>
-<p>Invites: <span id="refCount">0</span></p>
-<button onclick="confirmInvite()">Confirm</button>
-<button onclick="closeAll()">Close</button>
-</div>
-</div>
-
-<div id="toast"></div>
-
 <script>
 let sound=true;
-let player={name:"Player",hp:100,max:100,coins:0,gems:0,level:1,damage:10,refCode:"",refCount:0};
-let zombie={hp:30,max:30};
+
+let player={
+  name:"Player",
+  hp:100,max:100,
+  coins:0,gems:0,
+  level:1,exp:0,
+  damage:10,
+  energy:10,
+  weapon:"sword",
+  skill:false,
+  character:"hero",
+  kills:0,
+  refCode:"",
+  refCount:0
+};
+
+let zombie={
+  hp:30,max:30,
+  damage:5,
+  boss:false
+};
+
 let lastAd=0;
 
+/* LOAD */
 let save=localStorage.getItem("zf");
-if(save)player=JSON.parse(save);
-if(!player.refCode)player.refCode="ZF"+Math.random().toString(36).substr(2,5).toUpperCase();
+if(save) player=JSON.parse(save);
+if(!player.refCode) player.refCode="ZF"+Math.random().toString(36).substr(2,5).toUpperCase();
 
+/* UPDATE UI */
 function update(){
-playerName.textContent=player.name;
-level.textContent=player.level;
-coins.textContent=player.coins;
-gems.textContent=player.gems;
-hp.textContent=player.hp;
-hpmax.textContent=player.max;
-hpbar.style.width=(player.hp/player.max*100)+"%";
-zhp.textContent=zombie.hp+"/"+zombie.max;
-zbar.style.width=(zombie.hp/zombie.max*100)+"%";
-localStorage.setItem("zf",JSON.stringify(player));
+  playerName.textContent=player.name;
+  level.textContent=player.level;
+  coins.textContent=player.coins;
+  gems.textContent=player.gems;
+  hp.textContent=player.hp;
+  hpmax.textContent=player.max;
+  hpbar.style.width=(player.hp/player.max*100)+"%";
+  zhp.textContent=zombie.hp+"/"+zombie.max;
+  zbar.style.width=(zombie.hp/zombie.max*100)+"%";
+  localStorage.setItem("zf",JSON.stringify(player));
 }
 
+/* SPAWN ZOMBIE */
+function spawnZombie(){
+  zombie.boss = player.kills>0 && player.kills%5===0;
+  zombie.max = zombie.boss ? 150+player.level*20 : 30+player.level*10;
+  zombie.hp = zombie.max;
+  zombieChar.textContent = zombie.boss ? "👹" : "🧟";
+  if(zombie.boss) toastMsg("👹 BOSS ZOMBIE!");
+}
+
+/* ATTACK */
 function attack(){
-playerChar.classList.add("attack");
-zombieChar.classList.add("hit");
-zombie.hp-=player.damage;
-floatText("-"+player.damage,zombieChar);
-if(zombie.hp<=0){
-player.coins+=10;
-coinSound();
-toastMsg("+10💰");
-zombie.hp=zombie.max;
+  if(player.energy<=0) return toastMsg("⚡ No Energy");
+
+  player.energy--;
+  playerChar.classList.add("attack");
+  zombieChar.classList.add("hit");
+
+  let dmg = player.damage;
+  let crit = player.skill && Math.random()<0.25;
+  if(crit) dmg*=2;
+
+  zombie.hp -= dmg;
+  floatText((crit?"⚡ ":"-")+dmg,zombieChar);
+
+  if(zombie.hp<=0){
+    player.kills++;
+    player.coins += zombie.boss ? 50 : 10;
+    player.exp += 20;
+    levelCheck();
+    coinSound();
+    toastMsg(zombie.boss?"+50💰 Boss":"+10💰");
+    spawnZombie();
+  }
+
+  setTimeout(()=>{
+    playerChar.classList.remove("attack");
+    zombieChar.classList.remove("hit");
+  },200);
+
+  update();
 }
-setTimeout(()=>{playerChar.classList.remove("attack");zombieChar.classList.remove("hit")},200);
-update();
+
+/* LEVEL UP */
+function levelCheck(){
+  if(player.exp>=player.level*100){
+    player.exp=0;
+    player.level++;
+    player.max+=20;
+    player.hp=player.max;
+    player.damage+=2;
+    toastMsg("⭐ LEVEL UP!");
+  }
 }
 
-function floatText(t,e){let d=document.createElement("div");d.className="float";d.textContent=t;e.appendChild(d);setTimeout(()=>d.remove(),1000)}
+/* ENERGY REGEN */
+setInterval(()=>{
+  if(player.energy<10) player.energy++;
+},4000);
 
-function watchAd(){if(Date.now()-lastAd<30000)return toastMsg("⏳ Wait");lastAd=Date.now();player.coins+=20;toastMsg("+20💰");update()}
-function daily(){let d=localStorage.getItem("daily")||0;if(Date.now()-d<86400000)return toastMsg("Tomorrow");player.coins+=50;localStorage.setItem("daily",Date.now());toastMsg("+50💰");update()}
-function spin(){if(player.gems<1)return toastMsg("Need 1💎");player.gems--;let r=[10,20,50,0][Math.floor(Math.random()*4)];player.coins+=r;toastMsg("Won "+r+"💰");update()}
+/* WEAPONS */
+function equipWeapon(type){
+  if(type==="axe"){
+    if(player.coins<200) return toastMsg("Need 200💰");
+    player.coins-=200;
+    player.weapon="axe";
+    player.damage=15;
+    toastMsg("🪓 Axe Equipped");
+  }
+  update();
+}
 
-function openReferral(){refModal.style.display="flex";refCode.textContent=player.refCode;refLink.value="https://yourgame.site/?ref="+player.refCode;refCount.textContent=player.refCount}
-function confirmInvite(){player.refCount++;player.coins+=50;toastMsg("+50💰");update()}
+/* SKILLS */
+function unlockSkill(){
+  if(player.coins<300) return toastMsg("Need 300💰");
+  player.coins-=300;
+  player.skill=true;
+  toastMsg("✨ Skill Activated");
+  update();
+}
 
-function openSettings(){settingsModal.style.display="flex";nameInput.value=player.name}
-function saveSettings(){player.name=nameInput.value||"Player";toastMsg("Saved");closeAll();update()}
-function toggleSound(){sound=!sound;toastMsg(sound?"Sound ON":"Sound OFF")}
-function coinSound(){if(sound)new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play()}
+/* CHARACTERS */
+function selectCharacter(c){
+  player.character=c;
+  if(c==="ninja"){
+    player.damage+=3;
+    player.max-=10;
+  }
+  toastMsg("🧙 Character Selected");
+  update();
+}
 
-function openWeapons(){weaponModal.style.display="flex"}
-function openSkills(){skillModal.style.display="flex"}
-function openCharacters(){charModal.style.display="flex"}
-function openStats(){statsModal.style.display="flex";sLevel.textContent=player.level;sCoins.textContent=player.coins}
+/* FLOAT TEXT */
+function floatText(txt,el){
+  let d=document.createElement("div");
+  d.className="float";
+  d.textContent=txt;
+  el.appendChild(d);
+  setTimeout(()=>d.remove(),1000);
+}
 
-function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
-function toastMsg(t){toast.textContent=t;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),1500)}
+/* EARNING */
+function watchAd(){
+  if(Date.now()-lastAd<30000) return toastMsg("⏳ Wait");
+  lastAd=Date.now();
+  player.coins+=20;
+  toastMsg("+20💰");
+  update();
+}
+function daily(){
+  let d=localStorage.getItem("daily")||0;
+  if(Date.now()-d<86400000) return toastMsg("Tomorrow");
+  player.coins+=50;
+  localStorage.setItem("daily",Date.now());
+  toastMsg("+50💰");
+  update();
+}
+function spin(){
+  if(player.gems<1) return toastMsg("Need 1💎");
+  player.gems--;
+  let r=[10,20,50,0][Math.floor(Math.random()*4)];
+  player.coins+=r;
+  toastMsg("Won "+r+"💰");
+  update();
+}
 
+/* REFERRAL */
+function openReferral(){
+  refModal.style.display="flex";
+  refCode.textContent=player.refCode;
+  refLink.value="https://yourgame.site/?ref="+player.refCode;
+  refCount.textContent=player.refCount;
+}
+function confirmInvite(){
+  player.refCount++;
+  player.coins+=50;
+  toastMsg("+50💰 Referral");
+  update();
+}
+
+/* SETTINGS */
+function openSettings(){
+  settingsModal.style.display="flex";
+  nameInput.value=player.name;
+}
+function saveSettings(){
+  player.name=nameInput.value||"Player";
+  toastMsg("Settings Saved");
+  closeAll();
+  update();
+}
+function toggleSound(){
+  sound=!sound;
+  toastMsg(sound?"🔊 Sound ON":"🔇 Sound OFF");
+}
+function coinSound(){
+  if(!sound) return;
+  new Audio("https://assets.mixkit.co/sfx/preview/mixkit-coin-win-notification-1992.mp3").play();
+}
+
+/* UTILS */
+function closeAll(){
+  document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+}
+function toastMsg(t){
+  toast.textContent=t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1500);
+}
+
+/* INIT */
+spawnZombie();
 update();
 </script>
-</body>
-</html>
