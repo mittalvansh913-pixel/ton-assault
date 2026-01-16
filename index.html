@@ -50,6 +50,44 @@ to{transform:translateY(-10vh)}
 animation: energyRegen 1s infinite;
 }
 
+/* ✨ NEW: Modal animations */
+.modal{
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.85);
+display:none;align-items:center;justify-content:center;z-index:200;
+overflow-y:auto;padding:20px;box-sizing:border-box;
+opacity:0;
+transition:opacity 0.3s ease;
+}
+.modal.show{
+display:flex;
+opacity:1;
+}
+.modal-box{
+background:#1a1a2e;padding:20px;border-radius:12px;width:100%;max-width:380px;
+max-height:90vh;overflow-y:auto;
+transform:translateY(20px);
+transition:transform 0.3s ease;
+}
+.modal.show .modal-box{
+transform:translateY(0);
+}
+
+/* ✨ NEW: Button click protection */
+.button-protected{
+position:relative;
+}
+.button-protected:after{
+content:'';
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:transparent;
+border-radius:10px;
+}
+
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between;align-items:center}
 
@@ -69,6 +107,97 @@ justify-content:center;
 width:60px;
 height:60px;
 object-fit:contain;
+}
+
+/* ✨ NEW: Skin preview styling */
+.skin-preview{
+width:60px;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:36px;
+margin:0 auto 10px;
+border-radius:10px;
+border:2px solid #444;
+background:rgba(255,255,255,0.05);
+}
+.skin-preview.active{
+border-color:#ffc107;
+background:rgba(255,193,7,0.1);
+}
+.skin-preview.owned{
+border-color:#4caf50;
+}
+.skin-preview img{
+width:50px;
+height:50px;
+object-fit:contain;
+}
+
+/* ✨ NEW: Shop tabs */
+.shop-tabs{
+display:flex;
+background:rgba(255,255,255,0.05);
+border-radius:8px;
+padding:5px;
+margin-bottom:15px;
+}
+.shop-tab{
+flex:1;
+text-align:center;
+padding:10px;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+transition:all 0.3s;
+}
+.shop-tab.active{
+background:#1e88e5;
+}
+
+/* ✨ NEW: Profile styling */
+.profile-header{
+text-align:center;
+margin-bottom:20px;
+}
+.profile-avatar{
+width:80px;
+height:80px;
+margin:0 auto 15px;
+border-radius:50%;
+border:3px solid #ffc107;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:48px;
+background:rgba(255,255,255,0.05);
+}
+.profile-avatar img{
+width:70px;
+height:70px;
+object-fit:contain;
+border-radius:50%;
+}
+.profile-name{
+font-size:24px;
+font-weight:bold;
+margin-bottom:5px;
+}
+.profile-level{
+color:#ffc107;
+font-size:16px;
+margin-bottom:15px;
+}
+
+/* ✨ NEW: Daily reward animation */
+@keyframes rewardPulse {
+0% { transform: scale(1); }
+50% { transform: scale(1.1); }
+100% { transform: scale(1); }
+}
+.reward-claimed{
+animation: rewardPulse 0.5s ease 3;
 }
 
 /* ✨ NEW: Screen shake on crit */
@@ -100,6 +229,22 @@ button{padding:10px 20px;border:none;border-radius:10px;font-weight:bold;cursor:
 button:active{transform:scale(0.95)}
 button:disabled{opacity:0.5;cursor:not-allowed}
 
+/* ✨ NEW: Button click protection class */
+button.button-click-protected:disabled{
+position:relative;
+}
+button.button-click-protected:disabled:after{
+content:'';
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(255,255,255,0.1);
+border-radius:10px;
+cursor:not-allowed;
+}
+
 /* SIDE MENUS */
 .side-menu{position:fixed;top:30%;display:flex;flex-direction:column;gap:10px;z-index:99}
 .side-menu.left{left:10px}
@@ -114,17 +259,6 @@ box-shadow:0 4px 8px rgba(0,0,0,0.3);
 .side-btn:active{transform:scale(0.9)}
 
 /* MODALS */
-.modal{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.85);
-display:none;align-items:center;justify-content:center;z-index:200;
-overflow-y:auto;padding:20px;box-sizing:border-box;
-}
-.modal.show{display:flex}
-.modal-box{
-background:#1a1a2e;padding:20px;border-radius:12px;width:100%;max-width:380px;
-max-height:90vh;overflow-y:auto;
-}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
 .modal-header h2{margin:0;font-size:20px}
 .close-btn{background:#ff5252;color:#fff;border:none;padding:5px 15px;border-radius:8px;cursor:pointer;font-size:18px}
@@ -357,10 +491,17 @@ min-height:30px;
 font-size:14px;
 color:#aaa;
 margin-top:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:5px;
 }
 .spin-timer.active{
 color:#4caf50;
 font-weight:bold;
+}
+.spin-timer.locked{
+color:#ff5252;
 }
 
 /* FLOAT DAMAGE */
@@ -461,26 +602,24 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
 
-<button id="attackButton" onclick="attack()">⚔️ Attack</button>
+<button id="attackButton" onclick="protectedAttack()" class="button-click-protected">⚔️ Attack</button>
 <div id="energyWarning" style="color:#ff5252;font-size:12px;margin-top:5px;display:none;">⚡ Not enough energy</div>
 </div>
 
 <!-- SIDE MENUS -->
 <div class="side-menu left">
-<div class="side-btn" onclick="watchAd()">📺</div>
+<div class="side-btn" onclick="protectedWatchAd()">📺</div>
 <div class="side-btn" onclick="openDailyReward()">🎁</div>
 <div class="side-btn" onclick="openReferral()">👥</div>
 <div class="side-btn" onclick="openSpinWheel()">🎡</div>
 </div>
 
 <div class="side-menu right">
-<div class="side-btn" onclick="openWeapons()">⚔️</div>
-<!-- ✨ FEATURE 2: Replaced Characters and Skills with VIP and Inventory -->
+<div class="side-btn" onclick="openShop()">🛒</div>
 <div class="side-btn" onclick="openVIP()">👑</div>
-<div class="side-btn" onclick="openInventory()">🎒</div>
+<div class="side-btn" onclick="openProfile()">👤</div>
+<div class="side-btn" onclick="openSkins()">🎨</div>
 <div class="side-btn" onclick="openAchievements()">🏆</div>
-<div class="side-btn" onclick="openStats()">📊</div>
-<div class="side-btn" onclick="openSettings()">⚙️</div>
 </div>
 
 <!-- BOTTOM MENU -->
@@ -488,6 +627,54 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bottom-btn" onclick="openWeapons()">⚔️ Weapons</div>
 <div class="bottom-btn" onclick="openCharacters()">🧙 Characters</div>
 <div class="bottom-btn" onclick="openSkills()">✨ Skills</div>
+</div>
+
+<!-- ✨ NEW: PROFILE MODAL -->
+<div id="profileModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>👤 Profile</h2>
+<button class="close-btn" onclick="closeModal('profileModal')">✕</button>
+</div>
+<div id="profileContent">
+<div class="profile-header">
+<div class="profile-avatar" id="profileAvatar">🦸‍♂️</div>
+<div class="profile-name" id="profilePlayerName">Player</div>
+<div class="profile-level">⭐ Level <span id="profileLevel">1</span></div>
+</div>
+<div id="profileStats"></div>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: SHOP MODAL -->
+<div id="shopModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🛒 Shop</h2>
+<button class="close-btn" onclick="closeModal('shopModal')">✕</button>
+</div>
+<div class="shop-tabs" id="shopTabs">
+<div class="shop-tab active" onclick="switchShopTab('items')">Items</div>
+<div class="shop-tab" onclick="switchShopTab('skins')">Skins</div>
+</div>
+<div id="shopItemsContent"></div>
+<div id="shopSkinsContent" style="display:none;"></div>
+</div>
+</div>
+
+<!-- ✨ NEW: SKINS MODAL -->
+<div id="skinsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🎨 Skins</h2>
+<button class="close-btn" onclick="closeModal('skinsModal')">✕</button>
+</div>
+<div id="skinsContent">
+<p style="text-align:center;color:#aaa;padding:20px;">Select a skin pack to preview</p>
+<div id="skinsList"></div>
+</div>
+</div>
 </div>
 
 <!-- WEAPONS MODAL -->
@@ -581,7 +768,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <p style="font-size:14px;color:#4caf50;">VIP Bonus Applied: +<span id="dailyVIPBonus">0</span>%</p>
 </div>
 <div id="dailyTimer" style="font-size:18px;color:#4caf50;font-weight:bold;margin:15px 0;">00:00:00</div>
-<button id="dailyClaimButton" onclick="claimDailyReward()" style="width:100%;padding:12px;font-size:16px;margin-top:10px;" disabled>
+<button id="dailyClaimButton" onclick="protectedClaimDailyReward()" class="button-click-protected" style="width:100%;padding:12px;font-size:16px;margin-top:10px;" disabled>
 ⏳ Claim in 00:00:00
 </button>
 </div>
@@ -637,9 +824,9 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 </div>
 </div>
 <div class="spin-result" id="spinResult"></div>
-<div class="spin-timer" id="spinTimer">Next spin in: 00:00:00</div>
-<button id="spinButton" onclick="spinWheel()" style="width:100%;padding:12px;margin-top:10px" disabled>
-🎰 SPIN (Free)
+<div class="spin-timer" id="spinTimer">🔒 Next spin in: 00:00:00</div>
+<button id="spinButton" onclick="protectedSpinWheel()" class="button-click-protected" style="width:100%;padding:12px;margin-top:10px" disabled>
+🔒 SPIN (Cooldown)
 </button>
 </div>
 </div>
@@ -811,7 +998,12 @@ kill100: {completed: false, claimed: false, progress: 0, target: 100},
 level10: {completed: false, claimed: false, progress: 0, target: 10},
 spin5: {completed: false, claimed: false, progress: 0, target: 5},
 daily7: {completed: false, claimed: false, progress: 0, target: 7}
-}
+},
+  
+// ✨ FEATURE 2: Skins system
+ownedSkins: [], // Array of owned skin pack IDs
+activeSkin: null, // Currently active skin
+skins: {} // Character-specific skins
 };
 
 let zombie = {hp: 30, max: 30};
@@ -827,11 +1019,49 @@ const wheelPrizes = [
 ];
 const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336'];
 
+// ✨ FEATURE 2: Skin packs data
+const skinPacks = [
+{id: "starter", name: "Starter Pack", price: 0, priceType: "free", icon: "🎁", desc: "Free basic skins", skins: ["hero_basic"]},
+{id: "ninja", name: "Ninja Pack", price: 0.2, priceType: "ton", icon: "🥷", desc: "Ninja-themed skins", skins: ["ninja_dark", "hero_ninja"]},
+{id: "dark", name: "Dark Pack", price: 0.5, priceType: "ton", icon: "🌑", desc: "Dark-themed skins", skins: ["hero_dark", "slayer_dark"]},
+{id: "neon", name: "Neon Pack", price: 1, priceType: "ton", icon: "💡", desc: "Neon glow skins", skins: ["hero_neon", "wizard_neon", "knight_neon"]}
+];
+
+// ✨ FEATURE 2: Character skins data
+const characterSkins = {
+hero: [
+{id: "default", name: "Default", icon: "🦸‍♂️", pack: "starter"},
+{id: "hero_basic", name: "Basic", icon: "🦸‍♂️", color: "#1e88e5", pack: "starter"},
+{id: "hero_ninja", name: "Ninja Style", icon: "🥷", color: "#333", pack: "ninja"},
+{id: "hero_dark", name: "Dark Knight", icon: "🦇", color: "#222", pack: "dark"},
+{id: "hero_neon", name: "Neon Hero", icon: "🦸‍♂️", color: "#00ff88", pack: "neon"}
+],
+ninja: [
+{id: "default", name: "Default", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e", pack: "starter"},
+{id: "ninja_dark", name: "Shadow Ninja", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=shadow&backgroundColor=1a1a2e&hair=short&hairColor=000000", pack: "ninja"}
+],
+slayer: [
+{id: "default", name: "Default", icon: "🧔‍♂️", pack: "starter"},
+{id: "slayer_dark", name: "Dark Slayer", icon: "🧛‍♂️", color: "#660000", pack: "dark"}
+],
+wizard: [
+{id: "default", name: "Default", icon: "🧙‍♂️", pack: "starter"},
+{id: "wizard_neon", name: "Neon Wizard", icon: "🧙‍♂️", color: "#ff00ff", pack: "neon"}
+],
+knight: [
+{id: "default", name: "Default", icon: "🛡️", pack: "starter"},
+{id: "knight_neon", name: "Neon Knight", icon: "🛡️", color: "#00ffff", pack: "neon"}
+]
+};
+
 let isSpinning = false;
 
 // ✨ NEW: Timer variables
 let spinTimerInterval = null;
 let dailyTimerInterval = null;
+
+// ✨ FEATURE 3: Button click protection
+let buttonCooldowns = {};
 
 // Skills State
 let skills = {
@@ -901,6 +1131,10 @@ spin5: {completed: false, claimed: false, progress: 0, target: 5},
 daily7: {completed: false, claimed: false, progress: 0, target: 7}
 };
 }
+// ✨ FEATURE 2: Load skins data
+if(!player.ownedSkins) player.ownedSkins = ["starter"]; // Everyone gets starter pack
+if(!player.activeSkin) player.activeSkin = null;
+if(!player.skins) player.skins = {};
 }
 // Get Telegram username
 if(tg && tg.initDataUnsafe?.user){
@@ -1012,6 +1246,50 @@ function calculateCoinReward() {
 return 10 + Math.floor(player.level / 2);
 }
 
+// ✨ FEATURE 3: Button click protection function
+function protectButton(buttonId, callback, cooldown = 500) {
+if (buttonCooldowns[buttonId]) return;
+  
+buttonCooldowns[buttonId] = true;
+  
+// Disable button visually
+const button = document.getElementById(buttonId);
+if (button) {
+button.disabled = true;
+}
+  
+// Execute callback
+if (callback) callback();
+  
+// Re-enable after cooldown
+setTimeout(() => {
+buttonCooldowns[buttonId] = false;
+if (button) {
+button.disabled = false;
+}
+}, cooldown);
+}
+
+// ✨ FEATURE 3: Protected attack function
+function protectedAttack() {
+protectButton('attackButton', attack, 300);
+}
+
+// ✨ FEATURE 3: Protected watch ad function
+function protectedWatchAd() {
+protectButton('watchAdButton', watchAd, 500);
+}
+
+// ✨ FEATURE 3: Protected spin wheel function
+function protectedSpinWheel() {
+protectButton('spinButton', spinWheel, 500);
+}
+
+// ✨ FEATURE 3: Protected claim daily reward function
+function protectedClaimDailyReward() {
+protectButton('dailyClaimButton', claimDailyReward, 500);
+}
+
 // ✨ MODIFIED: Update UI with all improvements
 function update(){
 hp.textContent = player.hp;
@@ -1036,13 +1314,8 @@ hpLabel.classList.remove('hp-low');
 zhp.textContent = zombie.hp + "/" + zombie.max;
 zbar.style.width = (zombie.hp / zombie.max * 100) + "%";
   
-// ✨ FEATURE 5: Display character with image for ninja
-const charData = characters[player.char];
-if (player.char === 'ninja' && charData.image) {
-playerChar.innerHTML = `<img src="${charData.image}" alt="Ninja" class="ninja-icon" style="width:60px;height:60px;">`;
-} else {
-playerChar.textContent = charData.icon;
-}
+// ✨ FEATURE 2: Display character with active skin
+updateCharacterDisplay();
   
 coins.textContent = player.coins;
 gems.textContent = player.gems;
@@ -1053,6 +1326,44 @@ playerName.textContent = player.name;
 updateAchievementProgress();
   
 saveGame();
+}
+
+// ✨ FEATURE 2: Update character display with skin
+function updateCharacterDisplay() {
+const charData = characters[player.char];
+let displayHTML = '';
+  
+// Check if character has skins and active skin
+if (player.skins && player.skins[player.char]) {
+const skinId = player.skins[player.char];
+const characterSkinList = characterSkins[player.char];
+if (characterSkinList) {
+const activeSkin = characterSkinList.find(skin => skin.id === skinId);
+if (activeSkin) {
+if (activeSkin.image) {
+displayHTML = `<img src="${activeSkin.image}" alt="${charData.name}" class="ninja-icon" style="width:60px;height:60px;">`;
+} else {
+displayHTML = `<div style="font-size:48px;color:${activeSkin.color || 'inherit'}">${activeSkin.icon}</div>`;
+}
+} else {
+// Fallback to default
+if (player.char === 'ninja' && charData.image) {
+displayHTML = `<img src="${charData.image}" alt="${charData.name}" class="ninja-icon" style="width:60px;height:60px;">`;
+} else {
+displayHTML = charData.icon;
+}
+}
+}
+} else {
+// Default display
+if (player.char === 'ninja' && charData.image) {
+displayHTML = `<img src="${charData.image}" alt="${charData.name}" class="ninja-icon" style="width:60px;height:60px;">`;
+} else {
+displayHTML = charData.icon;
+}
+}
+  
+playerChar.innerHTML = displayHTML;
 }
 
 // ✨ MODIFIED: Attack Function with all improvements
@@ -1183,6 +1494,259 @@ toast.classList.add("show");
 setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
+// ✨ FEATURE 6: Open Profile modal
+function openProfile() {
+const modal = document.getElementById('profileModal');
+const profileContent = document.getElementById('profileContent');
+const profileAvatar = document.getElementById('profileAvatar');
+const profilePlayerName = document.getElementById('profilePlayerName');
+const profileLevel = document.getElementById('profileLevel');
+const profileStats = document.getElementById('profileStats');
+  
+// Update profile info
+profilePlayerName.textContent = player.name;
+profileLevel.textContent = player.level;
+  
+// Update avatar based on character and skin
+const charData = characters[player.char];
+if (player.char === 'ninja') {
+profileAvatar.innerHTML = `<img src="${charData.image}" alt="${charData.name}">`;
+} else {
+profileAvatar.textContent = charData.icon;
+}
+  
+// Update stats
+profileStats.innerHTML = '';
+  
+const stats = [
+{label: "VIP Tier", value: vipTiers[player.vipTier].name, color: "#ffc107"},
+{label: "Active Skin", value: player.activeSkin || "Default", color: "#4caf50"},
+{label: "Total Coins Earned", value: player.coinsEarned.toLocaleString(), color: "#ffc107"},
+{label: "Total TON Earned", value: "0.000", color: "#4caf50"},
+{label: "Total Kills", value: player.kills.toLocaleString(), color: "#ff5252"},
+{label: "Total Spins", value: player.spinCount, color: "#2196f3"},
+{label: "Daily Claims", value: player.dailyCount, color: "#9c27b0"}
+];
+  
+stats.forEach(stat => {
+const div = document.createElement("div");
+div.className = "stat-row";
+div.innerHTML = `<span class="label">${stat.label}</span><span class="value" style="color:${stat.color}">${stat.value}</span>`;
+profileStats.appendChild(div);
+});
+  
+modal.classList.add("show");
+}
+
+// ✨ FEATURE 4: Open Shop modal
+function openShop() {
+const modal = document.getElementById('shopModal');
+switchShopTab('items');
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 4: Switch shop tab
+function switchShopTab(tab) {
+const itemsContent = document.getElementById('shopItemsContent');
+const skinsContent = document.getElementById('shopSkinsContent');
+const tabs = document.querySelectorAll('.shop-tab');
+  
+// Update active tab
+tabs.forEach(t => t.classList.remove('active'));
+if (tab === 'items') {
+tabs[0].classList.add('active');
+itemsContent.style.display = 'block';
+skinsContent.style.display = 'none';
+loadShopItems();
+} else {
+tabs[1].classList.add('active');
+itemsContent.style.display = 'none';
+skinsContent.style.display = 'block';
+loadShopSkins();
+}
+}
+
+// ✨ FEATURE 4: Load shop items
+function loadShopItems() {
+const itemsContent = document.getElementById('shopItemsContent');
+itemsContent.innerHTML = '<div class="item-grid" id="shopItemsGrid"></div>';
+const grid = document.getElementById('shopItemsGrid');
+  
+// Add weapons to shop
+for(let id in weapons){
+let w = weapons[id];
+let owned = player.ownedWeapons.includes(id);
+let equipped = player.weapon === id;
+
+let card = document.createElement("div");
+card.className = "item-card";
+if(owned) card.classList.add("owned");
+if(equipped) card.classList.add("equipped");
+
+card.innerHTML = `
+<div class="icon">${w.icon}</div>
+<div class="name">${w.name}</div>
+<div class="desc">${w.desc}</div>
+<div class="price">${w.price}💰</div>
+${!owned ? 
+`<button onclick="protectedBuyWeapon('${id}')" class="button-click-protected" ${player.coins >= w.price ? "" : "disabled"}>
+${player.coins >= w.price ? "Buy" : "Need Coins"}
+</button>` :
+`<button onclick="protectedEquipWeapon('${id}')" class="button-click-protected" ${!equipped ? "" : "disabled"}>
+${equipped ? "EQUIPPED" : "Equip"}
+</button>`
+}
+${owned ? '<div class="badge">OWNED</div>' : ''}
+${equipped ? '<div class="badge">EQUIPPED</div>' : ''}
+`;
+grid.appendChild(card);
+}
+}
+
+// ✨ FEATURE 4: Load shop skins
+function loadShopSkins() {
+const skinsContent = document.getElementById('shopSkinsContent');
+skinsContent.innerHTML = '<div class="item-grid" id="shopSkinsGrid"></div>';
+const grid = document.getElementById('shopSkinsGrid');
+  
+skinPacks.forEach(pack => {
+const owned = player.ownedSkins.includes(pack.id);
+  
+let card = document.createElement("div");
+card.className = "item-card";
+if(owned) card.classList.add("owned");
+  
+const priceDisplay = pack.priceType === 'free' ? 'FREE' : `${pack.price} TON`;
+  
+card.innerHTML = `
+<div class="icon">${pack.icon}</div>
+<div class="name">${pack.name}</div>
+<div class="desc">${pack.desc}</div>
+<div class="price">${priceDisplay}</div>
+<button onclick="protectedBuySkinPack('${pack.id}')" class="button-click-protected" ${owned ? "disabled" : ""}>
+${owned ? '✅ OWNED' : 'BUY'}
+</button>
+${owned ? '<div class="badge">OWNED</div>' : ''}
+`;
+grid.appendChild(card);
+});
+}
+
+// ✨ FEATURE 2: Open Skins modal
+function openSkins() {
+const modal = document.getElementById('skinsModal');
+const skinsList = document.getElementById('skinsList');
+skinsList.innerHTML = '';
+  
+skinPacks.forEach(pack => {
+const owned = player.ownedSkins.includes(pack.id);
+  
+const div = document.createElement("div");
+div.className = "item-card";
+if(owned) div.classList.add("owned");
+  
+const priceDisplay = pack.priceType === 'free' ? 'FREE' : `${pack.price} TON`;
+  
+div.innerHTML = `
+<div style="text-align:center;">
+<div style="font-size:36px;margin-bottom:10px;">${pack.icon}</div>
+<div class="name">${pack.name}</div>
+<div class="desc">${pack.desc}</div>
+<div class="price">${priceDisplay}</div>
+</div>
+<div style="margin-top:15px;">
+<button onclick="previewSkinPack('${pack.id}')" style="width:100%;padding:8px;margin-bottom:5px;background:#2196f3;">
+👁️ Preview
+</button>
+${owned ? 
+`<button onclick="applySkinPack('${pack.id}')" style="width:100%;padding:8px;background:#4caf50;">
+✅ Apply
+</button>` :
+`<button onclick="protectedBuySkinPack('${pack.id}')" class="button-click-protected" style="width:100%;padding:8px;">
+🛒 Buy
+</button>`
+}
+</div>
+`;
+skinsList.appendChild(div);
+});
+  
+modal.classList.add("show");
+}
+
+// ✨ FEATURE 2: Preview skin pack
+function previewSkinPack(packId) {
+const pack = skinPacks.find(p => p.id === packId);
+if (!pack) return;
+  
+toastMsg(`👁️ Previewing ${pack.name}. Select a character to see skins.`);
+}
+
+// ✨ FEATURE 2: Apply skin pack
+function applySkinPack(packId) {
+const pack = skinPacks.find(p => p.id === packId);
+if (!pack) return;
+  
+if (!player.ownedSkins.includes(packId)) {
+toastMsg("❌ You don't own this skin pack!");
+return;
+}
+  
+// For now, just mark as active skin
+player.activeSkin = packId;
+saveGame();
+update();
+toastMsg(`✅ ${pack.name} activated!`);
+}
+
+// ✨ FEATURE 2: Buy skin pack
+function protectedBuySkinPack(packId) {
+const pack = skinPacks.find(p => p.id === packId);
+if (!pack) return;
+  
+if (player.ownedSkins.includes(packId)) {
+toastMsg("✅ You already own this skin pack!");
+return;
+}
+  
+if (pack.priceType === 'free') {
+player.ownedSkins.push(packId);
+saveGame();
+update();
+toastMsg(`✅ ${pack.name} unlocked for free!`);
+openSkins();
+return;
+}
+  
+// For TON purchases, in real game this would process payment
+toastMsg(`💎 Would process ${pack.price} TON payment for ${pack.name}`);
+}
+
+// ✨ FEATURE 3: Protected buy weapon
+function protectedBuyWeapon(id) {
+protectButton(`buyWeapon_${id}`, () => buyWeapon(id), 500);
+}
+
+// ✨ FEATURE 3: Protected equip weapon
+function protectedEquipWeapon(id) {
+protectButton(`equipWeapon_${id}`, () => equipWeapon(id), 300);
+}
+
+// ✨ FEATURE 3: Protected buy character
+function protectedBuyChar(id) {
+protectButton(`buyChar_${id}`, () => buyChar(id), 500);
+}
+
+// ✨ FEATURE 3: Protected equip character
+function protectedEquipChar(id) {
+protectButton(`equipChar_${id}`, () => equipChar(id), 300);
+}
+
+// ✨ FEATURE 3: Protected upgrade skill
+function protectedUpgradeSkill(id) {
+protectButton(`upgradeSkill_${id}`, () => upgradeSkill(id), 500);
+}
+
 // ✨ FEATURE 6: Improved VIP modal
 function openVIP() {
 const modal = document.getElementById('vipModal');
@@ -1239,6 +1803,7 @@ modal.classList.add('show');
 
 // ✨ FEATURE 3: VIP purchase function
 function purchaseVIP(tierId) {
+protectButton(`purchaseVIP_${tierId}`, () => {
 const tier = vipTiers.find(t => t.id === tierId);
 if (!tier) return;
 
@@ -1260,6 +1825,7 @@ saveGame();
 update();
 toastMsg(`🎉 ${tier.name} activated! +${tier.bonus}% coin bonus!`);
 openVIP(); // Refresh the modal
+}, 500);
 }
 
 // ✨ FEATURE 4: Improved Inventory modal
@@ -1416,7 +1982,7 @@ div.innerHTML = `
 </div>
 <div style="display:flex;justify-content:space-between;font-size:12px;">
 <div>Progress: ${ach.progress}/${ach.target}</div>
-<button onclick="claimAchievement('${ach.id}')" style="padding:5px 10px;font-size:11px;${ach.completed && !ach.claimed ? 'background:#4caf50' : ach.claimed ? 'background:#ffc107' : 'background:#666'}" ${!ach.completed || ach.claimed ? 'disabled' : ''}>
+<button onclick="protectedClaimAchievement('${ach.id}')" class="button-click-protected" style="padding:5px 10px;font-size:11px;${ach.completed && !ach.claimed ? 'background:#4caf50' : ach.claimed ? 'background:#ffc107' : 'background:#666'}" ${!ach.completed || ach.claimed ? 'disabled' : ''}>
 ${ach.claimed ? '✅ Claimed' : ach.completed ? '🏆 Claim' : '🔒 Locked'}
 </button>
 </div>
@@ -1440,6 +2006,11 @@ player.achievements.kill100.completed = player.kills >= 100;
 player.achievements.level10.completed = player.level >= 10;
 player.achievements.spin5.completed = player.spinCount >= 5;
 player.achievements.daily7.completed = player.dailyCount >= 7;
+}
+
+// ✨ FEATURE 5: Protected claim achievement
+function protectedClaimAchievement(achievementId) {
+protectButton(`claimAchievement_${achievementId}`, () => claimAchievement(achievementId), 500);
 }
 
 // ✨ FEATURE 5: Claim achievement
@@ -1518,15 +2089,15 @@ const spinTimerElement = document.getElementById('spinTimer');
 if (timeLeft > 0) {
 // Still in cooldown
 spinButton.disabled = true;
-spinButton.textContent = '⏳ Spin Cooldown';
-spinTimerElement.textContent = `Next spin in: ${formatTime(timeLeft)}`;
-spinTimerElement.classList.add('active');
+spinButton.innerHTML = '🔒 SPIN (Cooldown)';
+spinTimerElement.textContent = `🔒 Next spin in: ${formatTime(timeLeft)}`;
+spinTimerElement.className = 'spin-timer locked';
 } else {
 // Ready to spin
 spinButton.disabled = false;
-spinButton.textContent = '🎰 SPIN (Free)';
-spinTimerElement.textContent = 'Ready to spin!';
-spinTimerElement.classList.remove('active');
+spinButton.innerHTML = '🎰 SPIN (Free)';
+spinTimerElement.textContent = '✅ Ready to spin!';
+spinTimerElement.className = 'spin-timer active';
 }
 }
 
@@ -1623,11 +2194,13 @@ if (timeLeft > 0) {
 dailyTimerElement.textContent = formatTime(timeLeft);
 dailyClaimButton.disabled = true;
 dailyClaimButton.textContent = `⏳ Claim in ${formatTime(timeLeft)}`;
+dailyTimerElement.classList.remove('reward-claimed');
 } else {
 // Ready to claim
 dailyTimerElement.textContent = "🎁 Ready to claim!";
 dailyClaimButton.disabled = false;
 dailyClaimButton.textContent = "🎁 Claim Daily Reward";
+dailyTimerElement.classList.add('reward-claimed');
 }
 }
 
@@ -1657,8 +2230,16 @@ updateAchievementProgress();
 saveGame();
 update();
   
+// ✨ FEATURE 5: Visual feedback
+const dailyTimerElement = document.getElementById('dailyTimer');
+dailyTimerElement.classList.add('reward-claimed');
+  
 toastMsg(`🎁 Daily reward claimed! +${coins} coins + ${ton} TON${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
+  
+// Close modal after short delay
+setTimeout(() => {
 closeModal('dailyRewardModal');
+}, 1500);
 }
 
 // ✨ NEW: Format time function (HH:MM:SS)
@@ -1752,10 +2333,10 @@ ${iconHTML}
 <div class="desc">${ch.desc}</div>
 <div class="price">Level ${ch.level} | ${ch.price}💰</div>
 ${!owned ? 
-`<button onclick="buyChar('${id}')" ${canBuy ? "" : "disabled"}>
+`<button onclick="protectedBuyChar('${id}')" class="button-click-protected" ${canBuy ? "" : "disabled"}>
 ${canBuy ? "Buy" : "Locked"}
 </button>` :
-`<button onclick="equipChar('${id}')" ${!equipped ? "" : "disabled"}>
+`<button onclick="protectedEquipChar('${id}')" class="button-click-protected" ${!equipped ? "" : "disabled"}>
 ${equipped ? "EQUIPPED" : "Equip"}
 </button>`
 }
@@ -1818,10 +2399,10 @@ card.innerHTML = `
 <div class="desc">${w.desc}</div>
 <div class="price">${w.price}💰</div>
 ${!owned ? 
-`<button onclick="buyWeapon('${id}')" ${player.coins >= w.price ? "" : "disabled"}>
+`<button onclick="protectedBuyWeapon('${id}')" class="button-click-protected" ${player.coins >= w.price ? "" : "disabled"}>
 ${player.coins >= w.price ? "Buy" : "Need Coins"}
 </button>` :
-`<button onclick="equipWeapon('${id}')" ${!equipped ? "" : "disabled"}>
+`<button onclick="protectedEquipWeapon('${id}')" class="button-click-protected" ${!equipped ? "" : "disabled"}>
 ${equipped ? "EQUIPPED" : "Equip"}
 </button>`
 }
@@ -1889,7 +2470,7 @@ div.innerHTML = `
 <div class="skill-level">Level ${s.level}/${s.max}</div>
 </div>
 <div class="skill-desc">${s.desc}</div>
-<button onclick="upgradeSkill('${s.id}')" ${s.level < s.max && player.coins >= price ? "" : "disabled"}>
+<button onclick="protectedUpgradeSkill('${s.id}')" class="button-click-protected" ${s.level < s.max && player.coins >= price ? "" : "disabled"}>
 ${s.level >= s.max ? "MAXED" : `Upgrade - ${price}💰`}
 </button>
 `;
@@ -1963,6 +2544,7 @@ list.appendChild(withdrawDiv);
 modal.classList.add("show");
 }
 
+// ✨ FEATURE 1: Updated Settings modal - Removed Export/Import/Reset buttons
 function openSettings(){
 const modal = document.getElementById('settingsModal');
 const list = document.getElementById('settingsList');
@@ -1980,28 +2562,25 @@ list.innerHTML = `
 <span>👤 Player Name</span>
 </label>
 <input type="text" id="playerNameInput" value="${player.name}" placeholder="Enter your name">
-<button onclick="changeName()" style="width:100%;margin-top:8px">Change Name</button>
-</div>
-<div class="setting-item">
-<label>
-<span>💾 Game Data</span>
-</label>
-<button onclick="exportSave()" style="width:100%;margin-top:8px;background:#4caf50">Export Save</button>
-<button onclick="importSave()" style="width:100%;margin-top:8px;background:#2196f3">Import Save</button>
-<button onclick="openModal('confirmModal')" style="width:100%;margin-top:8px;background:#ff5252">Reset Game</button>
+<button onclick="protectedChangeName()" class="button-click-protected" style="width:100%;margin-top:8px">Change Name</button>
 </div>
 <div class="setting-item">
 <label>
 <span>📱 About</span>
 </label>
 <p style="font-size:12px;color:#aaa;margin-top:8px;">
-Zombie Fighter - TON Edition v1.3<br>
-With Energy, VIP & Achievements Systems
+Zombie Fighter - TON Edition v1.4<br>
+With Skins, VIP & Achievements Systems
 </p>
 </div>
 `;
 
 modal.classList.add("show");
+}
+
+// ✨ FEATURE 3: Protected change name
+function protectedChangeName() {
+protectButton('changeNameButton', changeName, 500);
 }
 
 function toggleSound(){
@@ -2021,30 +2600,8 @@ toastMsg("❌ Name cannot be empty!");
 }
 }
 
-function exportSave(){
-let data = JSON.stringify({
-player: player,
-skills: skills
-});
-navigator.clipboard.writeText(data).then(() => {
-toastMsg("✅ Game data copied to clipboard!");
-});
-}
-
-function importSave(){
-let data = prompt("Paste your save data:");
-if(data){
-try{
-let parsed = JSON.parse(data);
-Object.assign(player, parsed.player);
-Object.assign(skills, parsed.skills);
-update();
-toastMsg("✅ Game data imported!");
-} catch(e){
-toastMsg("❌ Invalid save data!");
-}
-}
-}
+// ✨ FEATURE 1: Removed exportSave and importSave functions
+// ✨ FEATURE 1: Removed confirmReset function from settings
 
 function confirmReset(){
 player = {
@@ -2080,7 +2637,10 @@ kill100: {completed: false, claimed: false, progress: 0, target: 100},
 level10: {completed: false, claimed: false, progress: 0, target: 10},
 spin5: {completed: false, claimed: false, progress: 0, target: 5},
 daily7: {completed: false, claimed: false, progress: 0, target: 7}
-}
+},
+ownedSkins: ["starter"],
+activeSkin: null,
+skins: {}
 };
 skills = {
 damage: {level: 0, max: 5},
@@ -2145,6 +2705,14 @@ withdrawAmountInput.addEventListener('change', updateWithdrawalSummary);
 const dailyButton = document.querySelector('.side-menu.left .side-btn:nth-child(2)');
 if (dailyButton) {
 dailyButton.setAttribute('onclick', 'openDailyReward()');
+}
+  
+// ✨ FEATURE 7: Mobile responsiveness for Telegram WebView
+if (window.Telegram?.WebApp) {
+// Ensure viewport works correctly
+document.documentElement.style.height = '100%';
+document.body.style.height = '100%';
+document.body.style.overflow = 'auto';
 }
 };
 
