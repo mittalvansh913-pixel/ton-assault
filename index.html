@@ -40,6 +40,16 @@ to{transform:translateY(-10vh)}
 .energy-bar{background:#444;border-radius:8px;overflow:hidden;height:8px;margin-top:3px}
 .energy-bar div{height:100%;background:linear-gradient(90deg, #00ff88, #00ccff);transition:width 0.5s}
 
+/* ✨ NEW: Smooth energy regeneration animation */
+@keyframes energyRegen {
+0% { opacity: 0.5; }
+50% { opacity: 1; }
+100% { opacity: 0.5; }
+}
+.energy-regen {
+animation: energyRegen 1s infinite;
+}
+
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between;align-items:center}
 
@@ -170,6 +180,10 @@ border:2px solid #444;
 border-color:#ffc107;
 background:rgba(255,193,7,0.1);
 }
+.vip-tier.locked{
+opacity:0.6;
+border-color:#666;
+}
 .vip-tier-header{
 display:flex;
 justify-content:space-between;
@@ -192,6 +206,55 @@ font-weight:bold;
 font-size:12px;
 color:#aaa;
 margin-top:8px;
+}
+
+/* ACHIEVEMENT STYLES */
+.achievement-item{
+background:rgba(255,255,255,0.05);
+border-radius:10px;
+padding:15px;
+margin-bottom:10px;
+border:2px solid #444;
+}
+.achievement-item.completed{
+border-color:#4caf50;
+background:rgba(76,175,80,0.1);
+}
+.achievement-item.claimed{
+border-color:#ffc107;
+background:rgba(255,193,7,0.1);
+}
+.achievement-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:8px;
+}
+.achievement-name{
+font-weight:bold;
+font-size:16px;
+}
+.achievement-reward{
+color:#ffc107;
+font-size:14px;
+font-weight:bold;
+}
+.achievement-desc{
+font-size:12px;
+color:#aaa;
+margin-bottom:8px;
+}
+.achievement-progress{
+background:#444;
+border-radius:5px;
+height:10px;
+overflow:hidden;
+margin-bottom:8px;
+}
+.achievement-progress-bar{
+height:100%;
+background:linear-gradient(90deg, #4caf50, #8bc34a);
+transition:width 0.5s;
 }
 
 /* SETTINGS */
@@ -218,7 +281,7 @@ font-size:24px;font-weight:bold;letter-spacing:2px;
 color:#ffc107;margin:10px 0;
 }
 
-/* ✨ NEW: SPIN WHEEL STYLES */
+/* ✨ NEW: SPIN WHEEL STYLES - UPDATED FOR 6 SLOTS */
 .wheel-container{
 position:relative;
 width:280px;
@@ -244,7 +307,9 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-weight:bold;
-font-size:18px;
+font-size:20px; /* Bigger text */
+color:#000;
+text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 .wheel-pointer{
 position:absolute;
@@ -253,26 +318,28 @@ left:50%;
 transform:translateX(-50%);
 width:0;
 height:0;
-border-left:15px solid transparent;
-border-right:15px solid transparent;
-border-top:25px solid #ff5252;
+border-left:20px solid transparent;
+border-right:20px solid transparent;
+border-top:35px solid #ff5252;
 z-index:10;
+filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 .wheel-center{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%, -50%);
-width:60px;
-height:60px;
+width:70px;
+height:70px;
 background:#1a1a2e;
 border-radius:50%;
-border:3px solid #ffc107;
+border:4px solid #ffc107;
 display:flex;
 align-items:center;
 justify-content:center;
 font-size:24px;
 z-index:5;
+box-shadow:0 0 15px rgba(255,193,7,0.5);
 }
 .wheel-center img{
 width:50px;
@@ -285,6 +352,15 @@ font-weight:bold;
 color:#ffc107;
 margin-top:15px;
 min-height:30px;
+}
+.spin-timer{
+font-size:14px;
+color:#aaa;
+margin-top:10px;
+}
+.spin-timer.active{
+color:#4caf50;
+font-weight:bold;
 }
 
 /* FLOAT DAMAGE */
@@ -386,12 +462,13 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 </div>
 
 <button id="attackButton" onclick="attack()">⚔️ Attack</button>
+<div id="energyWarning" style="color:#ff5252;font-size:12px;margin-top:5px;display:none;">⚡ Not enough energy</div>
 </div>
 
 <!-- SIDE MENUS -->
 <div class="side-menu left">
 <div class="side-btn" onclick="watchAd()">📺</div>
-<div class="side-btn" onclick="daily()">🎁</div>
+<div class="side-btn" onclick="openDailyReward()">🎁</div>
 <div class="side-btn" onclick="openReferral()">👥</div>
 <div class="side-btn" onclick="openSpinWheel()">🎡</div>
 </div>
@@ -401,6 +478,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <!-- ✨ FEATURE 2: Replaced Characters and Skills with VIP and Inventory -->
 <div class="side-btn" onclick="openVIP()">👑</div>
 <div class="side-btn" onclick="openInventory()">🎒</div>
+<div class="side-btn" onclick="openAchievements()">🏆</div>
 <div class="side-btn" onclick="openStats()">📊</div>
 <div class="side-btn" onclick="openSettings()">⚙️</div>
 </div>
@@ -455,6 +533,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="vipList"></div>
 <div style="margin-top:20px;padding:10px;background:rgba(255,215,0,0.1);border-radius:8px;">
 <p style="font-size:12px;color:#aaa;">💡 VIP Bonus applies to: Kills, Ads, Daily Rewards</p>
+<p style="font-size:12px;color:#aaa;">Current VIP Tier: <span id="currentVIPTier" style="color:#ffc107;font-weight:bold;">No VIP</span></p>
 <p style="font-size:12px;color:#aaa;">Current VIP Bonus: <span id="currentVIPBonus">0%</span></p>
 </div>
 </div>
@@ -468,7 +547,43 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button class="close-btn" onclick="closeModal('inventoryModal')">✕</button>
 </div>
 <div id="inventoryList">
-<p style="text-align:center;color:#aaa;">Inventory items will appear here</p>
+<div style="text-align:center;padding:10px;">
+<h3 style="color:#ffc107;">Your Inventory</h3>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: ACHIEVEMENTS MODAL -->
+<div id="achievementsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🏆 Achievements</h2>
+<button class="close-btn" onclick="closeModal('achievementsModal')">✕</button>
+</div>
+<div id="achievementsList"></div>
+</div>
+</div>
+
+<!-- ✨ NEW: DAILY REWARD MODAL -->
+<div id="dailyRewardModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🎁 Daily Reward</h2>
+<button class="close-btn" onclick="closeModal('dailyRewardModal')">✕</button>
+</div>
+<div style="padding:15px;text-align:center;">
+<div style="font-size:48px;margin:20px 0;">🎁</div>
+<h3>Daily Bonus!</h3>
+<p style="color:#aaa;margin-bottom:20px;">Claim your daily reward every 24 hours</p>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:20px;">
+<p style="font-size:16px;margin:5px 0;">🎯 Reward: <span style="color:#ffc107;font-weight:bold;">50 Coins + 0.005 TON</span></p>
+<p style="font-size:14px;color:#4caf50;">VIP Bonus Applied: +<span id="dailyVIPBonus">0</span>%</p>
+</div>
+<div id="dailyTimer" style="font-size:18px;color:#4caf50;font-weight:bold;margin:15px 0;">00:00:00</div>
+<button id="dailyClaimButton" onclick="claimDailyReward()" style="width:100%;padding:12px;font-size:16px;margin-top:10px;" disabled>
+⏳ Claim in 00:00:00
+</button>
 </div>
 </div>
 </div>
@@ -522,7 +637,8 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 </div>
 </div>
 <div class="spin-result" id="spinResult"></div>
-<button id="spinButton" onclick="spinWheel()" style="width:100%;padding:12px;margin-top:10px">
+<div class="spin-timer" id="spinTimer">Next spin in: 00:00:00</div>
+<button id="spinButton" onclick="spinWheel()" style="width:100%;padding:12px;margin-top:10px" disabled>
 🎰 SPIN (Free)
 </button>
 </div>
@@ -681,10 +797,41 @@ ownedWeapons: ["sword"],
 ownedChars: ["hero"],
 soundEnabled: true,
 vipTier: 0, // ✨ FEATURE 3: VIP system (0 = no VIP, 1-4 = VIP tiers)
-vipBonus: 0 // ✨ FEATURE 3: VIP bonus percentage
+vipBonus: 0, // ✨ FEATURE 3: VIP bonus percentage
+  
+// ✨ NEW: Timers and achievements
+lastSpinTime: 0, // Timestamp of last spin
+spinCount: 0, // Total spins done
+lastDailyTime: 0, // Timestamp of last daily claim
+dailyCount: 0, // Total daily claims
+  
+// ✨ NEW: Achievements progress
+achievements: {
+kill100: {completed: false, claimed: false, progress: 0, target: 100},
+level10: {completed: false, claimed: false, progress: 0, target: 10},
+spin5: {completed: false, claimed: false, progress: 0, target: 5},
+daily7: {completed: false, claimed: false, progress: 0, target: 7}
+}
 };
 
 let zombie = {hp: 30, max: 30};
+
+// ✨ FEATURE 1: Updated spin wheel prizes (6 slots)
+const wheelPrizes = [
+{text: "50 Coins", value: 50, type: "coins"},
+{text: "100 Coins", value: 100, type: "coins"},
+{text: "200 Coins", value: 200, type: "coins"},
+{text: "0.001 TON", value: 0.001, type: "ton"},
+{text: "0.002 TON", value: 0.002, type: "ton"},
+{text: "Sorry 😅", value: 0, type: "none"}
+];
+const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336'];
+
+let isSpinning = false;
+
+// ✨ NEW: Timer variables
+let spinTimerInterval = null;
+let dailyTimerInterval = null;
 
 // Skills State
 let skills = {
@@ -720,13 +867,11 @@ const vipTiers = [
 {id: 4, name: "VIP 4", bonus: 100, price: 50, desc: "+100% coin earnings"}
 ];
 
-// ✨ NEW: Spin wheel prizes
-const wheelPrizes = [100, 50, 20, 10, 50, 0, 30, 20];
-const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336', '#00bcd4', '#8bc34a'];
-let isSpinning = false;
-
 // ✨ FEATURE 1: Energy regeneration timer
 let energyTimer = null;
+
+// ✨ NEW: Cooldown timer to prevent rapid clicking
+let attackCooldown = false;
 
 // Load saved data
 function loadGame(){
@@ -744,6 +889,18 @@ if(!player.energy) player.energy = 100;
 if(!player.energyMax) player.energyMax = 100;
 if(!player.vipTier) player.vipTier = 0;
 if(!player.vipBonus) player.vipBonus = 0;
+if(!player.lastSpinTime) player.lastSpinTime = 0;
+if(!player.spinCount) player.spinCount = 0;
+if(!player.lastDailyTime) player.lastDailyTime = 0;
+if(!player.dailyCount) player.dailyCount = 0;
+if(!player.achievements) {
+player.achievements = {
+kill100: {completed: false, claimed: false, progress: 0, target: 100},
+level10: {completed: false, claimed: false, progress: 0, target: 10},
+spin5: {completed: false, claimed: false, progress: 0, target: 5},
+daily7: {completed: false, claimed: false, progress: 0, target: 7}
+};
+}
 }
 // Get Telegram username
 if(tg && tg.initDataUnsafe?.user){
@@ -757,8 +914,14 @@ player.referralCode = "ZF" + Math.random().toString(36).substr(2, 6).toUpperCase
 // ✨ FEATURE 1: Start energy regeneration
 startEnergyRegeneration();
 
+// ✨ NEW: Start timers
+startTimers();
+
 // Update VIP bonus
 updateVIPBonus();
+
+// ✨ NEW: Update achievement progress
+updateAchievementProgress();
 
 update();
 }
@@ -771,7 +934,7 @@ skills: skills
 }));
 }
 
-// ✨ FEATURE 1: Energy regeneration system
+// ✨ FEATURE 3: Improved energy regeneration system
 function startEnergyRegeneration() {
 if (energyTimer) clearInterval(energyTimer);
 energyTimer = setInterval(() => {
@@ -783,34 +946,48 @@ saveGame();
 }, 5000); // Every 5 seconds
 }
 
-// ✨ FEATURE 1: Update energy UI
+// ✨ FEATURE 3: Update energy UI with smooth animation
 function updateEnergyUI() {
 const energyElement = document.getElementById('energy');
 const energyMaxElement = document.getElementById('energymax');
 const energyBar = document.getElementById('energybar');
 const attackButton = document.getElementById('attackButton');
+const energyWarning = document.getElementById('energyWarning');
   
 energyElement.textContent = player.energy;
 energyMaxElement.textContent = player.energyMax;
 energyBar.style.width = (player.energy / player.energyMax * 100) + "%";
   
+// Add smooth animation when regenerating
+if (player.energy < player.energyMax) {
+energyBar.classList.add('energy-regen');
+} else {
+energyBar.classList.remove('energy-regen');
+}
+  
 // Disable attack button if not enough energy
 if (player.energy < 5) {
 attackButton.disabled = true;
+energyWarning.style.display = 'block';
 } else {
 attackButton.disabled = false;
+energyWarning.style.display = 'none';
 }
 }
 
-// ✨ FEATURE 3: Update VIP bonus
+// ✨ FEATURE 6: Improved VIP bonus update
 function updateVIPBonus() {
 const vipTier = vipTiers.find(tier => tier.id === player.vipTier);
 if (vipTier) {
 player.vipBonus = vipTier.bonus;
 }
 const currentVIPBonusElement = document.getElementById('currentVIPBonus');
+const currentVIPTierElement = document.getElementById('currentVIPTier');
 if (currentVIPBonusElement) {
 currentVIPBonusElement.textContent = player.vipBonus + "%";
+}
+if (currentVIPTierElement) {
+currentVIPTierElement.textContent = vipTiers[player.vipTier].name;
 }
 }
 
@@ -823,7 +1000,19 @@ return Math.floor(coins * bonusMultiplier);
 return coins;
 }
 
-// ✨ MODIFIED: Update UI with XP bar, Energy bar and low HP warning
+// ✨ FEATURE 7: Smoother zombie HP scaling
+function calculateZombieHP() {
+// Smoother scaling: base 30 + 2 per level
+return 30 + (player.level * 2);
+}
+
+// ✨ FEATURE 7: Smoother coin rewards scaling
+function calculateCoinReward() {
+// Base 10 coins + 1 per 2 levels
+return 10 + Math.floor(player.level / 2);
+}
+
+// ✨ MODIFIED: Update UI with all improvements
 function update(){
 hp.textContent = player.hp;
 hpmax.textContent = player.max;
@@ -834,7 +1023,7 @@ xp.textContent = player.xp;
 xpmax.textContent = player.xpMax;
 xpbar.style.width = (player.xp / player.xpMax * 100) + "%";
 
-// ✨ NEW: Energy bar update
+// ✨ FEATURE 3: Energy bar update
 updateEnergyUI();
 
 // ✨ NEW: Low HP warning
@@ -859,23 +1048,33 @@ coins.textContent = player.coins;
 gems.textContent = player.gems;
 level.textContent = player.level;
 playerName.textContent = player.name;
+  
+// ✨ NEW: Update achievement progress
+updateAchievementProgress();
+  
 saveGame();
 }
 
-// ✨ MODIFIED: Attack Function with Energy system and VIP bonus
+// ✨ MODIFIED: Attack Function with all improvements
 function attack(){
+if(attackCooldown) return; // ✨ FEATURE 7: Prevent rapid clicking
+  
 if(player.hp <= 0){
 toastMsg("❌ You are dead! Heal first!");
 return;
 }
 
-// ✨ FEATURE 1: Check energy
+// ✨ FEATURE 3: Check energy
 if (player.energy < 5) {
 toastMsg("⚡ Not enough energy! Wait for regeneration.");
 return;
 }
 
-// ✨ FEATURE 1: Consume energy
+// ✨ FEATURE 7: Set cooldown
+attackCooldown = true;
+setTimeout(() => { attackCooldown = false; }, 300);
+
+// ✨ FEATURE 3: Consume energy
 player.energy -= 5;
 updateEnergyUI();
 
@@ -910,8 +1109,8 @@ player.kills++;
 let xpGain = 20 + Math.floor(player.level * 2); // XP scales with level
 player.xp += xpGain;
   
-// ✨ FEATURE 3: Apply VIP bonus to coins
-let coinGain = 10;
+// ✨ FEATURE 7: Smoother coin reward scaling
+let coinGain = calculateCoinReward();
 coinGain = applyVIPBonus(coinGain);
   
 player.coins += coinGain;
@@ -934,9 +1133,9 @@ toastMsg(`+${xpGain}⚡ +${coinGain}💰`);
 }
 
 sounds.play('death');
-// ✨ NEW: Zombie difficulty scales more gradually
-zombie.hp = zombie.max + Math.floor(player.level * 3);
-zombie.max = zombie.hp;
+// ✨ FEATURE 7: Smoother zombie HP scaling
+zombie.max = calculateZombieHP();
+zombie.hp = zombie.max;
 }
 
 // Zombie counter attack
@@ -984,11 +1183,29 @@ toast.classList.add("show");
 setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-// ✨ FEATURE 2: New modal functions for VIP and Inventory
+// ✨ FEATURE 6: Improved VIP modal
 function openVIP() {
 const modal = document.getElementById('vipModal');
 const vipList = document.getElementById('vipList');
 vipList.innerHTML = '';
+
+// Show current VIP status
+const currentTier = vipTiers.find(t => t.id === player.vipTier);
+if (currentTier && currentTier.id > 0) {
+const statusDiv = document.createElement('div');
+statusDiv.className = 'vip-tier active';
+statusDiv.innerHTML = `
+<div class="vip-tier-header">
+<div class="vip-tier-name">✅ Active: ${currentTier.name}</div>
+<div class="vip-tier-bonus">+${currentTier.bonus}% coins</div>
+</div>
+<div style="background:#4caf50;color:#000;padding:5px 10px;border-radius:5px;display:inline-block;font-weight:bold;">
+VIP ACTIVE
+</div>
+<div class="vip-tier-desc">${currentTier.desc}</div>
+`;
+vipList.appendChild(statusDiv);
+}
 
 vipTiers.forEach(tier => {
 if (tier.id === 0) return; // Skip "No VIP" tier
@@ -997,17 +1214,21 @@ const div = document.createElement('div');
 div.className = 'vip-tier';
 if (player.vipTier === tier.id) {
 div.classList.add('active');
+} else if (tier.id > player.vipTier + 1) {
+div.classList.add('locked'); // ✨ FEATURE 6: Lock higher tiers
 }
+  
+const isLocked = tier.id > player.vipTier + 1;
   
 div.innerHTML = `
 <div class="vip-tier-header">
-<div class="vip-tier-name">${tier.name}</div>
+<div class="vip-tier-name">${tier.name} ${isLocked ? '🔒' : ''}</div>
 <div class="vip-tier-bonus">+${tier.bonus}% coins</div>
 </div>
 <div class="vip-tier-price">${tier.price} TON</div>
 <div class="vip-tier-desc">${tier.desc}</div>
-<button onclick="purchaseVIP(${tier.id})" style="width:100%;margin-top:10px;padding:8px;${player.vipTier === tier.id ? 'background:#4caf50' : 'background:#1e88e5'}">
-${player.vipTier === tier.id ? '✅ Active' : '👑 Purchase'}
+<button onclick="purchaseVIP(${tier.id})" style="width:100%;margin-top:10px;padding:8px;${player.vipTier === tier.id ? 'background:#4caf50' : isLocked ? 'background:#666' : 'background:#1e88e5'}" ${isLocked ? 'disabled' : ''}>
+${player.vipTier === tier.id ? '✅ Active' : isLocked ? '🔒 Locked' : '👑 Purchase'}
 </button>
 `;
 vipList.appendChild(div);
@@ -1026,6 +1247,11 @@ toastMsg(`✅ You already have ${tier.name}`);
 return;
 }
 
+if (tierId > player.vipTier + 1) {
+toastMsg("🔒 Unlock lower tiers first!");
+return;
+}
+
 // In a real app, this would process a real payment
 // For simulation, we'll just activate it
 player.vipTier = tierId;
@@ -1036,39 +1262,426 @@ toastMsg(`🎉 ${tier.name} activated! +${tier.bonus}% coin bonus!`);
 openVIP(); // Refresh the modal
 }
 
-// ✨ FEATURE 2: Inventory modal
+// ✨ FEATURE 4: Improved Inventory modal
 function openInventory() {
 const modal = document.getElementById('inventoryModal');
 const inventoryList = document.getElementById('inventoryList');
   
-inventoryList.innerHTML = `
-<div style="text-align:center;padding:20px;">
-<h3 style="color:#ffc107;">Your Inventory</h3>
-<p style="color:#aaa;margin-bottom:20px;">Items you've collected will appear here</p>
+// Clear existing content
+inventoryList.innerHTML = '';
   
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;text-align:center;">
-<div style="font-size:24px;">⚔️</div>
-<div style="font-weight:bold;margin:5px 0;">Weapons</div>
-<div style="font-size:12px;color:#4caf50;">${player.ownedWeapons.length} owned</div>
-</div>
+// Create header
+const header = document.createElement('div');
+header.style.textAlign = 'center';
+header.style.padding = '10px';
+header.innerHTML = '<h3 style="color:#ffc107;">Your Inventory</h3>';
+inventoryList.appendChild(header);
   
-<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;text-align:center;">
-<div style="font-size:24px;">🧙</div>
-<div style="font-weight:bold;margin:5px 0;">Characters</div>
-<div style="font-size:12px;color:#4caf50;">${player.ownedChars.length} owned</div>
-</div>
-</div>
+// Weapons section
+const weaponsSection = document.createElement('div');
+weaponsSection.style.marginBottom = '20px';
+weaponsSection.innerHTML = `
+<h4 style="color:#4caf50;margin-bottom:10px;">⚔️ Weapons (${player.ownedWeapons.length}/${Object.keys(weapons).length})</h4>
+<div style="display:flex;flex-wrap:wrap;gap:10px;">
+`;
   
-<div style="margin-top:20px;background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;">
-<h4 style="margin-top:0;color:#ffc107;">VIP Status</h4>
-<p style="color:#aaa;">Current Tier: <span style="color:#4caf50;font-weight:bold;">${vipTiers[player.vipTier].name}</span></p>
-<p style="color:#aaa;">Coin Bonus: <span style="color:#4caf50;font-weight:bold;">+${player.vipBonus}%</span></p>
-</div>
+player.ownedWeapons.forEach(weaponId => {
+const weapon = weapons[weaponId];
+const isEquipped = player.weapon === weaponId;
+weaponsSection.innerHTML += `
+<div style="background:${isEquipped ? 'rgba(255,193,7,0.2)' : 'rgba(255,255,255,0.05)'};padding:10px;border-radius:8px;border:2px solid ${isEquipped ? '#ffc107' : '#444'};text-align:center;min-width:80px;">
+<div style="font-size:24px;">${weapon.icon}</div>
+<div style="font-size:12px;font-weight:bold;">${weapon.name}</div>
+<div style="font-size:10px;color:#aaa;">DMG: ${weapon.dmg}</div>
+${isEquipped ? '<div style="font-size:10px;color:#ffc107;margin-top:5px;">EQUIPPED</div>' : ''}
 </div>
 `;
+});
+  
+weaponsSection.innerHTML += '</div>';
+inventoryList.appendChild(weaponsSection);
+  
+// Characters section
+const charsSection = document.createElement('div');
+charsSection.innerHTML = `
+<h4 style="color:#4caf50;margin-bottom:10px;">🧙 Characters (${player.ownedChars.length}/${Object.keys(characters).length})</h4>
+<div style="display:flex;flex-wrap:wrap;gap:10px;">
+`;
+  
+player.ownedChars.forEach(charId => {
+const char = characters[charId];
+const isEquipped = player.char === charId;
+let iconHTML = charId === 'ninja' && char.image ? 
+`<img src="${char.image}" alt="${char.name}" style="width:40px;height:40px;">` :
+`<div style="font-size:24px;">${char.icon}</div>`;
+  
+charsSection.innerHTML += `
+<div style="background:${isEquipped ? 'rgba(255,193,7,0.2)' : 'rgba(255,255,255,0.05)'};padding:10px;border-radius:8px;border:2px solid ${isEquipped ? '#ffc107' : '#444'};text-align:center;min-width:80px;">
+${iconHTML}
+<div style="font-size:12px;font-weight:bold;margin-top:5px;">${char.name}</div>
+<div style="font-size:10px;color:#aaa;">HP: ${char.hp}</div>
+${isEquipped ? '<div style="font-size:10px;color:#ffc107;margin-top:5px;">EQUIPPED</div>' : ''}
+</div>
+`;
+});
+  
+charsSection.innerHTML += '</div>';
+inventoryList.appendChild(charsSection);
+  
+// VIP Status
+const vipSection = document.createElement('div');
+vipSection.style.marginTop = '20px';
+vipSection.style.padding = '15px';
+vipSection.style.background = 'rgba(255,215,0,0.1)';
+vipSection.style.borderRadius = '8px';
+vipSection.innerHTML = `
+<h4 style="color:#ffc107;margin-top:0;">👑 VIP Status</h4>
+<p style="font-size:12px;color:#aaa;margin:5px 0;">Current Tier: <span style="color:#ffc107;font-weight:bold;">${vipTiers[player.vipTier].name}</span></p>
+<p style="font-size:12px;color:#aaa;margin:5px 0;">Coin Bonus: <span style="color:#4caf50;font-weight:bold;">+${player.vipBonus}%</span></p>
+${player.vipTier > 0 ? '<div style="background:#4caf50;color:#000;padding:3px 8px;border-radius:5px;display:inline-block;font-size:10px;font-weight:bold;margin-top:5px;">VIP ACTIVE</div>' : ''}
+`;
+inventoryList.appendChild(vipSection);
 
 modal.classList.add('show');
+}
+
+// ✨ FEATURE 5: Achievements system
+function openAchievements() {
+const modal = document.getElementById('achievementsModal');
+const achievementsList = document.getElementById('achievementsList');
+achievementsList.innerHTML = '';
+
+const achievements = [
+{
+id: 'kill100',
+name: 'Zombie Slayer',
+desc: 'Kill 100 zombies',
+reward: '500 coins',
+progress: player.achievements.kill100.progress,
+target: player.achievements.kill100.target,
+completed: player.achievements.kill100.completed,
+claimed: player.achievements.kill100.claimed
+},
+{
+id: 'level10',
+name: 'Seasoned Warrior',
+desc: 'Reach Level 10',
+reward: '0.01 TON',
+progress: player.achievements.level10.progress,
+target: player.achievements.level10.target,
+completed: player.achievements.level10.completed,
+claimed: player.achievements.level10.claimed
+},
+{
+id: 'spin5',
+name: 'Lucky Spinner',
+desc: 'Spin the wheel 5 times',
+reward: '0.02 TON',
+progress: player.achievements.spin5.progress,
+target: player.achievements.spin5.target,
+completed: player.achievements.spin5.completed,
+claimed: player.achievements.spin5.claimed
+},
+{
+id: 'daily7',
+name: 'Daily Grinder',
+desc: 'Claim daily reward 7 times',
+reward: '0.05 TON',
+progress: player.achievements.daily7.progress,
+target: player.achievements.daily7.target,
+completed: player.achievements.daily7.completed,
+claimed: player.achievements.daily7.claimed
+}
+];
+
+achievements.forEach(ach => {
+const div = document.createElement('div');
+div.className = 'achievement-item';
+if (ach.completed && ach.claimed) {
+div.classList.add('claimed');
+} else if (ach.completed) {
+div.classList.add('completed');
+}
+
+const progressPercent = Math.min((ach.progress / ach.target) * 100, 100);
+
+div.innerHTML = `
+<div class="achievement-header">
+<div class="achievement-name">${ach.name}</div>
+<div class="achievement-reward">${ach.reward}</div>
+</div>
+<div class="achievement-desc">${ach.desc}</div>
+<div class="achievement-progress">
+<div class="achievement-progress-bar" style="width:${progressPercent}%"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:12px;">
+<div>Progress: ${ach.progress}/${ach.target}</div>
+<button onclick="claimAchievement('${ach.id}')" style="padding:5px 10px;font-size:11px;${ach.completed && !ach.claimed ? 'background:#4caf50' : ach.claimed ? 'background:#ffc107' : 'background:#666'}" ${!ach.completed || ach.claimed ? 'disabled' : ''}>
+${ach.claimed ? '✅ Claimed' : ach.completed ? '🏆 Claim' : '🔒 Locked'}
+</button>
+</div>
+`;
+achievementsList.appendChild(div);
+});
+
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 5: Update achievement progress
+function updateAchievementProgress() {
+// Update progress
+player.achievements.kill100.progress = player.kills;
+player.achievements.level10.progress = player.level;
+player.achievements.spin5.progress = player.spinCount;
+player.achievements.daily7.progress = player.dailyCount;
+
+// Check completion
+player.achievements.kill100.completed = player.kills >= 100;
+player.achievements.level10.completed = player.level >= 10;
+player.achievements.spin5.completed = player.spinCount >= 5;
+player.achievements.daily7.completed = player.dailyCount >= 7;
+}
+
+// ✨ FEATURE 5: Claim achievement
+function claimAchievement(achievementId) {
+const achievement = player.achievements[achievementId];
+if (!achievement) return;
+  
+if (!achievement.completed) {
+toastMsg("❌ Achievement not completed yet!");
+return;
+}
+  
+if (achievement.claimed) {
+toastMsg("✅ Already claimed!");
+return;
+}
+  
+// Give rewards based on achievement
+switch(achievementId) {
+case 'kill100':
+player.coins += 500;
+toastMsg("🏆 Achievement claimed! +500 coins!");
+break;
+case 'level10':
+// In real game, this would add TON
+toastMsg("🏆 Achievement claimed! +0.01 TON!");
+break;
+case 'spin5':
+// In real game, this would add TON
+toastMsg("🏆 Achievement claimed! +0.02 TON!");
+break;
+case 'daily7':
+// In real game, this would add TON
+toastMsg("🏆 Achievement claimed! +0.05 TON!");
+break;
+}
+  
+achievement.claimed = true;
+saveGame();
+update();
+openAchievements(); // Refresh modal
+}
+
+// ✨ FEATURE 1 & 2: Spin wheel with 24-hour cooldown
+function openSpinWheel() {
+const modal = document.getElementById('spinModal');
+const wheel = document.getElementById('wheel');
+wheel.innerHTML = "";
+
+// Create 6 wheel slices (60 degrees each)
+for(let i = 0; i < 6; i++) {
+let slice = document.createElement("div");
+slice.className = "wheel-slice";
+slice.style.transform = `rotate(${i * 60}deg)`;
+slice.style.backgroundColor = wheelColors[i];
+slice.innerHTML = `<div style="transform:rotate(30deg);font-size:16px;font-weight:bold;">${wheelPrizes[i].text}</div>`;
+wheel.appendChild(slice);
+}
+
+// Update timer
+updateSpinTimer();
+
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 1: Update spin timer
+function updateSpinTimer() {
+const now = Date.now();
+const lastSpin = player.lastSpinTime || 0;
+const cooldown = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const timeLeft = cooldown - (now - lastSpin);
+  
+const spinButton = document.getElementById('spinButton');
+const spinTimerElement = document.getElementById('spinTimer');
+  
+if (timeLeft > 0) {
+// Still in cooldown
+spinButton.disabled = true;
+spinButton.textContent = '⏳ Spin Cooldown';
+spinTimerElement.textContent = `Next spin in: ${formatTime(timeLeft)}`;
+spinTimerElement.classList.add('active');
+} else {
+// Ready to spin
+spinButton.disabled = false;
+spinButton.textContent = '🎰 SPIN (Free)';
+spinTimerElement.textContent = 'Ready to spin!';
+spinTimerElement.classList.remove('active');
+}
+}
+
+// ✨ FEATURE 1: Spin wheel function with cooldown
+function spinWheel(){
+if(isSpinning) return;
+  
+const now = Date.now();
+const lastSpin = player.lastSpinTime || 0;
+const cooldown = 24 * 60 * 60 * 1000;
+  
+if (now - lastSpin < cooldown) {
+toastMsg("⏳ You can spin again in " + formatTime(cooldown - (now - lastSpin)));
+return;
+}
+
+isSpinning = true;
+
+const wheel = document.getElementById('wheel');
+const spinButton = document.getElementById('spinButton');
+const result = document.getElementById('spinResult');
+
+spinButton.disabled = true;
+result.textContent = "";
+
+// Random prize selection
+let prizeIndex = Math.floor(Math.random() * wheelPrizes.length);
+let prize = wheelPrizes[prizeIndex];
+
+// Calculate rotation (multiple full rotations + prize offset)
+let rotations = 5;
+let targetAngle = rotations * 360 + (360 - (prizeIndex * 60) - 30); // 60 degrees per slice, 30 degrees offset
+
+wheel.style.transform = `rotate(${targetAngle}deg)`;
+sounds.play('spin');
+
+setTimeout(() => {
+// Give prize
+if (prize.type === "coins") {
+let finalPrize = prize.value;
+if (prize.value > 0) {
+finalPrize = applyVIPBonus(prize.value);
+player.coins += finalPrize;
+player.coinsEarned += finalPrize;
+}
+result.textContent = `🎉 You won ${finalPrize} coins!`;
+} else if (prize.type === "ton") {
+result.textContent = `🎉 You won ${prize.value} TON!`;
+} else {
+result.textContent = "😅 Better luck next time!";
+}
+
+// Update player data
+player.lastSpinTime = Date.now();
+player.spinCount = (player.spinCount || 0) + 1;
+updateAchievementProgress();
+saveGame();
+update();
+
+isSpinning = false;
+updateSpinTimer(); // Update timer immediately
+
+// Update spin count in achievements
+if (player.achievements.spin5) {
+player.achievements.spin5.progress = player.spinCount;
+player.achievements.spin5.completed = player.spinCount >= 5;
+}
+}, 3500);
+}
+
+// ✨ FEATURE 2: Daily reward system
+function openDailyReward() {
+const modal = document.getElementById('dailyRewardModal');
+const dailyVIPBonusElement = document.getElementById('dailyVIPBonus');
+if (dailyVIPBonusElement) {
+dailyVIPBonusElement.textContent = player.vipBonus;
+}
+updateDailyTimer();
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 2: Update daily timer
+function updateDailyTimer() {
+const now = Date.now();
+const lastDaily = player.lastDailyTime || 0;
+const cooldown = 24 * 60 * 60 * 1000; // 24 hours
+const timeLeft = cooldown - (now - lastDaily);
+  
+const dailyTimerElement = document.getElementById('dailyTimer');
+const dailyClaimButton = document.getElementById('dailyClaimButton');
+  
+if (timeLeft > 0) {
+// Still in cooldown
+dailyTimerElement.textContent = formatTime(timeLeft);
+dailyClaimButton.disabled = true;
+dailyClaimButton.textContent = `⏳ Claim in ${formatTime(timeLeft)}`;
+} else {
+// Ready to claim
+dailyTimerElement.textContent = "🎁 Ready to claim!";
+dailyClaimButton.disabled = false;
+dailyClaimButton.textContent = "🎁 Claim Daily Reward";
+}
+}
+
+// ✨ FEATURE 2: Claim daily reward
+function claimDailyReward() {
+const now = Date.now();
+const lastDaily = player.lastDailyTime || 0;
+const cooldown = 24 * 60 * 60 * 1000;
+  
+if (now - lastDaily < cooldown) {
+toastMsg("⏳ You can claim again in " + formatTime(cooldown - (now - lastDaily)));
+return;
+}
+  
+// Give reward
+let coins = 50;
+let ton = 0.005;
+  
+coins = applyVIPBonus(coins);
+  
+player.coins += coins;
+player.coinsEarned += coins;
+player.lastDailyTime = Date.now();
+player.dailyCount = (player.dailyCount || 0) + 1;
+  
+updateAchievementProgress();
+saveGame();
+update();
+  
+toastMsg(`🎁 Daily reward claimed! +${coins} coins + ${ton} TON${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
+closeModal('dailyRewardModal');
+}
+
+// ✨ NEW: Format time function (HH:MM:SS)
+function formatTime(ms) {
+const totalSeconds = Math.floor(ms / 1000);
+const hours = Math.floor(totalSeconds / 3600);
+const minutes = Math.floor((totalSeconds % 3600) / 60);
+const seconds = totalSeconds % 60;
+  
+return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// ✨ NEW: Start all timers
+function startTimers() {
+// Clear existing intervals
+if (spinTimerInterval) clearInterval(spinTimerInterval);
+if (dailyTimerInterval) clearInterval(dailyTimerInterval);
+  
+// Update spin timer every second
+spinTimerInterval = setInterval(updateSpinTimer, 1000);
+  
+// Update daily timer every second
+dailyTimerInterval = setInterval(updateDailyTimer, 1000);
 }
 
 // ✨ FEATURE 4: Withdrawal functions
@@ -1181,18 +1794,6 @@ player.coins += adReward;
 player.coinsEarned += adReward;
 update();
 toastMsg(`📺 +${adReward} coins from ad!${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
-}
-
-// ✨ FEATURE 4: Modified daily function to include VIP bonus
-function daily(){
-// ✨ FEATURE 3: Apply VIP bonus to daily rewards
-let dailyReward = 100;
-dailyReward = applyVIPBonus(dailyReward);
-  
-player.coins += dailyReward;
-player.coinsEarned += dailyReward;
-update();
-toastMsg(`🎁 +${dailyReward} daily coins!${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
 }
 
 // Other existing functions (unchanged but kept for completeness)
@@ -1339,7 +1940,9 @@ let stats = [
 {label: "Current Energy", value: `${player.energy}/${player.energyMax}`},
 {label: "Current Weapon", value: weapons[player.weapon].name},
 {label: "Current Character", value: characters[player.char].name},
-{label: "Referrals", value: player.referrals}
+{label: "Referrals", value: player.referrals},
+{label: "Total Spins", value: player.spinCount || 0},
+{label: "Daily Claims", value: player.dailyCount || 0}
 ];
 
 stats.forEach(s => {
@@ -1392,8 +1995,8 @@ list.innerHTML = `
 <span>📱 About</span>
 </label>
 <p style="font-size:12px;color:#aaa;margin-top:8px;">
-Zombie Fighter - TON Edition v1.2<br>
-With Energy & VIP Systems
+Zombie Fighter - TON Edition v1.3<br>
+With Energy, VIP & Achievements Systems
 </p>
 </div>
 `;
@@ -1467,7 +2070,17 @@ ownedWeapons: ["sword"],
 ownedChars: ["hero"],
 soundEnabled: true,
 vipTier: 0,
-vipBonus: 0
+vipBonus: 0,
+lastSpinTime: 0,
+spinCount: 0,
+lastDailyTime: 0,
+dailyCount: 0,
+achievements: {
+kill100: {completed: false, claimed: false, progress: 0, target: 100},
+level10: {completed: false, claimed: false, progress: 0, target: 10},
+spin5: {completed: false, claimed: false, progress: 0, target: 5},
+daily7: {completed: false, claimed: false, progress: 0, target: 7}
+}
 };
 skills = {
 damage: {level: 0, max: 5},
@@ -1475,6 +2088,10 @@ hp: {level: 0, max: 5},
 crit: {level: 0, max: 3}
 };
 zombie = {hp: 30, max: 30};
+  
+// Restart timers
+startTimers();
+  
 update();
 closeModal('confirmModal');
 toastMsg("✅ Game reset!");
@@ -1512,83 +2129,22 @@ toastMsg("✅ Referral code copied!");
 });
 }
 
-function openSpinWheel(){
-const modal = document.getElementById('spinModal');
-const wheel = document.getElementById('wheel');
-wheel.innerHTML = "";
-
-// Create wheel slices
-for(let i=0;i<8;i++){
-let slice = document.createElement("div");
-slice.className = "wheel-slice";
-slice.style.transform = `rotate(${i * 45}deg)`;
-slice.style.backgroundColor = wheelColors[i];
-slice.innerHTML = `<div style="transform:rotate(45deg)">${wheelPrizes[i]}💰</div>`;
-wheel.appendChild(slice);
-}
-
-// ✨ FEATURE 5: Update wheel center with ninja image
-const wheelCenterImage = document.getElementById('wheelCenterImage');
-if (wheelCenterImage) {
-wheelCenterImage.src = characters.ninja.image;
-}
-
-modal.classList.add('show');
-}
-
-function spinWheel(){
-if(isSpinning) return;
-isSpinning = true;
-
-const wheel = document.getElementById('wheel');
-const spinButton = document.getElementById('spinButton');
-const result = document.getElementById('spinResult');
-
-spinButton.disabled = true;
-result.textContent = "";
-
-// Random prize selection
-let prizeIndex = Math.floor(Math.random() * wheelPrizes.length);
-let prize = wheelPrizes[prizeIndex];
-
-// Calculate rotation (multiple full rotations + prize offset)
-let rotations = 5;
-let targetAngle = rotations * 360 + (360 - (prizeIndex * 45) - 22.5);
-
-wheel.style.transform = `rotate(${targetAngle}deg)`;
-sounds.play('spin');
-
-setTimeout(() => {
-// ✨ FEATURE 3: Apply VIP bonus to wheel prizes
-let finalPrize = prize;
-if (prize > 0) {
-finalPrize = applyVIPBonus(prize);
-player.coins += finalPrize;
-player.coinsEarned += finalPrize;
-update();
-}
-
-result.textContent = `🎉 You won ${finalPrize} coins!${player.vipBonus > 0 && prize > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`;
-if(prize === 0){
-result.textContent = "😅 Better luck next time!";
-}
-
-isSpinning = false;
-spinButton.disabled = false;
-}, 3500);
-}
-
 // Initialize
 window.onload = function(){
 initSounds();
 loadGame();
-openSpinWheel(); // Initialize wheel
 
 // ✨ FEATURE 4: Add event listener for withdrawal amount input
 const withdrawAmountInput = document.getElementById('withdrawAmount');
 if (withdrawAmountInput) {
 withdrawAmountInput.addEventListener('input', updateWithdrawalSummary);
 withdrawAmountInput.addEventListener('change', updateWithdrawalSummary);
+}
+  
+// ✨ FEATURE 3: Fix daily function to open modal
+const dailyButton = document.querySelector('.side-menu.left .side-btn:nth-child(2)');
+if (dailyButton) {
+dailyButton.setAttribute('onclick', 'openDailyReward()');
 }
 };
 
