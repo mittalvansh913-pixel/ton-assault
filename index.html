@@ -441,7 +441,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-weight:bold;
-font-size:20px; /* Bigger text */
+font-size:24px; /* Bigger text */
 color:#000;
 text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
@@ -549,6 +549,45 @@ cursor:pointer;
 }
 .bottom-btn:active{background:#222}
 
+/* MAIN ACTION ROW */
+.main-action-row {
+position: fixed;
+bottom: 70px;
+left: 0;
+width: 100%;
+display: flex;
+justify-content: center;
+gap: 15px;
+z-index: 100;
+}
+.action-btn {
+width: 70px;
+height: 70px;
+border-radius: 50%;
+font-size: 30px;
+display: flex;
+align-items: center;
+justify-content: center;
+border: none;
+cursor: pointer;
+box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+.action-btn:active { transform: scale(0.95); }
+
+/* WALLET BUTTON */
+.wallet-btn {
+position: absolute;
+top: 15px;
+right: 15px;
+background: none;
+border: none;
+color: #fff;
+font-size: 24px;
+cursor: pointer;
+padding: 8px;
+z-index: 10;
+}
+
 /* CONFIRM DIALOG */
 .confirm-dialog{
 background:#1a1a2e;padding:20px;border-radius:12px;
@@ -557,6 +596,44 @@ text-align:center;max-width:300px;
 .confirm-dialog h3{margin-top:0}
 .confirm-dialog .buttons{display:flex;gap:10px;margin-top:15px}
 .confirm-dialog button{flex:1;padding:10px}
+
+/* SKIN PACKS */
+.skin-pack-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+margin-top: 15px;
+}
+.skin-pack-card {
+background: rgba(255,255,255,0.05);
+border-radius: 10px;
+padding: 15px;
+border: 2px solid #444;
+text-align: center;
+}
+.skin-pack-card.common { border-color: #1e88e5; }
+.skin-pack-card.rare { border-color: #4caf50; }
+.skin-pack-card.epic { border-color: #9c27b0; }
+.skin-pack-card.legendary { border-color: #ffc107; }
+.skin-pack-icon {
+font-size: 36px;
+margin-bottom: 10px;
+}
+.skin-pack-name {
+font-weight: bold;
+margin-bottom: 5px;
+}
+.skin-pack-rarity {
+font-size: 12px;
+padding: 2px 8px;
+border-radius: 10px;
+display: inline-block;
+margin-bottom: 8px;
+}
+.skin-pack-rarity.common { background: #1e88e5; }
+.skin-pack-rarity.rare { background: #4caf50; }
+.skin-pack-rarity.epic { background: #9c27b0; }
+.skin-pack-rarity.legendary { background: #ffc107; color: #000; }
 </style>
 </head>
 
@@ -572,9 +649,15 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 
 <div class="container">
 <div class="top">
+<div style="display:flex;align-items:center;gap:10px;">
 <div class="stat">👤 <span id="playerName">Player</span></div>
 <div class="stat">⭐ <span id="level">1</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;">
 <div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
+<!-- Wallet Button -->
+<button class="wallet-btn" onclick="openWallet()">💰</button>
+</div>
 </div>
 
 <!-- ✨ NEW: XP Progress Bar -->
@@ -602,31 +685,41 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
 
-<button id="attackButton" onclick="protectedAttack()" class="button-click-protected">⚔️ Attack</button>
+<!-- MAIN ACTION ROW -->
+<div class="main-action-row">
+<button class="action-btn" onclick="openSkills()" style="background:#2196f3;">✨</button>
+<button id="axeAttackButton" class="action-btn button-click-protected" onclick="protectedAttack()" style="background:#ff5255;">🪓</button>
+<button class="action-btn" onclick="openSkins()" style="background:#9c27b0;">🎨</button>
+</div>
+
 <div id="energyWarning" style="color:#ff5252;font-size:12px;margin-top:5px;display:none;">⚡ Not enough energy</div>
 </div>
 
-<!-- SIDE MENUS -->
+<!-- UPDATED LEFT SIDE MENU (6 ICONS) -->
 <div class="side-menu left">
 <div class="side-btn" onclick="protectedWatchAd()">📺</div>
 <div class="side-btn" onclick="openDailyReward()">🎁</div>
-<div class="side-btn" onclick="openReferral()">👥</div>
 <div class="side-btn" onclick="openSpinWheel()">🎡</div>
+<div class="side-btn" onclick="openReferral()">👥</div>
+<div class="side-btn" onclick="openLeaderboard()">🏆</div>
+<div class="side-btn" onclick="openAchievements()">🏅</div>
 </div>
 
+<!-- UPDATED RIGHT SIDE MENU (6 ICONS) -->
 <div class="side-menu right">
-<div class="side-btn" onclick="openShop()">🛒</div>
-<div class="side-btn" onclick="openVIP()">👑</div>
-<div class="side-btn" onclick="openProfile()">👤</div>
-<div class="side-btn" onclick="openSkins()">🎨</div>
-<div class="side-btn" onclick="openAchievements()">🏆</div>
+<div class="side-btn" onclick="openSettings()">⚙️</div>
+<div class="side-btn" onclick="openBossRaid()">👹</div>
+<div class="side-btn" onclick="openStats()">📊</div>
+<div class="side-btn" onclick="openVIP()">⭐</div>
+<div class="side-btn" onclick="openConvertGems()">🔁</div>
+<div class="side-btn" onclick="openSeasonPass()">🎫</div>
 </div>
 
-<!-- BOTTOM MENU -->
+<!-- UPDATED BOTTOM MENU (3 ICONS ONLY) -->
 <div class="bottom-menu">
 <div class="bottom-btn" onclick="openWeapons()">⚔️ Weapons</div>
 <div class="bottom-btn" onclick="openCharacters()">🧙 Characters</div>
-<div class="bottom-btn" onclick="openSkills()">✨ Skills</div>
+<div class="bottom-btn" onclick="openShop()">🛒 Shop</div>
 </div>
 
 <!-- ✨ NEW: PROFILE MODAL -->
@@ -671,8 +764,9 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button class="close-btn" onclick="closeModal('skinsModal')">✕</button>
 </div>
 <div id="skinsContent">
-<p style="text-align:center;color:#aaa;padding:20px;">Select a skin pack to preview</p>
-<div id="skinsList"></div>
+<div class="skin-pack-grid" id="skinsList">
+<!-- Skin packs will be loaded here -->
+</div>
 </div>
 </div>
 </div>
@@ -714,7 +808,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="vipModal" class="modal">
 <div class="modal-box">
 <div class="modal-header">
-<h2>👑 VIP System</h2>
+<h2>⭐ VIP Upgrade</h2>
 <button class="close-btn" onclick="closeModal('vipModal')">✕</button>
 </div>
 <div id="vipList"></div>
@@ -745,7 +839,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="achievementsModal" class="modal">
 <div class="modal-box">
 <div class="modal-header">
-<h2>🏆 Achievements</h2>
+<h2>🏅 Achievements</h2>
 <button class="close-btn" onclick="closeModal('achievementsModal')">✕</button>
 </div>
 <div id="achievementsList"></div>
@@ -819,7 +913,6 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="wheel-pointer"></div>
 <div class="wheel" id="wheel"></div>
 <div class="wheel-center">
-<!-- ✨ FEATURE 5: Ninja image in wheel center -->
 <img id="wheelCenterImage" src="https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e" alt="Ninja">
 </div>
 </div>
@@ -828,6 +921,38 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button id="spinButton" onclick="protectedSpinWheel()" class="button-click-protected" style="width:100%;padding:12px;margin-top:10px" disabled>
 🔒 SPIN (Cooldown)
 </button>
+</div>
+</div>
+
+<!-- ✨ NEW: WALLET MODAL -->
+<div id="walletModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>💰 Wallet</h2>
+<button class="close-btn" onclick="closeModal('walletModal')">✕</button>
+</div>
+<div style="padding:15px;">
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:20px;">
+<h3 style="margin-top:0;color:#ffc107;">TON Balance</h3>
+<p style="font-size:32px;font-weight:bold;text-align:center;margin:10px 0;">0.000</p>
+<p style="font-size:12px;color:#aaa;text-align:center;">≈ $0.00</p>
+</div>
+<div style="margin-bottom:15px;">
+<label style="display:block;margin-bottom:5px;color:#aaa;">Connected Address:</label>
+<div style="background:#0f0f1e;padding:10px;border-radius:8px;border:1px solid #444;font-size:12px;word-break:break-all;">
+Not connected
+</div>
+</div>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:20px;">
+<h4 style="margin-top:0;color:#4caf50;">Withdrawal Rules</h4>
+<p style="font-size:14px;color:#aaa;margin:5px 0;">• Minimum: <strong>20 TON</strong></p>
+<p style="font-size:14px;color:#aaa;margin:5px 0;">• Fee: <strong>25%</strong></p>
+<p style="font-size:14px;color:#aaa;margin:5px 0;">• Processing Time: 24-48 hours</p>
+</div>
+<button onclick="openWithdrawal()" style="width:100%;padding:12px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:bold;">
+💸 Withdraw TON
+</button>
+</div>
 </div>
 </div>
 
@@ -844,6 +969,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <p style="font-size:14px;color:#aaa;">• Minimum: <strong>20 TON</strong></p>
 <p style="font-size:14px;color:#aaa;">• Fee: <strong>25%</strong></p>
 <p style="font-size:14px;color:#aaa;">• Network: TON Blockchain</p>
+<p style="font-size:14px;color:#aaa;">• Processing Time: 24-48 hours</p>
 </div>
 <div style="margin-bottom:15px;">
 <label style="display:block;margin-bottom:5px;">Amount to Withdraw (TON):</label>
@@ -858,6 +984,148 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button onclick="processWithdrawal()" style="width:100%;padding:12px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:bold;">
 💸 Request Withdrawal
 </button>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: BOSS RAID MODAL -->
+<div id="bossRaidModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>👹 Boss Raid</h2>
+<button class="close-btn" onclick="closeModal('bossRaidModal')">✕</button>
+</div>
+<div style="padding:15px;text-align:center;">
+<div style="font-size:72px;margin:20px 0;">👹</div>
+<h3>Giant Zombie King</h3>
+<p style="color:#aaa;margin-bottom:20px;">Fight the boss with other players!</p>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:10px;margin-bottom:20px;">
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+<span>Boss HP:</span>
+<span style="color:#ff5252;">5,000,000/5,000,000</span>
+</div>
+<div class="bar"><div style="width:100%;background:#ff5252"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;">
+<div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+<div style="font-size:12px;color:#aaa;">Participants</div>
+<div style="font-size:20px;font-weight:bold;">128</div>
+</div>
+<div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+<div style="font-size:12px;color:#aaa;">Time Left</div>
+<div style="font-size:20px;font-weight:bold;color:#4caf50;">24:30:15</div>
+</div>
+</div>
+<button onclick="joinBossRaid()" style="width:100%;padding:12px;background:#ff5252;color:#fff;border:none;border-radius:8px;font-weight:bold;font-size:16px;">
+⚔️ Join Raid
+</button>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: CONVERT GEMS MODAL -->
+<div id="convertGemsModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🔁 Convert Gems → TON</h2>
+<button class="close-btn" onclick="closeModal('convertGemsModal')">✕</button>
+</div>
+<div style="padding:15px;text-align:center;">
+<div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;margin-bottom:20px;">
+<div style="font-size:14px;color:#aaa;">Conversion Rate</div>
+<div style="font-size:28px;font-weight:bold;color:#ffc107;margin:10px 0;">
+100 💎 = 0.1 TON
+</div>
+<div style="font-size:12px;color:#4caf50;">1 💎 = 0.001 TON</div>
+</div>
+<div style="margin-bottom:20px;">
+<label style="display:block;margin-bottom:10px;color:#aaa;">Gems to Convert:</label>
+<div style="display:flex;align-items:center;gap:10px;">
+<button onclick="adjustGems(-100)" style="padding:10px 15px;background:#444;border-radius:8px;">-100</button>
+<input type="number" id="gemsToConvert" value="100" min="100" step="100" style="flex:1;padding:10px;background:#0f0f1e;border:1px solid #444;border-radius:8px;color:#fff;text-align:center;">
+<button onclick="adjustGems(100)" style="padding:10px 15px;background:#444;border-radius:8px;">+100</button>
+</div>
+<div style="margin-top:10px;font-size:12px;color:#aaa;">
+Available Gems: <span style="color:#ffc107;font-weight:bold;" id="availableGems">0</span> 💎
+</div>
+</div>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:20px;">
+<h4 style="margin-top:0;color:#4caf50;">Conversion Summary</h4>
+<p>You convert: <span style="color:#ffc107;font-weight:bold;" id="convertGemsAmount">100</span> 💎</p>
+<p>You receive: <span style="color:#4caf50;font-weight:bold;" id="receiveTONAmount">0.1</span> TON</p>
+</div>
+<button onclick="convertGemsToTON()" style="width:100%;padding:12px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:bold;">
+💎 Convert to TON
+</button>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: SEASON PASS MODAL -->
+<div id="seasonPassModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🎫 Season Pass</h2>
+<button class="close-btn" onclick="closeModal('seasonPassModal')">✕</button>
+</div>
+<div style="padding:15px;">
+<div style="text-align:center;margin-bottom:20px;">
+<div style="font-size:14px;color:#aaa;">Season 1 • Days Left: <span style="color:#4caf50;font-weight:bold;">28</span></div>
+<div style="font-size:24px;font-weight:bold;color:#ffc107;">Zombie Apocalypse</div>
+</div>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:20px;">
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+<span style="font-weight:bold;">Free Track</span>
+<span style="color:#aaa;">Level 5/30</span>
+</div>
+<div class="bar"><div style="width:17%;background:#1e88e5"></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;border:2px solid #1e88e5;">
+<h4 style="margin-top:0;color:#1e88e5;">Free</h4>
+<ul style="text-align:left;padding-left:20px;font-size:12px;color:#aaa;">
+<li>100 Coins (Level 1)</li>
+<li>Common Skin (Level 5)</li>
+<li>500 Coins (Level 10)</li>
+<li>Rare Weapon (Level 20)</li>
+</ul>
+</div>
+<div style="background:rgba(255,193,7,0.1);padding:15px;border-radius:8px;border:2px solid #ffc107;">
+<div style="position:absolute;top:-10px;right:10px;background:#ffc107;color:#000;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:bold;">PREMIUM</div>
+<h4 style="margin-top:0;color:#ffc107;">Premium Pass</h4>
+<p style="font-size:24px;color:#ffc107;font-weight:bold;">2.5 TON</p>
+<ul style="text-align:left;padding-left:20px;font-size:12px;color:#aaa;">
+<li>All Free Rewards +</li>
+<li>+100% XP Boost</li>
+<li>Epic Character (Level 1)</li>
+<li>Legendary Skin (Level 15)</li>
+<li>5,000 Coins (Level 30)</li>
+</ul>
+</div>
+</div>
+<button onclick="buySeasonPass()" style="width:100%;padding:12px;background:linear-gradient(45deg, #ffc107, #ff9800);color:#000;border:none;border-radius:8px;font-weight:bold;">
+🎫 Buy Premium Pass - 2.5 TON
+</button>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: LEADERBOARD MODAL -->
+<div id="leaderboardModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🏆 Leaderboard</h2>
+<button class="close-btn" onclick="closeModal('leaderboardModal')">✕</button>
+</div>
+<div style="padding:15px;">
+<div style="display:flex;justify-content:space-around;margin-bottom:20px;border-bottom:1px solid #444;padding-bottom:10px;">
+<button onclick="switchLeaderboardTab('weekly')" style="background:none;border:none;color:#fff;padding:8px 15px;border-radius:5px;" id="weeklyTab">Weekly</button>
+<button onclick="switchLeaderboardTab('alltime')" style="background:none;border:none;color:#aaa;padding:8px 15px;border-radius:5px;" id="alltimeTab">All Time</button>
+<button onclick="switchLeaderboardTab('referral')" style="background:none;border:none;color:#aaa;padding:8px 15px;border-radius:5px;" id="referralTab">Referrals</button>
+</div>
+<div id="leaderboardContent">
+<!-- Content will be loaded here -->
+</div>
 </div>
 </div>
 </div>
@@ -1008,49 +1276,49 @@ skins: {} // Character-specific skins
 
 let zombie = {hp: 30, max: 30};
 
-// ✨ FEATURE 1: Updated spin wheel prizes (6 slots)
+// ✨ FEATURE 1: Updated spin wheel prizes (6 slots) - BIGGER TEXT
 const wheelPrizes = [
-{text: "50 Coins", value: 50, type: "coins"},
-{text: "100 Coins", value: 100, type: "coins"},
-{text: "200 Coins", value: 200, type: "coins"},
-{text: "0.001 TON", value: 0.001, type: "ton"},
-{text: "0.002 TON", value: 0.002, type: "ton"},
-{text: "Sorry 😅", value: 0, type: "none"}
+{text: "500", value: 500, type: "coins"},
+{text: "1000", value: 1000, type: "coins"},
+{text: "2000", value: 2000, type: "coins"},
+{text: "0.005", value: 0.005, type: "ton"},
+{text: "0.01", value: 0.01, type: "ton"},
+{text: "SORRY", value: 0, type: "none"}
 ];
 const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336'];
 
-// ✨ FEATURE 2: Skin packs data
+// ✨ FEATURE 2: Skin packs data - UPDATED with proper rarities
 const skinPacks = [
-{id: "starter", name: "Starter Pack", price: 0, priceType: "free", icon: "🎁", desc: "Free basic skins", skins: ["hero_basic"]},
-{id: "ninja", name: "Ninja Pack", price: 0.2, priceType: "ton", icon: "🥷", desc: "Ninja-themed skins", skins: ["ninja_dark", "hero_ninja"]},
-{id: "dark", name: "Dark Pack", price: 0.5, priceType: "ton", icon: "🌑", desc: "Dark-themed skins", skins: ["hero_dark", "slayer_dark"]},
-{id: "neon", name: "Neon Pack", price: 1, priceType: "ton", icon: "💡", desc: "Neon glow skins", skins: ["hero_neon", "wizard_neon", "knight_neon"]}
+{id: "common", name: "Starter Pack", price: 0, priceType: "free", icon: "🎁", desc: "Free basic skins", rarity: "common", skins: ["hero_basic"]},
+{id: "rare", name: "Ninja Pack", price: 0.2, priceType: "ton", icon: "🥷", desc: "Ninja-themed skins", rarity: "rare", skins: ["ninja_dark", "hero_ninja"]},
+{id: "epic", name: "Dark Pack", price: 0.5, priceType: "ton", icon: "🌑", desc: "Dark-themed skins", rarity: "epic", skins: ["hero_dark", "slayer_dark"]},
+{id: "legendary", name: "Neon Pack", price: 1, priceType: "ton", icon: "💡", desc: "Neon glow skins", rarity: "legendary", skins: ["hero_neon", "wizard_neon", "knight_neon"]}
 ];
 
 // ✨ FEATURE 2: Character skins data
 const characterSkins = {
 hero: [
-{id: "default", name: "Default", icon: "🦸‍♂️", pack: "starter"},
-{id: "hero_basic", name: "Basic", icon: "🦸‍♂️", color: "#1e88e5", pack: "starter"},
-{id: "hero_ninja", name: "Ninja Style", icon: "🥷", color: "#333", pack: "ninja"},
-{id: "hero_dark", name: "Dark Knight", icon: "🦇", color: "#222", pack: "dark"},
-{id: "hero_neon", name: "Neon Hero", icon: "🦸‍♂️", color: "#00ff88", pack: "neon"}
+{id: "default", name: "Default", icon: "🦸‍♂️", pack: "common"},
+{id: "hero_basic", name: "Basic", icon: "🦸‍♂️", color: "#1e88e5", pack: "common"},
+{id: "hero_ninja", name: "Ninja Style", icon: "🥷", color: "#333", pack: "rare"},
+{id: "hero_dark", name: "Dark Knight", icon: "🦇", color: "#222", pack: "epic"},
+{id: "hero_neon", name: "Neon Hero", icon: "🦸‍♂️", color: "#00ff88", pack: "legendary"}
 ],
 ninja: [
-{id: "default", name: "Default", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e", pack: "starter"},
-{id: "ninja_dark", name: "Shadow Ninja", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=shadow&backgroundColor=1a1a2e&hair=short&hairColor=000000", pack: "ninja"}
+{id: "default", name: "Default", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e", pack: "common"},
+{id: "ninja_dark", name: "Shadow Ninja", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=shadow&backgroundColor=1a1a2e&hair=short&hairColor=000000", pack: "rare"}
 ],
 slayer: [
-{id: "default", name: "Default", icon: "🧔‍♂️", pack: "starter"},
-{id: "slayer_dark", name: "Dark Slayer", icon: "🧛‍♂️", color: "#660000", pack: "dark"}
+{id: "default", name: "Default", icon: "🧔‍♂️", pack: "common"},
+{id: "slayer_dark", name: "Dark Slayer", icon: "🧛‍♂️", color: "#660000", pack: "epic"}
 ],
 wizard: [
-{id: "default", name: "Default", icon: "🧙‍♂️", pack: "starter"},
-{id: "wizard_neon", name: "Neon Wizard", icon: "🧙‍♂️", color: "#ff00ff", pack: "neon"}
+{id: "default", name: "Default", icon: "🧙‍♂️", pack: "common"},
+{id: "wizard_neon", name: "Neon Wizard", icon: "🧙‍♂️", color: "#ff00ff", pack: "legendary"}
 ],
 knight: [
-{id: "default", name: "Default", icon: "🛡️", pack: "starter"},
-{id: "knight_neon", name: "Neon Knight", icon: "🛡️", color: "#00ffff", pack: "neon"}
+{id: "default", name: "Default", icon: "🛡️", pack: "common"},
+{id: "knight_neon", name: "Neon Knight", icon: "🛡️", color: "#00ffff", pack: "legendary"}
 ]
 };
 
@@ -1132,7 +1400,7 @@ daily7: {completed: false, claimed: false, progress: 0, target: 7}
 };
 }
 // ✨ FEATURE 2: Load skins data
-if(!player.ownedSkins) player.ownedSkins = ["starter"]; // Everyone gets starter pack
+if(!player.ownedSkins) player.ownedSkins = ["common"]; // Everyone gets starter pack
 if(!player.activeSkin) player.activeSkin = null;
 if(!player.skins) player.skins = {};
 }
@@ -1185,7 +1453,6 @@ function updateEnergyUI() {
 const energyElement = document.getElementById('energy');
 const energyMaxElement = document.getElementById('energymax');
 const energyBar = document.getElementById('energybar');
-const attackButton = document.getElementById('attackButton');
 const energyWarning = document.getElementById('energyWarning');
   
 energyElement.textContent = player.energy;
@@ -1201,10 +1468,10 @@ energyBar.classList.remove('energy-regen');
   
 // Disable attack button if not enough energy
 if (player.energy < 5) {
-attackButton.disabled = true;
+document.getElementById('axeAttackButton').disabled = true;
 energyWarning.style.display = 'block';
 } else {
-attackButton.disabled = false;
+document.getElementById('axeAttackButton').disabled = false;
 energyWarning.style.display = 'none';
 }
 }
@@ -1252,27 +1519,18 @@ if (buttonCooldowns[buttonId]) return;
   
 buttonCooldowns[buttonId] = true;
   
-// Disable button visually
-const button = document.getElementById(buttonId);
-if (button) {
-button.disabled = true;
-}
-  
 // Execute callback
 if (callback) callback();
   
 // Re-enable after cooldown
 setTimeout(() => {
 buttonCooldowns[buttonId] = false;
-if (button) {
-button.disabled = false;
-}
 }, cooldown);
 }
 
 // ✨ FEATURE 3: Protected attack function
 function protectedAttack() {
-protectButton('attackButton', attack, 300);
+protectButton('axeAttackButton', attack, 300);
 }
 
 // ✨ FEATURE 3: Protected watch ad function
@@ -1632,7 +1890,7 @@ grid.appendChild(card);
 });
 }
 
-// ✨ FEATURE 2: Open Skins modal
+// ✨ FEATURE 2: Open Skins modal - UPDATED with proper skin packs UI
 function openSkins() {
 const modal = document.getElementById('skinsModal');
 const skinsList = document.getElementById('skinsList');
@@ -1642,31 +1900,24 @@ skinPacks.forEach(pack => {
 const owned = player.ownedSkins.includes(pack.id);
   
 const div = document.createElement("div");
-div.className = "item-card";
-if(owned) div.classList.add("owned");
+div.className = `skin-pack-card ${pack.rarity}`;
   
 const priceDisplay = pack.priceType === 'free' ? 'FREE' : `${pack.price} TON`;
   
 div.innerHTML = `
-<div style="text-align:center;">
-<div style="font-size:36px;margin-bottom:10px;">${pack.icon}</div>
-<div class="name">${pack.name}</div>
-<div class="desc">${pack.desc}</div>
-<div class="price">${priceDisplay}</div>
-</div>
-<div style="margin-top:15px;">
-<button onclick="previewSkinPack('${pack.id}')" style="width:100%;padding:8px;margin-bottom:5px;background:#2196f3;">
-👁️ Preview
-</button>
+<div class="skin-pack-icon">${pack.icon}</div>
+<div class="skin-pack-name">${pack.name}</div>
+<div class="skin-pack-rarity ${pack.rarity}">${pack.rarity.toUpperCase()}</div>
+<div style="font-size:12px;color:#aaa;margin-bottom:10px;">${pack.desc}</div>
+<div style="font-size:14px;color:#ffc107;margin-bottom:10px;">${priceDisplay}</div>
 ${owned ? 
-`<button onclick="applySkinPack('${pack.id}')" style="width:100%;padding:8px;background:#4caf50;">
+`<button onclick="applySkinPack('${pack.id}')" style="width:100%;padding:8px;background:#4caf50;border:none;border-radius:5px;color:#fff;font-weight:bold;">
 ✅ Apply
 </button>` :
-`<button onclick="protectedBuySkinPack('${pack.id}')" class="button-click-protected" style="width:100%;padding:8px;">
+`<button onclick="protectedBuySkinPack('${pack.id}')" class="button-click-protected" style="width:100%;padding:8px;background:#1e88e5;border:none;border-radius:5px;color:#fff;font-weight:bold;">
 🛒 Buy
 </button>`
 }
-</div>
 `;
 skinsList.appendChild(div);
 });
@@ -2054,7 +2305,7 @@ update();
 openAchievements(); // Refresh modal
 }
 
-// ✨ FEATURE 1 & 2: Spin wheel with 24-hour cooldown
+// ✨ FEATURE 1 & 2: Spin wheel with 24-hour cooldown - UPDATED for 6 slots
 function openSpinWheel() {
 const modal = document.getElementById('spinModal');
 const wheel = document.getElementById('wheel');
@@ -2066,7 +2317,7 @@ let slice = document.createElement("div");
 slice.className = "wheel-slice";
 slice.style.transform = `rotate(${i * 60}deg)`;
 slice.style.backgroundColor = wheelColors[i];
-slice.innerHTML = `<div style="transform:rotate(30deg);font-size:16px;font-weight:bold;">${wheelPrizes[i].text}</div>`;
+slice.innerHTML = `<div style="transform:rotate(30deg);font-size:20px;font-weight:bold;">${wheelPrizes[i].text}</div>`;
 wheel.appendChild(slice);
 }
 
@@ -2265,7 +2516,7 @@ spinTimerInterval = setInterval(updateSpinTimer, 1000);
 dailyTimerInterval = setInterval(updateDailyTimer, 1000);
 }
 
-// ✨ FEATURE 4: Withdrawal functions
+// ✨ NEW: Withdrawal functions
 function updateWithdrawalSummary() {
 const amount = parseInt(document.getElementById('withdrawAmount').value) || 20;
 if (amount < 20) {
@@ -2300,6 +2551,184 @@ const final = amount - fee;
 
 toastMsg(`✅ Withdrawal request sent: ${final.toFixed(2)} TON (after 25% fee)`);
 closeModal('withdrawalModal');
+}
+
+// ✨ NEW: Wallet functions
+function openWallet() {
+const modal = document.getElementById('walletModal');
+modal.classList.add('show');
+}
+
+// ✨ NEW: Boss Raid functions
+function openBossRaid() {
+const modal = document.getElementById('bossRaidModal');
+modal.classList.add('show');
+}
+
+function joinBossRaid() {
+toastMsg("⚔️ Joining boss raid... Matchmaking in progress!");
+}
+
+// ✨ NEW: Convert Gems functions
+function openConvertGems() {
+const modal = document.getElementById('convertGemsModal');
+const availableGems = document.getElementById('availableGems');
+const convertGemsAmount = document.getElementById('convertGemsAmount');
+const receiveTONAmount = document.getElementById('receiveTONAmount');
+  
+availableGems.textContent = player.gems;
+convertGemsAmount.textContent = "100";
+receiveTONAmount.textContent = "0.1";
+  
+modal.classList.add('show');
+}
+
+function adjustGems(amount) {
+const input = document.getElementById('gemsToConvert');
+const current = parseInt(input.value) || 100;
+const newValue = Math.max(100, Math.min(player.gems, current + amount));
+  
+// Round to nearest 100
+const roundedValue = Math.floor(newValue / 100) * 100;
+input.value = roundedValue;
+  
+updateConversionSummary();
+}
+
+function updateConversionSummary() {
+const gemsInput = document.getElementById('gemsToConvert');
+const gems = parseInt(gemsInput.value) || 100;
+const ton = gems * 0.001;
+  
+document.getElementById('convertGemsAmount').textContent = gems;
+document.getElementById('receiveTONAmount').textContent = ton.toFixed(3);
+}
+
+function convertGemsToTON() {
+const gemsInput = document.getElementById('gemsToConvert');
+const gems = parseInt(gemsInput.value) || 100;
+  
+if (gems < 100) {
+toastMsg("❌ Minimum conversion is 100 gems!");
+return;
+}
+  
+if (player.gems < gems) {
+toastMsg("❌ Not enough gems!");
+return;
+}
+  
+const ton = gems * 0.001;
+player.gems -= gems;
+// In real game, you would add TON to wallet here
+  
+update();
+toastMsg(`✅ Converted ${gems} gems to ${ton.toFixed(3)} TON!`);
+closeModal('convertGemsModal');
+}
+
+// ✨ NEW: Season Pass functions
+function openSeasonPass() {
+const modal = document.getElementById('seasonPassModal');
+modal.classList.add('show');
+}
+
+function buySeasonPass() {
+toastMsg("🎫 Processing Premium Season Pass purchase...");
+// In real game, this would process TON payment
+}
+
+// ✨ NEW: Leaderboard functions
+function openLeaderboard() {
+const modal = document.getElementById('leaderboardModal');
+switchLeaderboardTab('weekly');
+modal.classList.add('show');
+}
+
+function switchLeaderboardTab(tab) {
+// Update tab buttons
+document.getElementById('weeklyTab').style.color = tab === 'weekly' ? '#fff' : '#aaa';
+document.getElementById('alltimeTab').style.color = tab === 'alltime' ? '#fff' : '#aaa';
+document.getElementById('referralTab').style.color = tab === 'referral' ? '#fff' : '#aaa';
+  
+const content = document.getElementById('leaderboardContent');
+  
+if (tab === 'weekly') {
+content.innerHTML = `
+<h3 style="text-align:center;margin-bottom:20px;">🏆 Weekly Top Players</h3>
+<div style="display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+<div style="text-align:center;margin:0 20px;">
+<div style="font-size:36px;">🥈</div>
+<div style="font-weight:bold;">Player2</div>
+<div style="color:#ffc107;">15,820 kills</div>
+</div>
+<div style="text-align:center;">
+<div style="font-size:48px;">🥇</div>
+<div style="font-weight:bold;">ZombieSlayer</div>
+<div style="color:#ffc107;">24,530 kills</div>
+</div>
+<div style="text-align:center;margin:0 20px;">
+<div style="font-size:36px;">🥉</div>
+<div style="font-weight:bold;">Player3</div>
+<div style="color:#ffc107;">12,450 kills</div>
+</div>
+</div>
+<div style="margin-top:20px;">
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,0.05);border-radius:5px;margin-bottom:5px;">
+<span>4. YourRank</span>
+<span style="color:#ffc107;">${player.kills} kills</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,0.05);border-radius:5px;margin-bottom:5px;">
+<span>5. Player5</span>
+<span style="color:#ffc107;">8,240 kills</span>
+</div>
+</div>
+`;
+} else if (tab === 'alltime') {
+content.innerHTML = `
+<h3 style="text-align:center;margin-bottom:20px;">🏆 All Time Leaders</h3>
+<div style="margin-top:20px;">
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,193,7,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥇 LegendPlayer</span>
+<span style="color:#ffc107;">1,245,820 kills</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(192,192,192,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥈 ProSlayer</span>
+<span style="color:#ffc107;">987,450 kills</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(205,127,50,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥉 ZombieMaster</span>
+<span style="color:#ffc107;">756,320 kills</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,0.05);border-radius:5px;margin-bottom:5px;">
+<span>${player.kills > 10000 ? "🏅" : ""} ${player.name}</span>
+<span style="color:#ffc107;">${player.kills} kills</span>
+</div>
+</div>
+`;
+} else {
+content.innerHTML = `
+<h3 style="text-align:center;margin-bottom:20px;">👥 Referral Leaders</h3>
+<div style="margin-top:20px;">
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,193,7,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥇 ReferralKing</span>
+<span style="color:#4caf50;">1,245 referrals</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(192,192,192,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥈 InviteMaster</span>
+<span style="color:#4caf50;">987 referrals</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(205,127,50,0.1);border-radius:5px;margin-bottom:5px;">
+<span>🥉 Networker</span>
+<span style="color:#4caf50;">756 referrals</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:10px;background:rgba(255,255,255,0.05);border-radius:5px;margin-bottom:5px;">
+<span>${player.referrals > 10 ? "🎯" : ""} ${player.name}</span>
+<span style="color:#4caf50;">${player.referrals} referrals</span>
+</div>
+</div>
+`;
+}
 }
 
 // ✨ FEATURE 5: Modified character display in characters modal
@@ -2533,18 +2962,10 @@ div.innerHTML = `<span class="label">${s.label}</span><span class="value">${s.va
 list.appendChild(div);
 });
 
-// Add withdrawal button
-let withdrawDiv = document.createElement("div");
-withdrawDiv.style.marginTop = "20px";
-withdrawDiv.innerHTML = `<button onclick="openWithdrawal()" style="width:100%;padding:12px;background:#ffc107;color:#000;font-weight:bold;">
-💰 Withdraw TON
-</button>`;
-list.appendChild(withdrawDiv);
-
 modal.classList.add("show");
 }
 
-// ✨ FEATURE 1: Updated Settings modal - Removed Export/Import/Reset buttons
+// ✨ UPDATED: Settings modal with required items
 function openSettings(){
 const modal = document.getElementById('settingsModal');
 const list = document.getElementById('settingsList');
@@ -2553,24 +2974,39 @@ list.innerHTML = "";
 list.innerHTML = `
 <div class="setting-item">
 <label>
-<span>🔊 Sound Effects</span>
+<span>🔊 Sound ON/OFF</span>
 <input type="checkbox" id="soundToggle" ${player.soundEnabled ? "checked" : ""} onchange="toggleSound()">
 </label>
 </div>
 <div class="setting-item">
 <label>
-<span>👤 Player Name</span>
+<span>🌙 Dark / Light Mode</span>
+<input type="checkbox" checked disabled>
+</label>
+<p style="font-size:12px;color:#aaa;margin:5px 0;">Light mode coming soon</p>
+</div>
+<div class="setting-item">
+<label>
+<span>👤 Change Name</span>
 </label>
 <input type="text" id="playerNameInput" value="${player.name}" placeholder="Enter your name">
 <button onclick="protectedChangeName()" class="button-click-protected" style="width:100%;margin-top:8px">Change Name</button>
 </div>
 <div class="setting-item">
-<label>
-<span>📱 About</span>
-</label>
-<p style="font-size:12px;color:#aaa;margin-top:8px;">
-Zombie Fighter - TON Edition v1.4<br>
-With Skins, VIP & Achievements Systems
+<button onclick="openSeasonPass()" style="width:100%;padding:12px;background:linear-gradient(45deg, #ffc107, #ff9800);color:#000;border:none;border-radius:8px;font-weight:bold;margin-bottom:5px;">
+🎫 Season Pass
+</button>
+</div>
+<div class="setting-item">
+<h4 style="margin-top:0;color:#1e88e5;">ℹ️ Game Info / Rules</h4>
+<p style="font-size:12px;color:#aaa;">
+Zombie Fighter TON Edition v2.0<br>
+Build: Telegram WebApp<br>
+Season: Apocalypse (S1)<br>
+Network: TON Blockchain<br>
+Withdrawals: 20 TON min, 25% fee<br>
+Daily Rewards: Once every 24 hours<br>
+Spin Wheel: Once every 24 hours
 </p>
 </div>
 `;
@@ -2638,7 +3074,7 @@ level10: {completed: false, claimed: false, progress: 0, target: 10},
 spin5: {completed: false, claimed: false, progress: 0, target: 5},
 daily7: {completed: false, claimed: false, progress: 0, target: 7}
 },
-ownedSkins: ["starter"],
+ownedSkins: ["common"],
 activeSkin: null,
 skins: {}
 };
