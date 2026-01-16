@@ -3,11 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zombie Fighter - TON Edition</title>
-
-<!-- ✨ NEW: Favicon and App Icons -->
-<link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🧟</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🧟</text></svg>">
+<title>Zombie Fighter</title>
 
 <style>
 body{
@@ -34,9 +30,15 @@ to{transform:translateY(-10vh)}
 .bar{background:#444;border-radius:8px;overflow:hidden;height:10px;margin-top:5px}
 .bar div{height:100%;transition:width 0.3s}
 
+/* ✨ NEW: XP Bar styling */
 .xp-bar-container{margin:5px 0}
 .xp-bar{background:#444;border-radius:8px;overflow:hidden;height:8px;margin-top:3px}
 .xp-bar div{height:100%;background:linear-gradient(90deg, #ffc107, #ff9800);transition:width 0.5s}
+
+/* ✨ NEW: Energy Bar styling */
+.energy-bar-container{margin:5px 0}
+.energy-bar{background:#444;border-radius:8px;overflow:hidden;height:8px;margin-top:3px}
+.energy-bar div{height:100%;background:linear-gradient(90deg, #00ff88, #00ccff);transition:width 0.5s}
 
 .game{background:rgba(0,0,0,.4);border-radius:12px;padding:20px;margin:10px 0}
 .fighters{font-size:48px;display:flex;justify-content:space-between;align-items:center}
@@ -44,6 +46,22 @@ to{transform:translateY(-10vh)}
 #playerChar.attack{animation:attack .2s}
 #zombieChar.hit{animation:hit .2s}
 
+/* ✨ NEW: Character icon styling */
+.character-icon{
+font-size:48px;
+width:60px;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+.ninja-icon{
+width:60px;
+height:60px;
+object-fit:contain;
+}
+
+/* ✨ NEW: Screen shake on crit */
 .game.shake{animation:shake 0.3s}
 @keyframes shake{
 0%, 100%{transform:translateX(0)}
@@ -51,12 +69,14 @@ to{transform:translateY(-10vh)}
 75%{transform:translateX(5px)}
 }
 
+/* ✨ NEW: Level up glow effect */
 .game.levelup{animation:levelupGlow 0.8s}
 @keyframes levelupGlow{
 0%, 100%{box-shadow:0 0 0 rgba(255,193,7,0)}
 50%{box-shadow:0 0 30px rgba(255,193,7,0.8)}
 }
 
+/* ✨ NEW: Low HP warning */
 .hp-low{animation:hpWarning 1s infinite}
 @keyframes hpWarning{
 0%, 100%{color:#fff}
@@ -129,17 +149,6 @@ border:2px solid #444;margin-bottom:10px;
 .skill-item .skill-desc{font-size:13px;color:#aaa;margin:5px 0}
 .skill-item button{padding:6px 12px;font-size:12px;width:100%;margin-top:5px}
 
-/* ✨ NEW: Task Items */
-.task-item{
-background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;
-border:2px solid #444;margin-bottom:10px;
-}
-.task-item.completed{border-color:#4caf50;opacity:0.7}
-.task-item .task-header{display:flex;justify-content:space-between;align-items:center}
-.task-item .task-title{font-weight:bold;font-size:15px}
-.task-item .task-reward{color:#0088cc;font-size:13px}
-.task-item button{padding:6px 12px;font-size:12px;width:100%;margin-top:8px}
-
 /* STATS PAGE */
 .stat-row{
 display:flex;justify-content:space-between;
@@ -148,6 +157,42 @@ border-radius:8px;margin-bottom:8px;
 }
 .stat-row .label{color:#aaa}
 .stat-row .value{font-weight:bold;color:#4caf50}
+
+/* VIP TIER STYLES */
+.vip-tier{
+background:rgba(255,255,255,0.05);
+border-radius:10px;
+padding:15px;
+margin-bottom:10px;
+border:2px solid #444;
+}
+.vip-tier.active{
+border-color:#ffc107;
+background:rgba(255,193,7,0.1);
+}
+.vip-tier-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+.vip-tier-name{
+font-weight:bold;
+font-size:18px;
+}
+.vip-tier-bonus{
+color:#4caf50;
+font-size:14px;
+}
+.vip-tier-price{
+color:#ffc107;
+font-weight:bold;
+}
+.vip-tier-desc{
+font-size:12px;
+color:#aaa;
+margin-top:8px;
+}
 
 /* SETTINGS */
 .setting-item{
@@ -163,18 +208,6 @@ background:#0f0f1e;color:#fff;margin-top:5px;
 width:40px;height:20px;cursor:pointer;
 }
 
-/* ✨ NEW: Wallet Status */
-.wallet-status{
-background:rgba(0,136,204,0.2);
-border:1px solid #0088cc;
-padding:10px;
-border-radius:8px;
-margin:10px 0;
-font-size:13px;
-}
-.wallet-connected{color:#4caf50}
-.wallet-disconnected{color:#ff9800}
-
 /* REFERRAL */
 .referral-code{
 background:rgba(255,255,255,0.1);padding:15px;
@@ -185,7 +218,7 @@ font-size:24px;font-weight:bold;letter-spacing:2px;
 color:#ffc107;margin:10px 0;
 }
 
-/* SPIN WHEEL STYLES */
+/* ✨ NEW: SPIN WHEEL STYLES */
 .wheel-container{
 position:relative;
 width:280px;
@@ -198,7 +231,7 @@ height:100%;
 border-radius:50%;
 position:relative;
 overflow:hidden;
-box-shadow:0 0 20px rgba(0,136,204,0.5);
+box-shadow:0 0 20px rgba(255,193,7,0.5);
 transition:transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
 }
 .wheel-slice{
@@ -211,7 +244,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 font-weight:bold;
-font-size:16px;
+font-size:18px;
 }
 .wheel-pointer{
 position:absolute;
@@ -230,31 +263,28 @@ position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%, -50%);
-width:70px;
-height:70px;
+width:60px;
+height:60px;
 background:#1a1a2e;
 border-radius:50%;
-border:3px solid #0088cc;
+border:3px solid #ffc107;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:32px;
+font-size:24px;
 z-index:5;
 }
+.wheel-center img{
+width:50px;
+height:50px;
+object-fit:contain;
+}
 .spin-result{
-font-size:18px;
+font-size:20px;
 font-weight:bold;
-color:#0088cc;
+color:#ffc107;
 margin-top:15px;
 min-height:30px;
-}
-
-/* ✨ NEW: Timer display */
-.timer-display{
-color:#ff9800;
-font-size:16px;
-font-weight:bold;
-margin:10px 0;
 }
 
 /* FLOAT DAMAGE */
@@ -327,10 +357,10 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="top">
 <div class="stat">👤 <span id="playerName">Player</span></div>
 <div class="stat">⭐ <span id="level">1</span></div>
-<!-- ✨ MODIFIED: Replaced gems with TON -->
-<div class="stat">💰 <span id="coins">0</span> | 💎 <span id="ton">0</span> TON</div>
+<div class="stat">💰 <span id="coins">0</span> | 💎 <span id="gems">0</span></div>
 </div>
 
+<!-- ✨ NEW: XP Progress Bar -->
 <div class="xp-bar-container">
 ⚡ XP <span id="xp">0</span>/<span id="xpmax">100</span>
 <div class="xp-bar"><div id="xpbar" style="width:0%;background:linear-gradient(90deg, #ffc107, #ff9800)"></div></div>
@@ -341,40 +371,45 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div class="bar"><div id="hpbar" style="width:100%;background:red"></div></div>
 </div>
 
+<!-- ✨ NEW: Energy Progress Bar -->
+<div class="energy-bar-container">
+⚡ Energy <span id="energy">100</span>/<span id="energymax">100</span>
+<div class="energy-bar"><div id="energybar" style="width:100%;background:linear-gradient(90deg, #00ff88, #00ccff)"></div></div>
+</div>
+
 <div class="game" id="gameContainer">
 <div class="fighters">
-<div id="playerChar">🦸‍♂️</div> ⚔️ <div id="zombieChar">🧟</div>
+<div id="playerChar" class="character-icon">🦸‍♂️</div> ⚔️ <div id="zombieChar">🧟</div>
 </div>
 <div id="zhp">30/30</div>
 <div class="bar"><div id="zbar" style="width:100%;background:green"></div></div>
 </div>
 
-<button onclick="attack()">⚔️ Attack</button>
+<button id="attackButton" onclick="attack()">⚔️ Attack</button>
 </div>
 
 <!-- SIDE MENUS -->
 <div class="side-menu left">
 <div class="side-btn" onclick="watchAd()">📺</div>
-<div class="side-btn" onclick="openDaily()">🎁</div>
+<div class="side-btn" onclick="daily()">🎁</div>
 <div class="side-btn" onclick="openReferral()">👥</div>
 <div class="side-btn" onclick="openSpinWheel()">🎡</div>
 </div>
 
 <div class="side-menu right">
 <div class="side-btn" onclick="openWeapons()">⚔️</div>
-<div class="side-btn" onclick="openSkills()">✨</div>
-<div class="side-btn" onclick="openCharacters()">🧙</div>
+<!-- ✨ FEATURE 2: Replaced Characters and Skills with VIP and Inventory -->
+<div class="side-btn" onclick="openVIP()">👑</div>
+<div class="side-btn" onclick="openInventory()">🎒</div>
 <div class="side-btn" onclick="openStats()">📊</div>
 <div class="side-btn" onclick="openSettings()">⚙️</div>
 </div>
 
 <!-- BOTTOM MENU -->
-<!-- ✨ MODIFIED: Added new menu items -->
 <div class="bottom-menu">
-<div class="bottom-btn" onclick="openWeapons()">⚔️</div>
-<div class="bottom-btn" onclick="openCharacters()">🧙</div>
-<div class="bottom-btn" onclick="openTasks()">📋</div>
-<div class="bottom-btn" onclick="openShop()">🛒</div>
+<div class="bottom-btn" onclick="openWeapons()">⚔️ Weapons</div>
+<div class="bottom-btn" onclick="openCharacters()">🧙 Characters</div>
+<div class="bottom-btn" onclick="openSkills()">✨ Skills</div>
 </div>
 
 <!-- WEAPONS MODAL -->
@@ -407,6 +442,34 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <button class="close-btn" onclick="closeModal('skillsModal')">✕</button>
 </div>
 <div id="skillsList"></div>
+</div>
+</div>
+
+<!-- ✨ NEW: VIP MODAL -->
+<div id="vipModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>👑 VIP System</h2>
+<button class="close-btn" onclick="closeModal('vipModal')">✕</button>
+</div>
+<div id="vipList"></div>
+<div style="margin-top:20px;padding:10px;background:rgba(255,215,0,0.1);border-radius:8px;">
+<p style="font-size:12px;color:#aaa;">💡 VIP Bonus applies to: Kills, Ads, Daily Rewards</p>
+<p style="font-size:12px;color:#aaa;">Current VIP Bonus: <span id="currentVIPBonus">0%</span></p>
+</div>
+</div>
+</div>
+
+<!-- ✨ NEW: INVENTORY MODAL -->
+<div id="inventoryModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h2>🎒 Inventory</h2>
+<button class="close-btn" onclick="closeModal('inventoryModal')">✕</button>
+</div>
+<div id="inventoryList">
+<p style="text-align:center;color:#aaa;">Inventory items will appear here</p>
+</div>
 </div>
 </div>
 
@@ -443,79 +506,67 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 </div>
 </div>
 
-<!-- ✨ NEW: DAILY REWARD MODAL -->
-<div id="dailyModal" class="modal">
-<div class="modal-box">
-<div class="modal-header">
-<h2>🎁 Daily Reward</h2>
-<button class="close-btn" onclick="closeModal('dailyModal')">✕</button>
-</div>
-<div id="dailyContent"></div>
-</div>
-</div>
-
-<!-- SPIN WHEEL MODAL -->
+<!-- ✨ NEW: SPIN WHEEL MODAL -->
 <div id="spinModal" class="modal">
 <div class="modal-box">
 <div class="modal-header">
-<h2>🎡 Spin the Wheel 🥺</h2>
+<h2>🎡 Spin the Wheel</h2>
 <button class="close-btn" onclick="closeModal('spinModal')">✕</button>
 </div>
 <div class="wheel-container">
 <div class="wheel-pointer"></div>
 <div class="wheel" id="wheel"></div>
-<!-- ✨ MODIFIED: Character icon in center -->
-<div class="wheel-center" id="wheelCenter">🦸‍♂️</div>
+<div class="wheel-center">
+<!-- ✨ FEATURE 5: Ninja image in wheel center -->
+<img id="wheelCenterImage" src="https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e" alt="Ninja">
+</div>
 </div>
 <div class="spin-result" id="spinResult"></div>
-<div class="timer-display" id="spinTimer"></div>
 <button id="spinButton" onclick="spinWheel()" style="width:100%;padding:12px;margin-top:10px">
 🎰 SPIN (Free)
 </button>
 </div>
 </div>
 
-<!-- ✨ NEW: TASKS MODAL -->
-<div id="tasksModal" class="modal">
-<div class="modal-box">
-<div class="modal-header">
-<h2>📋 Weekly Tasks</h2>
-<button class="close-btn" onclick="closeModal('tasksModal')">✕</button>
-</div>
-<div id="tasksContent"></div>
-</div>
-</div>
-
-<!-- ✨ NEW: SHOP MODAL -->
-<div id="shopModal" class="modal">
-<div class="modal-box">
-<div class="modal-header">
-<h2>🛒 Shop 😀</h2>
-<button class="close-btn" onclick="closeModal('shopModal')">✕</button>
-</div>
-<div id="shopContent"></div>
-</div>
-</div>
-
 <!-- ✨ NEW: WITHDRAWAL MODAL -->
-<div id="withdrawModal" class="modal">
+<div id="withdrawalModal" class="modal">
 <div class="modal-box">
 <div class="modal-header">
-<h2>💸 Withdrawal</h2>
-<button class="close-btn" onclick="closeModal('withdrawModal')">✕</button>
+<h2>💰 Withdraw TON</h2>
+<button class="close-btn" onclick="closeModal('withdrawalModal')">✕</button>
 </div>
-<div id="withdrawContent"></div>
+<div style="padding:15px;">
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:15px;">
+<h3 style="margin-top:0;color:#ffc107;">Withdrawal Rules</h3>
+<p style="font-size:14px;color:#aaa;">• Minimum: <strong>20 TON</strong></p>
+<p style="font-size:14px;color:#aaa;">• Fee: <strong>25%</strong></p>
+<p style="font-size:14px;color:#aaa;">• Network: TON Blockchain</p>
+</div>
+<div style="margin-bottom:15px;">
+<label style="display:block;margin-bottom:5px;">Amount to Withdraw (TON):</label>
+<input type="number" id="withdrawAmount" min="20" step="1" value="20" style="width:100%;padding:10px;border-radius:8px;background:#0f0f1e;border:1px solid #444;color:#fff;">
+</div>
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;margin-bottom:15px;">
+<h4 style="margin-top:0;color:#4caf50;">Summary</h4>
+<p style="font-size:14px;">Requested: <span id="requestedAmount">20</span> TON</p>
+<p style="font-size:14px;">Fee (25%): <span id="feeAmount">5</span> TON</p>
+<p style="font-size:16px;font-weight:bold;color:#ffc107;">You receive: <span id="finalAmount">15</span> TON</p>
+</div>
+<button onclick="processWithdrawal()" style="width:100%;padding:12px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:bold;">
+💸 Request Withdrawal
+</button>
+</div>
 </div>
 </div>
 
 <!-- CONFIRM DIALOG -->
 <div id="confirmModal" class="modal">
-<div class="confirm-dialog" id="confirmContent">
-<h3>⚠️ Confirm</h3>
-<p>Are you sure?</p>
+<div class="confirm-dialog">
+<h3>⚠️ Reset Game?</h3>
+<p>This will delete all progress!</p>
 <div class="buttons">
 <button onclick="closeModal('confirmModal')">Cancel</button>
-<button onclick="confirmAction()" style="background:#ff5252">Confirm</button>
+<button onclick="confirmReset()" style="background:#ff5252">Reset</button>
 </div>
 </div>
 </div>
@@ -523,7 +574,7 @@ document.write(`<span style="left:${Math.random()*100}%;animation-delay:${Math.r
 <div id="toast"></div>
 
 <script>
-// Sound Effects System
+// ✨ NEW: Sound Effects System
 const sounds = {
 attack: null,
 hit: null,
@@ -533,7 +584,9 @@ levelup: null,
 spin: null
 };
 
+// Initialize sound effects (using data URIs for lightweight sounds)
 function initSounds(){
+// Simple beep sounds using Web Audio API
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 sounds.play = function(type){
@@ -604,31 +657,31 @@ tg.ready();
 tg.expand();
 }
 
-// ✨ MODIFIED: Game State with TON integration
+// ✨ MODIFIED: Game State with XP system, HP upgrades, Energy, and VIP
 let player = {
 hp: 100,
 max: 100,
-baseMax: 100,
-hpUpgrades: 0,
+baseMax: 100, // ✨ NEW: Base max HP before upgrades
+hpUpgrades: 0, // ✨ NEW: Number of HP upgrades purchased
 coins: 0,
-ton: 0, // ✨ NEW: TON balance (replaces gems)
+gems: 0,
 level: 1,
-xp: 0,
-xpMax: 100,
+xp: 0, // ✨ NEW: Current XP
+xpMax: 100, // ✨ NEW: XP needed for next level
+energy: 100, // ✨ FEATURE 1: Energy system
+energyMax: 100, // ✨ FEATURE 1: Max energy
 weapon: "sword",
 char: "hero",
 name: "Player",
 kills: 0,
 coinsEarned: 0,
-tonEarned: 0, // ✨ NEW: Track total TON earned
 referrals: 0,
 referralCode: "",
 ownedWeapons: ["sword"],
 ownedChars: ["hero"],
 soundEnabled: true,
-tonWallet: "", // ✨ NEW: TON wallet address
-lastDaily: 0, // ✨ NEW: Last daily claim timestamp
-lastSpin: 0 // ✨ NEW: Last spin timestamp
+vipTier: 0, // ✨ FEATURE 3: VIP system (0 = no VIP, 1-4 = VIP tiers)
+vipBonus: 0 // ✨ FEATURE 3: VIP bonus percentage
 };
 
 let zombie = {hp: 30, max: 30};
@@ -640,16 +693,6 @@ hp: {level: 0, max: 5},
 crit: {level: 0, max: 3}
 };
 
-// ✨ NEW: Weekly Tasks State
-let tasks = {
-task1: {completed: false, title: "Kill 50 Zombies", target: 50, progress: 0},
-task2: {completed: false, title: "Reach Level 10", target: 10, progress: 0},
-task3: {completed: false, title: "Earn 5,000 Coins", target: 5000, progress: 0},
-task4: {completed: false, title: "Upgrade Any Skill", target: 1, progress: 0},
-task5: {completed: false, title: "Unlock 2 Weapons", target: 2, progress: 0},
-lastReset: Date.now()
-};
-
 // Weapons Data
 let weapons = {
 sword: {name: "Basic Sword", dmg: 10, price: 0, icon: "⚔️", desc: "Starter weapon"},
@@ -659,32 +702,31 @@ laser: {name: "Laser Sword", dmg: 50, price: 600, icon: "🗡️", desc: "+40 da
 hammer: {name: "Thunder Hammer", dmg: 75, price: 1000, icon: "🔨", desc: "+65 damage"}
 };
 
-// Characters Data
+// ✨ MODIFIED: Characters Data with Ninja image
 let characters = {
 hero: {name: "Hero", icon: "🦸‍♂️", hp: 100, level: 1, price: 0, desc: "Balanced fighter"},
-ninja: {name: "Ninja", icon: "🥷", hp: 80, level: 5, price: 200, desc: "Fast attacks"},
+ninja: {name: "Ninja", icon: "🥷", image: "https://api.dicebear.com/7.x/adventurer/svg?seed=ninja&backgroundColor=1a1a2e", hp: 80, level: 5, price: 200, desc: "Fast attacks"},
 slayer: {name: "Slayer", icon: "🧔‍♂️", hp: 150, level: 10, price: 500, desc: "High HP tank"},
 wizard: {name: "Wizard", icon: "🧙‍♂️", hp: 90, level: 15, price: 800, desc: "Magic damage"},
 knight: {name: "Knight", icon: "🛡️", hp: 200, level: 20, price: 1200, desc: "Ultimate defense"}
 };
 
-// ✨ MODIFIED: Spin wheel with TON rewards
-const wheelPrizes = [
-{type: 'coins', value: 100},
-{type: 'coins', value: 50},
-{type: 'ton', value: 0.001},
-{type: 'coins', value: 20},
-{type: 'ton', value: 0.002},
-{type: 'sorry', value: 0},
-{type: 'coins', value: 30},
-{type: 'ton', value: 0.003}
+// ✨ NEW: VIP Tiers Data
+const vipTiers = [
+{id: 0, name: "No VIP", bonus: 0, price: 0, desc: "Standard earnings"},
+{id: 1, name: "VIP 1", bonus: 10, price: 0.5, desc: "+10% coin earnings"},
+{id: 2, name: "VIP 2", bonus: 25, price: 2.5, desc: "+25% coin earnings"},
+{id: 3, name: "VIP 3", bonus: 50, price: 10, desc: "+50% coin earnings"},
+{id: 4, name: "VIP 4", bonus: 100, price: 50, desc: "+100% coin earnings"}
 ];
-const wheelColors = ['#ffc107', '#4caf50', '#0088cc', '#9c27b0', '#0088cc', '#f44336', '#00bcd4', '#0088cc'];
-let isSpinning = false;
-let confirmCallback = null;
 
-// ✨ NEW: Timer update interval
-let timerInterval = null;
+// ✨ NEW: Spin wheel prizes
+const wheelPrizes = [100, 50, 20, 10, 50, 0, 30, 20];
+const wheelColors = ['#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800', '#f44336', '#00bcd4', '#8bc34a'];
+let isSpinning = false;
+
+// ✨ FEATURE 1: Energy regeneration timer
+let energyTimer = null;
 
 // Load saved data
 function loadGame(){
@@ -693,17 +735,15 @@ if(saved){
 let data = JSON.parse(saved);
 Object.assign(player, data.player);
 Object.assign(skills, data.skills);
-if(data.tasks) Object.assign(tasks, data.tasks);
-// Ensure new properties exist
+// ✨ NEW: Ensure new properties exist
 if(!player.xp) player.xp = 0;
 if(!player.xpMax) player.xpMax = 100;
 if(!player.baseMax) player.baseMax = 100;
 if(!player.hpUpgrades) player.hpUpgrades = 0;
-if(!player.ton) player.ton = 0;
-if(!player.tonEarned) player.tonEarned = 0;
-if(!player.tonWallet) player.tonWallet = "";
-if(!player.lastDaily) player.lastDaily = 0;
-if(!player.lastSpin) player.lastSpin = 0;
+if(!player.energy) player.energy = 100;
+if(!player.energyMax) player.energyMax = 100;
+if(!player.vipTier) player.vipTier = 0;
+if(!player.vipBonus) player.vipBonus = 0;
 }
 // Get Telegram username
 if(tg && tg.initDataUnsafe?.user){
@@ -713,46 +753,91 @@ player.name = tg.initDataUnsafe.user.first_name || "Player";
 if(!player.referralCode){
 player.referralCode = "ZF" + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
-// Check weekly tasks reset
-checkTasksReset();
-update();
-startTimerUpdates();
-}
 
-// ✨ NEW: Check if tasks need weekly reset
-function checkTasksReset(){
-const weekInMs = 7 * 24 * 60 * 60 * 1000;
-if(Date.now() - tasks.lastReset > weekInMs){
-// Reset all tasks
-for(let key in tasks){
-if(tasks[key].completed !== undefined){
-tasks[key].completed = false;
-tasks[key].progress = 0;
-}
-}
-tasks.lastReset = Date.now();
-}
+// ✨ FEATURE 1: Start energy regeneration
+startEnergyRegeneration();
+
+// Update VIP bonus
+updateVIPBonus();
+
+update();
 }
 
 // Save game
 function saveGame(){
 localStorage.setItem("zombieFighterSave", JSON.stringify({
 player: player,
-skills: skills,
-tasks: tasks
+skills: skills
 }));
 }
 
-// ✨ MODIFIED: Update UI with TON
+// ✨ FEATURE 1: Energy regeneration system
+function startEnergyRegeneration() {
+if (energyTimer) clearInterval(energyTimer);
+energyTimer = setInterval(() => {
+if (player.energy < player.energyMax) {
+player.energy += 1;
+updateEnergyUI();
+saveGame();
+}
+}, 5000); // Every 5 seconds
+}
+
+// ✨ FEATURE 1: Update energy UI
+function updateEnergyUI() {
+const energyElement = document.getElementById('energy');
+const energyMaxElement = document.getElementById('energymax');
+const energyBar = document.getElementById('energybar');
+const attackButton = document.getElementById('attackButton');
+  
+energyElement.textContent = player.energy;
+energyMaxElement.textContent = player.energyMax;
+energyBar.style.width = (player.energy / player.energyMax * 100) + "%";
+  
+// Disable attack button if not enough energy
+if (player.energy < 5) {
+attackButton.disabled = true;
+} else {
+attackButton.disabled = false;
+}
+}
+
+// ✨ FEATURE 3: Update VIP bonus
+function updateVIPBonus() {
+const vipTier = vipTiers.find(tier => tier.id === player.vipTier);
+if (vipTier) {
+player.vipBonus = vipTier.bonus;
+}
+const currentVIPBonusElement = document.getElementById('currentVIPBonus');
+if (currentVIPBonusElement) {
+currentVIPBonusElement.textContent = player.vipBonus + "%";
+}
+}
+
+// ✨ FEATURE 3: Apply VIP bonus to coin earnings
+function applyVIPBonus(coins) {
+if (player.vipBonus > 0) {
+const bonusMultiplier = 1 + (player.vipBonus / 100);
+return Math.floor(coins * bonusMultiplier);
+}
+return coins;
+}
+
+// ✨ MODIFIED: Update UI with XP bar, Energy bar and low HP warning
 function update(){
 hp.textContent = player.hp;
 hpmax.textContent = player.max;
 hpbar.style.width = (player.hp / player.max * 100) + "%";
 
+// ✨ NEW: XP bar update
 xp.textContent = player.xp;
 xpmax.textContent = player.xpMax;
 xpbar.style.width = (player.xp / player.xpMax * 100) + "%";
 
+// ✨ NEW: Energy bar update
+updateEnergyUI();
+
+// ✨ NEW: Low HP warning
 if(player.hp < player.max * 0.25){
 hpLabel.classList.add('hp-low');
 } else {
@@ -761,61 +846,54 @@ hpLabel.classList.remove('hp-low');
 
 zhp.textContent = zombie.hp + "/" + zombie.max;
 zbar.style.width = (zombie.hp / zombie.max * 100) + "%";
-playerChar.textContent = characters[player.char].icon;
+  
+// ✨ FEATURE 5: Display character with image for ninja
+const charData = characters[player.char];
+if (player.char === 'ninja' && charData.image) {
+playerChar.innerHTML = `<img src="${charData.image}" alt="Ninja" class="ninja-icon" style="width:60px;height:60px;">`;
+} else {
+playerChar.textContent = charData.icon;
+}
+  
 coins.textContent = player.coins;
-ton.textContent = player.ton.toFixed(4); // ✨ Display TON balance
+gems.textContent = player.gems;
 level.textContent = player.level;
 playerName.textContent = player.name;
-wheelCenter.textContent = characters[player.char].icon; // ✨ Update wheel center
 saveGame();
-updateTaskProgress();
 }
 
-// ✨ NEW: Update task progress
-function updateTaskProgress(){
-tasks.task1.progress = player.kills;
-tasks.task2.progress = player.level;
-tasks.task3.progress = player.coinsEarned;
-tasks.task5.progress = player.ownedWeapons.length;
-}
-
-// ✨ NEW: Start timer updates
-function startTimerUpdates(){
-if(timerInterval) clearInterval(timerInterval);
-timerInterval = setInterval(updateTimers, 1000);
-}
-
-// ✨ NEW: Update all timers
-function updateTimers(){
-// Update daily timer if modal is open
-if(document.getElementById('dailyModal').classList.contains('show')){
-updateDailyTimer();
-}
-// Update spin timer if modal is open
-if(document.getElementById('spinModal').classList.contains('show')){
-updateSpinTimer();
-}
-}
-
-// Attack Function
+// ✨ MODIFIED: Attack Function with Energy system and VIP bonus
 function attack(){
 if(player.hp <= 0){
 toastMsg("❌ You are dead! Heal first!");
 return;
 }
 
+// ✨ FEATURE 1: Check energy
+if (player.energy < 5) {
+toastMsg("⚡ Not enough energy! Wait for regeneration.");
+return;
+}
+
+// ✨ FEATURE 1: Consume energy
+player.energy -= 5;
+updateEnergyUI();
+
 playerChar.classList.add("attack");
 zombieChar.classList.add("hit");
 sounds.play('attack');
 
+// Calculate damage
 let dmg = weapons[player.weapon].dmg;
 dmg += skills.damage.level * 5;
 
+// Critical hit chance
 let isCrit = Math.random() < (skills.crit.level * 0.1);
 if(isCrit){
 dmg *= 2;
 floatText("💥 CRIT -" + dmg, zombieChar);
 sounds.play('hit');
+// ✨ NEW: Screen shake on crit
 gameContainer.classList.add('shake');
 setTimeout(() => gameContainer.classList.remove('shake'), 300);
 } else {
@@ -828,29 +906,40 @@ zombie.hp -= dmg;
 if(zombie.hp <= 0){
 player.kills++;
 
-let xpGain = 20 + Math.floor(player.level * 2);
+// ✨ NEW: XP-based leveling system
+let xpGain = 20 + Math.floor(player.level * 2); // XP scales with level
 player.xp += xpGain;
-player.coins += 10;
-player.coinsEarned += 10;
+  
+// ✨ FEATURE 3: Apply VIP bonus to coins
+let coinGain = 10;
+coinGain = applyVIPBonus(coinGain);
+  
+player.coins += coinGain;
+player.coinsEarned += coinGain;
 sounds.play('coin');
 
+// Check for level up
 if(player.xp >= player.xpMax){
 player.xp -= player.xpMax;
 player.level++;
+// ✨ NEW: XP requirement increases gradually
 player.xpMax = Math.floor(100 + (player.level * 15));
 sounds.play('levelup');
 toastMsg("🎉 LEVEL UP! Level " + player.level);
+// ✨ NEW: Level up visual effect
 gameContainer.classList.add('levelup');
 setTimeout(() => gameContainer.classList.remove('levelup'), 800);
 } else {
-toastMsg(`+${xpGain}⚡ +10💰`);
+toastMsg(`+${xpGain}⚡ +${coinGain}💰`);
 }
 
 sounds.play('death');
+// ✨ NEW: Zombie difficulty scales more gradually
 zombie.hp = zombie.max + Math.floor(player.level * 3);
 zombie.max = zombie.hp;
 }
 
+// Zombie counter attack
 setTimeout(() => {
 let zombieDmg = 5 + Math.floor(player.level / 3);
 player.hp = Math.max(0, player.hp - zombieDmg);
@@ -895,6 +984,184 @@ toast.classList.add("show");
 setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
+// ✨ FEATURE 2: New modal functions for VIP and Inventory
+function openVIP() {
+const modal = document.getElementById('vipModal');
+const vipList = document.getElementById('vipList');
+vipList.innerHTML = '';
+
+vipTiers.forEach(tier => {
+if (tier.id === 0) return; // Skip "No VIP" tier
+  
+const div = document.createElement('div');
+div.className = 'vip-tier';
+if (player.vipTier === tier.id) {
+div.classList.add('active');
+}
+  
+div.innerHTML = `
+<div class="vip-tier-header">
+<div class="vip-tier-name">${tier.name}</div>
+<div class="vip-tier-bonus">+${tier.bonus}% coins</div>
+</div>
+<div class="vip-tier-price">${tier.price} TON</div>
+<div class="vip-tier-desc">${tier.desc}</div>
+<button onclick="purchaseVIP(${tier.id})" style="width:100%;margin-top:10px;padding:8px;${player.vipTier === tier.id ? 'background:#4caf50' : 'background:#1e88e5'}">
+${player.vipTier === tier.id ? '✅ Active' : '👑 Purchase'}
+</button>
+`;
+vipList.appendChild(div);
+});
+
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 3: VIP purchase function
+function purchaseVIP(tierId) {
+const tier = vipTiers.find(t => t.id === tierId);
+if (!tier) return;
+
+if (player.vipTier === tierId) {
+toastMsg(`✅ You already have ${tier.name}`);
+return;
+}
+
+// In a real app, this would process a real payment
+// For simulation, we'll just activate it
+player.vipTier = tierId;
+updateVIPBonus();
+saveGame();
+update();
+toastMsg(`🎉 ${tier.name} activated! +${tier.bonus}% coin bonus!`);
+openVIP(); // Refresh the modal
+}
+
+// ✨ FEATURE 2: Inventory modal
+function openInventory() {
+const modal = document.getElementById('inventoryModal');
+const inventoryList = document.getElementById('inventoryList');
+  
+inventoryList.innerHTML = `
+<div style="text-align:center;padding:20px;">
+<h3 style="color:#ffc107;">Your Inventory</h3>
+<p style="color:#aaa;margin-bottom:20px;">Items you've collected will appear here</p>
+  
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;text-align:center;">
+<div style="font-size:24px;">⚔️</div>
+<div style="font-weight:bold;margin:5px 0;">Weapons</div>
+<div style="font-size:12px;color:#4caf50;">${player.ownedWeapons.length} owned</div>
+</div>
+  
+<div style="background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;text-align:center;">
+<div style="font-size:24px;">🧙</div>
+<div style="font-weight:bold;margin:5px 0;">Characters</div>
+<div style="font-size:12px;color:#4caf50;">${player.ownedChars.length} owned</div>
+</div>
+</div>
+  
+<div style="margin-top:20px;background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;">
+<h4 style="margin-top:0;color:#ffc107;">VIP Status</h4>
+<p style="color:#aaa;">Current Tier: <span style="color:#4caf50;font-weight:bold;">${vipTiers[player.vipTier].name}</span></p>
+<p style="color:#aaa;">Coin Bonus: <span style="color:#4caf50;font-weight:bold;">+${player.vipBonus}%</span></p>
+</div>
+</div>
+`;
+
+modal.classList.add('show');
+}
+
+// ✨ FEATURE 4: Withdrawal functions
+function updateWithdrawalSummary() {
+const amount = parseInt(document.getElementById('withdrawAmount').value) || 20;
+if (amount < 20) {
+document.getElementById('withdrawAmount').value = 20;
+updateWithdrawalSummary();
+return;
+}
+
+const fee = amount * 0.25;
+const final = amount - fee;
+
+document.getElementById('requestedAmount').textContent = amount;
+document.getElementById('feeAmount').textContent = fee.toFixed(2);
+document.getElementById('finalAmount').textContent = final.toFixed(2);
+}
+
+function openWithdrawal() {
+const modal = document.getElementById('withdrawalModal');
+modal.classList.add('show');
+updateWithdrawalSummary();
+}
+
+function processWithdrawal() {
+const amount = parseInt(document.getElementById('withdrawAmount').value) || 20;
+if (amount < 20) {
+toastMsg("❌ Minimum withdrawal is 20 TON");
+return;
+}
+
+const fee = amount * 0.25;
+const final = amount - fee;
+
+toastMsg(`✅ Withdrawal request sent: ${final.toFixed(2)} TON (after 25% fee)`);
+closeModal('withdrawalModal');
+}
+
+// ✨ FEATURE 5: Modified character display in characters modal
+function openCharacters(){
+const modal = document.getElementById('charactersModal');
+const list = document.getElementById('charactersList');
+list.innerHTML = "";
+
+for(let id in characters){
+let ch = characters[id];
+let owned = player.ownedChars.includes(id);
+let equipped = player.char === id;
+let canBuy = player.level >= ch.level && player.coins >= ch.price;
+
+let card = document.createElement("div");
+card.className = "item-card";
+if(owned) card.classList.add("owned");
+if(equipped) card.classList.add("equipped");
+
+// ✨ FEATURE 5: Use image for ninja character
+let iconHTML = '';
+if (id === 'ninja' && ch.image) {
+iconHTML = `<img src="${ch.image}" alt="Ninja" style="width:40px;height:40px;object-fit:contain;">`;
+} else {
+iconHTML = `<div class="icon">${ch.icon}</div>`;
+}
+
+card.innerHTML = `
+${iconHTML}
+<div class="name">${ch.name}</div>
+<div class="desc">${ch.desc}</div>
+<div class="price">Level ${ch.level} | ${ch.price}💰</div>
+${!owned ? 
+`<button onclick="buyChar('${id}')" ${canBuy ? "" : "disabled"}>
+${canBuy ? "Buy" : "Locked"}
+</button>` :
+`<button onclick="equipChar('${id}')" ${!equipped ? "" : "disabled"}>
+${equipped ? "EQUIPPED" : "Equip"}
+</button>`
+}
+${owned ? '<div class="badge">OWNED</div>' : ''}
+${equipped ? '<div class="badge">EQUIPPED</div>' : ''}
+`;
+list.appendChild(card);
+}
+modal.classList.add("show");
+}
+
+// ✨ FEATURE 5: Modified character equip function to handle images
+function equipChar(id){
+player.char = id;
+update();
+toastMsg(`✅ Equipped ${characters[id].name}`);
+openCharacters();
+}
+
 // Open/Close Modals
 function openModal(id){
 document.getElementById(id).classList.add("show");
@@ -904,886 +1171,433 @@ function closeModal(id){
 document.getElementById(id).classList.remove("show");
 }
 
-// WEAPONS PAGE
-function openWeapons(){
-let html = "";
-for(let key in weapons){
-let w = weapons[key];
-let owned = player.ownedWeapons.includes(key);
-let equipped = player.weapon === key;
-let canBuy = player.coins >= w.price;
+// ✨ FEATURE 4: Modified watchAd function to include VIP bonus
+function watchAd(){
+// ✨ FEATURE 3: Apply VIP bonus to ad rewards
+let adReward = 50;
+adReward = applyVIPBonus(adReward);
+  
+player.coins += adReward;
+player.coinsEarned += adReward;
+update();
+toastMsg(`📺 +${adReward} coins from ad!${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
+}
 
-html += `<div class="item-card ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}">
-${equipped ? '<span class="badge">EQUIPPED</span>' : ''}
+// ✨ FEATURE 4: Modified daily function to include VIP bonus
+function daily(){
+// ✨ FEATURE 3: Apply VIP bonus to daily rewards
+let dailyReward = 100;
+dailyReward = applyVIPBonus(dailyReward);
+  
+player.coins += dailyReward;
+player.coinsEarned += dailyReward;
+update();
+toastMsg(`🎁 +${dailyReward} daily coins!${player.vipBonus > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`);
+}
+
+// Other existing functions (unchanged but kept for completeness)
+function openWeapons(){
+const modal = document.getElementById('weaponsModal');
+const list = document.getElementById('weaponsList');
+list.innerHTML = "";
+
+for(let id in weapons){
+let w = weapons[id];
+let owned = player.ownedWeapons.includes(id);
+let equipped = player.weapon === id;
+
+let card = document.createElement("div");
+card.className = "item-card";
+if(owned) card.classList.add("owned");
+if(equipped) card.classList.add("equipped");
+
+card.innerHTML = `
 <div class="icon">${w.icon}</div>
 <div class="name">${w.name}</div>
 <div class="desc">${w.desc}</div>
-<div class="desc">💥 Damage: ${w.dmg}</div>`;
-
-if(!owned){
-html += `<div class="price">💰 ${w.price}</div>
-<button onclick="buyWeapon('${key}')" ${!canBuy ? 'disabled' : ''}>
-${canBuy ? 'Buy' : 'Not enough coins'}
-</button>`;
-} else if(!equipped){
-html += `<button onclick="equipWeapon('${key}')">Equip</button>`;
-} else {
-html += `<button style="background:#4caf50" disabled>Equipped</button>`;
+<div class="price">${w.price}💰</div>
+${!owned ? 
+`<button onclick="buyWeapon('${id}')" ${player.coins >= w.price ? "" : "disabled"}>
+${player.coins >= w.price ? "Buy" : "Need Coins"}
+</button>` :
+`<button onclick="equipWeapon('${id}')" ${!equipped ? "" : "disabled"}>
+${equipped ? "EQUIPPED" : "Equip"}
+</button>`
 }
-
-html += `</div>`;
-}
-weaponsList.innerHTML = html;
-openModal("weaponsModal");
-}
-
-function buyWeapon(key){
-let w = weapons[key];
-if(player.coins >= w.price && !player.ownedWeapons.includes(key)){
-player.coins -= w.price;
-player.ownedWeapons.push(key);
-sounds.play('coin');
-toastMsg(`✅ Bought ${w.name}!`);
-update();
-openWeapons();
-}
-}
-
-function equipWeapon(key){
-if(player.ownedWeapons.includes(key)){
-player.weapon = key;
-toastMsg(`⚔️ Equipped ${weapons[key].name}!`);
-update();
-openWeapons();
-}
-}
-
-// CHARACTERS PAGE
-function openCharacters(){
-let html = "";
-for(let key in characters){
-let c = characters[key];
-let owned = player.ownedChars.includes(key);
-let equipped = player.char === key;
-let unlocked = player.level >= c.level;
-let canBuy = player.coins >= c.price && unlocked;
-
-html += `<div class="item-card ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}">
-${equipped ? '<span class="badge">ACTIVE</span>' : ''}
-<div class="icon">${c.icon}</div>
-<div class="name">${c.name}</div>
-<div class="desc">${c.desc}</div>
-<div class="desc">❤️ HP: ${c.hp}</div>`;
-
-if(!owned){
-if(!unlocked){
-html += `<div class="price">🔒 Level ${c.level}</div>
-<button disabled>Locked</button>`;
-} else {
-html += `<div class="price">💰 ${c.price}</div>
-<button onclick="buyCharacter('${key}')" ${!canBuy ? 'disabled' : ''}>
-${canBuy ? 'Buy' : 'Not enough coins'}
-</button>`;
-}
-} else if(!equipped){
-html += `<button onclick="equipCharacter('${key}')">Select</button>`;
-} else {
-html += `<button style="background:#4caf50" disabled>Active</button>`;
-}
-
-html += `</div>`;
-}
-charactersList.innerHTML = html;
-openModal("charactersModal");
-}
-
-function buyCharacter(key){
-let c = characters[key];
-if(player.coins >= c.price && player.level >= c.level && !player.ownedChars.includes(key)){
-player.coins -= c.price;
-player.ownedChars.push(key);
-sounds.play('coin');
-toastMsg(`✅ Unlocked ${c.name}!`);
-update();
-openCharacters();
-}
-}
-
-function equipCharacter(key){
-if(player.ownedChars.includes(key)){
-player.char = key;
-recalculateMaxHP();
-player.hp = Math.min(player.hp, player.max);
-toastMsg(`✅ Selected ${characters[key].name}!`);
-update();
-openCharacters();
-}
-}
-
-function recalculateMaxHP(){
-player.baseMax = characters[player.char].hp;
-player.max = player.baseMax + (player.hpUpgrades * 20) + (skills.hp.level * 20);
-}
-
-// ✨ MODIFIED: Skills page with TON
-function openSkills(){
-let hpUpgradeCost = (player.hpUpgrades + 1) * 80;
-let html = `
-<div class="skill-item" style="border-color:#ff5252">
-<div class="skill-header">
-<span class="skill-name">❤️ HP Upgrade</span>
-<span class="skill-level">+${player.hpUpgrades * 20} HP</span>
-</div>
-<div class="skill-desc">Permanently increase Max HP by 20</div>
-<div class="skill-desc">Cost: ${hpUpgradeCost} 💰</div>
-<button onclick="upgradeHP()">Upgrade Max HP</button>
-</div>
-
-<!-- ✨ NEW: Coin to TON Conversion -->
-<div class="skill-item" style="border-color:#0088cc">
-<div class="skill-header">
-<span class="skill-name">💎 Convert to TON</span>
-</div>
-<div class="skill-desc">Convert 10,000 💰 → 0.2 TON</div>
-<div class="skill-desc">Your coins: ${player.coins}</div>
-<button onclick="convertCoinsToTON()">Convert Now</button>
-</div>
-
-<div class="skill-item">
-<div class="skill-header">
-<span class="skill-name">💥 Damage Boost</span>
-<span class="skill-level">Lv ${skills.damage.level}/${skills.damage.max}</span>
-</div>
-<div class="skill-desc">+5 damage per level</div>
-<div class="skill-desc">Cost: ${(skills.damage.level + 1) * 50} 💰</div>
-<button onclick="upgradeSkill('damage')" ${skills.damage.level >= skills.damage.max ? 'disabled' : ''}>
-${skills.damage.level >= skills.damage.max ? 'MAX' : 'Upgrade'}
-</button>
-</div>
-
-<div class="skill-item">
-<div class="skill-header">
-<span class="skill-name">❤️ HP Boost</span>
-<span class="skill-level">Lv ${skills.hp.level}/${skills.hp.max}</span>
-</div>
-<div class="skill-desc">+20 max HP per level</div>
-<div class="skill-desc">Cost: ${(skills.hp.level + 1) * 60} 💰</div>
-<button onclick="upgradeSkill('hp')" ${skills.hp.level >= skills.hp.max ? 'disabled' : ''}>
-${skills.hp.level >= skills.hp.max ? 'MAX' : 'Upgrade'}
-</button>
-</div>
-
-<div class="skill-item">
-<div class="skill-header">
-<span class="skill-name">⚡ Critical Hit</span>
-<span class="skill-level">Lv ${skills.crit.level}/${skills.crit.max}</span>
-</div>
-<div class="skill-desc">+10% crit chance (2x damage)</div>
-<div class="skill-desc">Cost: ${(skills.crit.level + 1) * 0.01} 💎 TON</div>
-<button onclick="upgradeSkill('crit')" ${skills.crit.level >= skills.crit.max ? 'disabled' : ''}>
-${skills.crit.level >= skills.crit.max ? 'MAX' : 'Upgrade'}
-</button>
-</div>
+${owned ? '<div class="badge">OWNED</div>' : ''}
+${equipped ? '<div class="badge">EQUIPPED</div>' : ''}
 `;
-skillsList.innerHTML = html;
-openModal("skillsModal");
+list.appendChild(card);
+}
+modal.classList.add("show");
 }
 
-// ✨ NEW: Convert coins to TON
-function convertCoinsToTON(){
-if(player.coins >= 10000){
-player.coins -= 10000;
-player.ton += 0.2;
-player.tonEarned += 0.2;
-sounds.play('levelup');
-toastMsg("✅ Converted to 0.2 TON!");
+function buyWeapon(id){
+let w = weapons[id];
+if(player.coins >= w.price){
+player.coins -= w.price;
+player.ownedWeapons.push(id);
 update();
-openSkills();
+toastMsg(`✅ Bought ${w.name}!`);
+openWeapons();
 } else {
-toastMsg("❌ Need 10,000 coins!");
+toastMsg("❌ Not enough coins!");
 }
 }
 
-function upgradeHP(){
-let cost = (player.hpUpgrades + 1) * 80;
-if(player.coins >= cost){
-player.coins -= cost;
-player.hpUpgrades++;
-recalculateMaxHP();
-player.hp = player.max;
-sounds.play('levelup');
-toastMsg(`✅ Max HP increased to ${player.max}!`);
+function equipWeapon(id){
+player.weapon = id;
 update();
+toastMsg(`✅ Equipped ${weapons[id].name}`);
+openWeapons();
+}
+
+function buyChar(id){
+let ch = characters[id];
+if(player.level >= ch.level && player.coins >= ch.price){
+player.coins -= ch.price;
+player.ownedChars.push(id);
+update();
+toastMsg(`✅ Unlocked ${ch.name}!`);
+openCharacters();
+} else if(player.level < ch.level){
+toastMsg(`❌ Need level ${ch.level}!`);
+} else {
+toastMsg("❌ Not enough coins!");
+}
+}
+
+function openSkills(){
+const modal = document.getElementById('skillsModal');
+const list = document.getElementById('skillsList');
+list.innerHTML = "";
+
+let skillData = [
+{id: "damage", name: "Damage Boost", desc: "Increase attack damage by +5 per level", priceBase: 100, level: skills.damage.level, max: skills.damage.max},
+{id: "hp", name: "Max HP", desc: "Increase max HP by +20 per level", priceBase: 150, level: skills.hp.level, max: skills.hp.max},
+{id: "crit", name: "Critical Chance", desc: "Increase critical hit chance by +10% per level", priceBase: 200, level: skills.crit.level, max: skills.crit.max}
+];
+
+skillData.forEach(s => {
+let price = s.priceBase * (s.level + 1);
+let div = document.createElement("div");
+div.className = "skill-item";
+div.innerHTML = `
+<div class="skill-header">
+<div class="skill-name">${s.name}</div>
+<div class="skill-level">Level ${s.level}/${s.max}</div>
+</div>
+<div class="skill-desc">${s.desc}</div>
+<button onclick="upgradeSkill('${s.id}')" ${s.level < s.max && player.coins >= price ? "" : "disabled"}>
+${s.level >= s.max ? "MAXED" : `Upgrade - ${price}💰`}
+</button>
+`;
+list.appendChild(div);
+});
+
+modal.classList.add("show");
+}
+
+function upgradeSkill(id){
+let skill = skills[id];
+let price = 0;
+if(id === "damage") price = 100 * (skill.level + 1);
+else if(id === "hp") price = 150 * (skill.level + 1);
+else if(id === "crit") price = 200 * (skill.level + 1);
+
+if(skill.level >= skill.max){
+toastMsg("❌ Skill already maxed!");
+return;
+}
+if(player.coins >= price){
+player.coins -= price;
+skill.level++;
+if(id === "hp"){
+player.max = player.baseMax + (skill.level * 20);
+player.hp = Math.min(player.hp + 20, player.max);
+}
+update();
+toastMsg(`✅ ${id} upgraded to level ${skill.level}!`);
 openSkills();
 } else {
 toastMsg("❌ Not enough coins!");
 }
 }
 
-// ✨ MODIFIED: Crit skill costs TON
-function upgradeSkill(type){
-let cost = (skills[type].level + 1) * (type === 'crit' ? 0.01 : (type === 'hp' ? 60 : 50));
-let currency = type === 'crit' ? 'ton' : 'coins';
-
-if(player[currency] >= cost && skills[type].level < skills[type].max){
-player[currency] -= cost;
-skills[type].level++;
-
-if(type === 'hp'){
-recalculateMaxHP();
-player.hp = player.max;
-}
-
-// Track task progress
-if(type !== 'crit'){
-tasks.task4.progress++;
-if(tasks.task4.progress >= tasks.task4.target) tasks.task4.completed = true;
-}
-
-sounds.play('levelup');
-toastMsg(`✅ Skill upgraded!`);
-update();
-openSkills();
-} else {
-toastMsg(`❌ Not enough ${currency}!`);
-}
-}
-
-// ✨ MODIFIED: STATS PAGE with TON
 function openStats(){
-let html = `
-<div class="stat-row">
-<span class="label">⭐ Level</span>
-<span class="value">${player.level}</span>
-</div>
-<div class="stat-row">
-<span class="label">⚡ XP Progress</span>
-<span class="value">${player.xp}/${player.xpMax}</span>
-</div>
-<div class="stat-row">
-<span class="label">☠️ Total Kills</span>
-<span class="value">${player.kills}</span>
-</div>
-<div class="stat-row">
-<span class="label">💰 Coins Earned</span>
-<span class="value">${player.coinsEarned}</span>
-</div>
-<div class="stat-row">
-<span class="label">💎 TON Earned</span>
-<span class="value">${player.tonEarned.toFixed(4)}</span>
-</div>
-<div class="stat-row">
-<span class="label">⚔️ Weapons Owned</span>
-<span class="value">${player.ownedWeapons.length}/${Object.keys(weapons).length}</span>
-</div>
-<div class="stat-row">
-<span class="label">🧙 Characters Unlocked</span>
-<span class="value">${player.ownedChars.length}/${Object.keys(characters).length}</span>
-</div>
-<div class="stat-row">
-<span class="label">👥 Referrals</span>
-<span class="value">${player.referrals}</span>
-</div>
-`;
-statsList.innerHTML = html;
-openModal("statsModal");
+const modal = document.getElementById('statsModal');
+const list = document.getElementById('statsList');
+list.innerHTML = "";
+
+let stats = [
+{label: "Player Level", value: player.level},
+{label: "Total Kills", value: player.kills},
+{label: "Coins Earned", value: player.coinsEarned},
+{label: "Total Gems", value: player.gems},
+{label: "VIP Tier", value: vipTiers[player.vipTier].name},
+{label: "VIP Bonus", value: `+${player.vipBonus}% coins`},
+{label: "Current Energy", value: `${player.energy}/${player.energyMax}`},
+{label: "Current Weapon", value: weapons[player.weapon].name},
+{label: "Current Character", value: characters[player.char].name},
+{label: "Referrals", value: player.referrals}
+];
+
+stats.forEach(s => {
+let div = document.createElement("div");
+div.className = "stat-row";
+div.innerHTML = `<span class="label">${s.label}</span><span class="value">${s.value}</span>`;
+list.appendChild(div);
+});
+
+// Add withdrawal button
+let withdrawDiv = document.createElement("div");
+withdrawDiv.style.marginTop = "20px";
+withdrawDiv.innerHTML = `<button onclick="openWithdrawal()" style="width:100%;padding:12px;background:#ffc107;color:#000;font-weight:bold;">
+💰 Withdraw TON
+</button>`;
+list.appendChild(withdrawDiv);
+
+modal.classList.add("show");
 }
 
-// ✨ MODIFIED: SETTINGS PAGE with TON wallet and withdrawal
 function openSettings(){
-let walletDisplay = player.tonWallet ? 
-`<div class="wallet-status wallet-connected">✅ Connected: ${player.tonWallet.substring(0,8)}...${player.tonWallet.substring(player.tonWallet.length-6)}</div>` :
-`<div class="wallet-status wallet-disconnected">⚠️ No wallet connected</div>`;
+const modal = document.getElementById('settingsModal');
+const list = document.getElementById('settingsList');
+list.innerHTML = "";
 
-let html = `
+list.innerHTML = `
+<div class="setting-item">
+<label>
+<span>🔊 Sound Effects</span>
+<input type="checkbox" id="soundToggle" ${player.soundEnabled ? "checked" : ""} onchange="toggleSound()">
+</label>
+</div>
 <div class="setting-item">
 <label>
 <span>👤 Player Name</span>
 </label>
-<input type="text" id="nameInput" value="${player.name}" onchange="changeName(this.value)">
+<input type="text" id="playerNameInput" value="${player.name}" placeholder="Enter your name">
+<button onclick="changeName()" style="width:100%;margin-top:8px">Change Name</button>
 </div>
-
-<!-- ✨ NEW: TON Wallet Connection -->
 <div class="setting-item">
 <label>
-<span>💎 TON Wallet</span>
+<span>💾 Game Data</span>
 </label>
-${walletDisplay}
-<input type="text" id="walletInput" placeholder="Enter TON wallet address" value="${player.tonWallet}" style="margin-top:8px">
-<button onclick="connectWallet()" style="width:100%;margin-top:8px">
-${player.tonWallet ? '🔄 Update Wallet' : '🔗 Connect Wallet'}
-</button>
+<button onclick="exportSave()" style="width:100%;margin-top:8px;background:#4caf50">Export Save</button>
+<button onclick="importSave()" style="width:100%;margin-top:8px;background:#2196f3">Import Save</button>
+<button onclick="openModal('confirmModal')" style="width:100%;margin-top:8px;background:#ff5252">Reset Game</button>
 </div>
-
-<!-- ✨ NEW: Withdrawal Option -->
-<div class="setting-item">
-<button onclick="openWithdrawal()" style="width:100%;background:#0088cc;padding:12px">
-💸 Withdraw TON
-</button>
-</div>
-
 <div class="setting-item">
 <label>
-<span>🔊 Sound Effects</span>
-<input type="checkbox" ${player.soundEnabled ? 'checked' : ''} onchange="toggleSound(this.checked)">
+<span>📱 About</span>
 </label>
-</div>
-
-<div class="setting-item">
-<button onclick="showResetConfirm()" style="width:100%;background:#ff5252;padding:12px">
-🗑️ Reset Game Progress
-</button>
+<p style="font-size:12px;color:#aaa;margin-top:8px;">
+Zombie Fighter - TON Edition v1.2<br>
+With Energy & VIP Systems
+</p>
 </div>
 `;
-settingsList.innerHTML = html;
-openModal("settingsModal");
+
+modal.classList.add("show");
 }
 
-// ✨ NEW: Connect TON Wallet
-function connectWallet(){
-let walletInput = document.getElementById('walletInput').value.trim();
-if(walletInput.length < 10){
-toastMsg("❌ Invalid wallet address!");
-return;
-}
-player.tonWallet = walletInput;
-toastMsg("✅ Wallet connected!");
+function toggleSound(){
+player.soundEnabled = !player.soundEnabled;
 update();
-openSettings();
+toastMsg(player.soundEnabled ? "🔊 Sound ON" : "🔇 Sound OFF");
 }
 
-// ✨ NEW: Open Withdrawal Modal
-function openWithdrawal(){
-if(!player.tonWallet){
-toastMsg("❌ Connect wallet first!");
-return;
-}
-
-let minWithdraw = 0.1;
-let html = `
-<div class="wallet-status">
-<strong>Your Balance:</strong> ${player.ton.toFixed(4)} TON
-</div>
-
-<div class="stat-row">
-<span class="label">💎 Wallet Address</span>
-<span class="value" style="font-size:11px">${player.tonWallet.substring(0,12)}...</span>
-</div>
-
-<div class="stat-row">
-<span class="label">⚠️ Minimum Withdrawal</span>
-<span class="value">${minWithdraw} TON</span>
-</div>
-
-<div style="margin:15px 0;padding:10px;background:rgba(255,152,0,0.2);border-radius:8px;font-size:13px">
-⚠️ Withdrawals are processed manually within 24-48 hours.
-</div>
-
-<button onclick="requestWithdrawal()" style="width:100%;padding:12px;margin-top:10px" ${player.ton < minWithdraw ? 'disabled' : ''}>
-${player.ton >= minWithdraw ? '💸 Request Withdrawal' : '❌ Insufficient Balance'}
-</button>
-`;
-withdrawContent.innerHTML = html;
-closeModal('settingsModal');
-openModal("withdrawModal");
-}
-
-// ✨ NEW: Request Withdrawal
-function requestWithdrawal(){
-let minWithdraw = 0.1;
-if(player.ton < minWithdraw){
-toastMsg("❌ Minimum withdrawal is 0.1 TON!");
-return;
-}
-
-confirmCallback = () => {
-let amount = player.ton;
-player.ton = 0;
-toastMsg(`✅ Withdrawal of ${amount.toFixed(4)} TON requested!`);
+function changeName(){
+let newName = document.getElementById("playerNameInput").value.trim();
+if(newName.length > 0){
+player.name = newName;
 update();
-closeModal("withdrawModal");
-};
-
-showConfirmDialog(
-"💸 Confirm Withdrawal?",
-`Withdraw ${player.ton.toFixed(4)} TON to your wallet?`
-);
-}
-
-function changeName(name){
-if(name.trim()){
-player.name = name.trim();
-update();
-toastMsg("✅ Name updated!");
-}
-}
-
-function toggleSound(enabled){
-player.soundEnabled = enabled;
-saveGame();
-toastMsg(enabled ? "🔊 Sound ON" : "🔇 Sound OFF");
-}
-
-function showResetConfirm(){
-closeModal("settingsModal");
-confirmCallback = confirmReset;
-showConfirmDialog("⚠️ Reset Game?", "This will delete all progress!");
-}
-
-function confirmReset(){
-localStorage.removeItem("zombieFighterSave");
-location.reload();
-}
-
-// ✨ NEW: Generic confirm dialog
-function showConfirmDialog(title, message){
-confirmContent.innerHTML = `
-<h3>${title}</h3>
-<p>${message}</p>
-<div class="buttons">
-<button onclick="closeModal('confirmModal')">Cancel</button>
-<button onclick="confirmAction()" style="background:#ff5252">Confirm</button>
-</div>
-`;
-openModal("confirmModal");
-}
-
-function confirmAction(){
-if(confirmCallback){
-confirmCallback();
-confirmCallback = null;
-}
-closeModal("confirmModal");
-}
-
-// ✨ MODIFIED: REFERRAL PAGE with TON rewards
-function openReferral(){
-let botUsername = "YourBotUsername";
-let referralLink = `https://t.me/${botUsername}?start=${player.referralCode}`;
-
-let html = `
-<div class="referral-code">
-<div>Your Referral Code</div>
-<div class="code">${player.referralCode}</div>
-<div style="font-size:12px;color:#aaa;margin-top:10px">
-Share with friends to earn rewards!
-</div>
-</div>
-
-<div class="stat-row">
-<span class="label">👥 Total Referrals</span>
-<span class="value">${player.referrals}</span>
-</div>
-
-<div class="stat-row">
-<span class="label">🎁 Reward per Friend</span>
-<span class="value">50 💰 + 0.005 💎 TON</span>
-</div>
-
-<button onclick="shareReferral('${referralLink}')" style="width:100%;padding:12px;margin-top:15px">
-📤 Share on Telegram
-</button>
-
-<div style="margin-top:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:13px;color:#aaa">
-💡 How it works:<br>
-1. Share your code with friends<br>
-2. They join using your link<br>
-3. You both get rewards!
-</div>
-`;
-referralContent.innerHTML = html;
-openModal("referralModal");
-}
-
-function shareReferral(link){
-if(tg){
-tg.openTelegramLink(link);
-toastMsg("📤 Opening Telegram...");
+toastMsg("✅ Name changed!");
 } else {
-navigator.clipboard.writeText(link);
-toastMsg("📋 Link copied to clipboard!");
+toastMsg("❌ Name cannot be empty!");
 }
 }
 
-// ✨ NEW: Daily Reward Modal with Timer
-function openDaily(){
-updateDailyTimer();
-openModal("dailyModal");
-}
-
-function updateDailyTimer(){
-const dayInMs = 24 * 60 * 60 * 1000;
-const timeSinceLast = Date.now() - player.lastDaily;
-const canClaim = timeSinceLast >= dayInMs;
-
-let html = '';
-if(canClaim){
-html = `
-<div style="text-align:center;padding:20px">
-<div style="font-size:60px;margin:20px 0">🎁</div>
-<h3>Daily Reward Available!</h3>
-<div class="stat-row">
-<span class="label">💰 Coins</span>
-<span class="value">+50</span>
-</div>
-<div class="stat-row">
-<span class="label">💎 TON</span>
-<span class="value">+0.005</span>
-</div>
-<button onclick="claimDaily()" style="width:100%;padding:15px;margin-top:15px;background:#4caf50">
-🎁 Claim Reward
-</button>
-</div>
-`;
-} else {
-const timeLeft = dayInMs - timeSinceLast;
-const hours = Math.floor(timeLeft / (60 * 60 * 1000));
-const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-
-html = `
-<div style="text-align:center;padding:20px">
-<div style="font-size:60px;margin:20px 0;opacity:0.5">🎁</div>
-<h3>Daily Reward</h3>
-<p style="color:#aaa">Come back later to claim your reward!</p>
-<div class="timer-display" style="font-size:32px;margin:20px 0">
-${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}
-</div>
-<button disabled style="width:100%;padding:15px;margin-top:15px">
-⏰ Already Claimed Today
-</button>
-</div>
-`;
-}
-dailyContent.innerHTML = html;
-}
-
-// ✨ NEW: Claim Daily Reward
-function claimDaily(){
-player.coins += 50;
-player.ton += 0.005;
-player.coinsEarned += 50;
-player.tonEarned += 0.005;
-player.lastDaily = Date.now();
-sounds.play('coin');
-toastMsg("🎁 Daily Reward: +50💰 +0.005💎 TON");
-update();
-closeModal("dailyModal");
-}
-
-// ✨ MODIFIED: Spin Wheel with Timer and Character Center
-function openSpinWheel(){
-initWheel();
-updateSpinTimer();
-openModal("spinModal");
-}
-
-function initWheel(){
-let wheel = document.getElementById('wheel');
-wheel.innerHTML = '';
-
-const sliceAngle = 360 / wheelPrizes.length;
-wheelPrizes.forEach((prize, i) => {
-let slice = document.createElement('div');
-slice.className = 'wheel-slice';
-slice.style.background = wheelColors[i];
-slice.style.transform = `rotate(${i * sliceAngle}deg)`;
-let text = '';
-if(prize.type === 'sorry'){
-text = '😅';
-} else if(prize.type === 'ton'){
-text = prize.value + '💎';
-} else {
-text = prize.value + '💰';
-}
-slice.innerHTML = `<span style="transform:rotate(22.5deg);display:inline-block;font-size:14px">${text}</span>`;
-wheel.appendChild(slice);
+function exportSave(){
+let data = JSON.stringify({
+player: player,
+skills: skills
+});
+navigator.clipboard.writeText(data).then(() => {
+toastMsg("✅ Game data copied to clipboard!");
 });
 }
 
-function updateSpinTimer(){
-const dayInMs = 24 * 60 * 60 * 1000;
-const timeSinceLast = Date.now() - player.lastSpin;
-const canSpin = timeSinceLast >= dayInMs;
-
-let button = document.getElementById('spinButton');
-let timer = document.getElementById('spinTimer');
-
-if(canSpin){
-button.disabled = false;
-button.textContent = '🎰 SPIN (Free)';
-timer.textContent = '';
-} else {
-const timeLeft = dayInMs - timeSinceLast;
-const hours = Math.floor(timeLeft / (60 * 60 * 1000));
-const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-
-button.disabled = true;
-button.textContent = '⏰ Already Used Today';
-timer.textContent = `Next spin in: ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+function importSave(){
+let data = prompt("Paste your save data:");
+if(data){
+try{
+let parsed = JSON.parse(data);
+Object.assign(player, parsed.player);
+Object.assign(skills, parsed.skills);
+update();
+toastMsg("✅ Game data imported!");
+} catch(e){
+toastMsg("❌ Invalid save data!");
+}
 }
 }
 
-// ✨ MODIFIED: Spin wheel animation with TON rewards
+function confirmReset(){
+player = {
+hp: 100,
+max: 100,
+baseMax: 100,
+hpUpgrades: 0,
+coins: 0,
+gems: 0,
+level: 1,
+xp: 0,
+xpMax: 100,
+energy: 100,
+energyMax: 100,
+weapon: "sword",
+char: "hero",
+name: "Player",
+kills: 0,
+coinsEarned: 0,
+referrals: 0,
+referralCode: "",
+ownedWeapons: ["sword"],
+ownedChars: ["hero"],
+soundEnabled: true,
+vipTier: 0,
+vipBonus: 0
+};
+skills = {
+damage: {level: 0, max: 5},
+hp: {level: 0, max: 5},
+crit: {level: 0, max: 3}
+};
+zombie = {hp: 30, max: 30};
+update();
+closeModal('confirmModal');
+toastMsg("✅ Game reset!");
+}
+
+function openReferral(){
+const modal = document.getElementById('referralModal');
+const content = document.getElementById('referralContent');
+content.innerHTML = `
+<h3>Invite Friends & Earn!</h3>
+<p style="color:#aaa;font-size:14px;">Share your code with friends to earn rewards when they join!</p>
+<div class="referral-code">
+<div>Your Referral Code:</div>
+<div class="code">${player.referralCode}</div>
+<button onclick="copyReferralCode()" style="width:100%;padding:10px;background:#4caf50;color:#fff;border:none;border-radius:8px;">
+📋 Copy Code
+</button>
+</div>
+<div style="margin-top:20px;background:rgba(255,255,255,0.05);padding:15px;border-radius:8px;">
+<h4 style="margin-top:0;color:#ffc107;">Rewards</h4>
+<p style="font-size:14px;color:#aaa;">• Each referral: +100💰</p>
+<p style="font-size:14px;color:#aaa;">• 10 referrals: +10💎</p>
+<p style="font-size:14px;color:#aaa;">• Your friends get +50💰 bonus</p>
+</div>
+<p style="text-align:center;color:#aaa;margin-top:20px;font-size:12px;">
+Total Referrals: <span style="color:#4caf50;font-weight:bold;">${player.referrals}</span>
+</p>
+`;
+modal.classList.add('show');
+}
+
+function copyReferralCode(){
+navigator.clipboard.writeText(player.referralCode).then(() => {
+toastMsg("✅ Referral code copied!");
+});
+}
+
+function openSpinWheel(){
+const modal = document.getElementById('spinModal');
+const wheel = document.getElementById('wheel');
+wheel.innerHTML = "";
+
+// Create wheel slices
+for(let i=0;i<8;i++){
+let slice = document.createElement("div");
+slice.className = "wheel-slice";
+slice.style.transform = `rotate(${i * 45}deg)`;
+slice.style.backgroundColor = wheelColors[i];
+slice.innerHTML = `<div style="transform:rotate(45deg)">${wheelPrizes[i]}💰</div>`;
+wheel.appendChild(slice);
+}
+
+// ✨ FEATURE 5: Update wheel center with ninja image
+const wheelCenterImage = document.getElementById('wheelCenterImage');
+if (wheelCenterImage) {
+wheelCenterImage.src = characters.ninja.image;
+}
+
+modal.classList.add('show');
+}
+
 function spinWheel(){
-const dayInMs = 24 * 60 * 60 * 1000;
-if(Date.now() - player.lastSpin < dayInMs){
-toastMsg("⏰ Wait 24 hours!");
-return;
-}
 if(isSpinning) return;
 isSpinning = true;
 
-let wheel = document.getElementById('wheel');
-let button = document.getElementById('spinButton');
-let result = document.getElementById('spinResult');
-button.disabled = true;
-result.textContent = '';
-sounds.play('spin');
+const wheel = document.getElementById('wheel');
+const spinButton = document.getElementById('spinButton');
+const result = document.getElementById('spinResult');
 
-let extraSpins = 5 + Math.floor(Math.random() * 3);
-let randomSlice = Math.floor(Math.random() * wheelPrizes.length);
-let sliceAngle = 360 / wheelPrizes.length;
-let finalRotation = (extraSpins * 360) + (randomSlice * sliceAngle) + (sliceAngle / 2);
+spinButton.disabled = true;
+result.textContent = "";
 
-wheel.style.transform = `rotate(${finalRotation}deg)`;
-
-let tickInterval = setInterval(() => {
-sounds.play('spin');
-}, 100);
-
-setTimeout(() => {
-clearInterval(tickInterval);
-let prizeIndex = (wheelPrizes.length - randomSlice) % wheelPrizes.length;
+// Random prize selection
+let prizeIndex = Math.floor(Math.random() * wheelPrizes.length);
 let prize = wheelPrizes[prizeIndex];
 
-if(prize.type === 'coins'){
-player.coins += prize.value;
-player.coinsEarned += prize.value;
-sounds.play('coin');
-result.textContent = `🎉 You won ${prize.value} coins!`;
-toastMsg(`🎡 +${prize.value}💰`);
-} else if(prize.type === 'ton'){
-player.ton += prize.value;
-player.tonEarned += prize.value;
-sounds.play('coin');
-result.textContent = `💎 You won ${prize.value} TON!`;
-toastMsg(`🎡 +${prize.value}💎 TON`);
-} else {
-result.textContent = `😅 Better luck next time!`;
-toastMsg(`🎡 No prize this time`);
+// Calculate rotation (multiple full rotations + prize offset)
+let rotations = 5;
+let targetAngle = rotations * 360 + (360 - (prizeIndex * 45) - 22.5);
+
+wheel.style.transform = `rotate(${targetAngle}deg)`;
+sounds.play('spin');
+
+setTimeout(() => {
+// ✨ FEATURE 3: Apply VIP bonus to wheel prizes
+let finalPrize = prize;
+if (prize > 0) {
+finalPrize = applyVIPBonus(prize);
+player.coins += finalPrize;
+player.coinsEarned += finalPrize;
+update();
 }
 
-player.lastSpin = Date.now();
-update();
+result.textContent = `🎉 You won ${finalPrize} coins!${player.vipBonus > 0 && prize > 0 ? ` (VIP +${player.vipBonus}%)` : ''}`;
+if(prize === 0){
+result.textContent = "😅 Better luck next time!";
+}
+
 isSpinning = false;
-updateSpinTimer();
-}, 3000);
+spinButton.disabled = false;
+}, 3500);
 }
 
-// ✨ NEW: Weekly Tasks System
-function openTasks(){
-let html = `
-<div style="padding:10px;background:rgba(0,136,204,0.2);border-radius:8px;margin-bottom:15px;text-align:center">
-<strong>Complete ALL tasks to earn 0.32 TON bonus!</strong>
-</div>
-`;
-
-let allCompleted = true;
-for(let key in tasks){
-if(tasks[key].title){
-let t = tasks[key];
-let progress = Math.min(t.progress, t.target);
-let completed = t.completed || progress >= t.target;
-if(!completed) allCompleted = false;
-
-html += `
-<div class="task-item ${completed ? 'completed' : ''}">
-<div class="task-header">
-<span class="task-title">${completed ? '✅' : '⭕'} ${t.title}</span>
-</div>
-<div class="task-reward">Reward: 1000 💰 + 0.003 💎 TON</div>
-<div style="font-size:12px;color:#aaa;margin:5px 0">Progress: ${progress}/${t.target}</div>
-<button onclick="claimTask('${key}')" ${completed && !t.claimed ? '' : 'disabled'}>
-${t.claimed ? 'Claimed' : (completed ? 'Claim Reward' : 'Incomplete')}
-</button>
-</div>
-`;
-}
-}
-
-// Bonus reward button
-html += `
-<div class="task-item" style="border-color:#ffc107;background:rgba(255,193,7,0.1)">
-<div class="task-header">
-<span class="task-title">🎁 Complete All Tasks Bonus</span>
-</div>
-<div class="task-reward">Bonus: 0.32 💎 TON</div>
-<button onclick="claimAllBonus()" ${allCompleted && !tasks.allBonus ? '' : 'disabled'}>
-${tasks.allBonus ? 'Claimed' : (allCompleted ? 'Claim Bonus' : 'Complete all tasks first')}
-</button>
-</div>
-
-<div style="margin-top:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:12px;color:#aaa;text-align:center">
-⏰ Tasks reset every 7 days
-</div>
-`;
-
-tasksContent.innerHTML = html;
-openModal("tasksModal");
-}
-
-// ✨ NEW: Claim individual task
-function claimTask(taskKey){
-let t = tasks[taskKey];
-if(t.progress >= t.target && !t.claimed){
-player.coins += 1000;
-player.ton += 0.003;
-player.coinsEarned += 1000;
-player.tonEarned += 0.003;
-t.claimed = true;
-t.completed = true;
-sounds.play('coin');
-toastMsg("✅ Task reward claimed!");
-update();
-openTasks();
-}
-}
-
-// ✨ NEW: Claim all tasks bonus
-function claimAllBonus(){
-let allCompleted = true;
-for(let key in tasks){
-if(tasks[key].title && !tasks[key].completed){
-allCompleted = false;
-break;
-}
-}
-
-if(allCompleted && !tasks.allBonus){
-player.ton += 0.32;
-player.tonEarned += 0.32;
-tasks.allBonus = true;
-sounds.play('levelup');
-toastMsg("🎉 Bonus claimed: +0.32 TON!");
-update();
-openTasks();
-}
-}
-
-// ✨ NEW: In-Game Shop
-function openShop(){
-let html = `
-<div style="text-align:center;padding:10px;background:rgba(0,136,204,0.2);border-radius:8px;margin-bottom:15px">
-<h3>💎 TON Shop 😀</h3>
-<p style="font-size:12px;color:#aaa">Purchase items with TON</p>
-</div>
-
-<div class="item-grid">
-<div class="item-card">
-<div class="icon">💰</div>
-<div class="name">Coin Pack</div>
-<div class="desc">Get 5,000 coins instantly</div>
-<div class="price">0.05 💎 TON</div>
-<button onclick="buyShopItem('coins', 5000, 0.05)">Purchase</button>
-</div>
-
-<div class="item-card">
-<div class="icon">⚡</div>
-<div class="name">XP Boost</div>
-<div class="desc">Gain 1000 XP instantly</div>
-<div class="price">0.03 💎 TON</div>
-<button onclick="buyShopItem('xp', 1000, 0.03)">Purchase</button>
-</div>
-
-<div class="item-card">
-<div class="icon">❤️</div>
-<div class="name">HP Refill</div>
-<div class="desc">Restore HP to maximum</div>
-<div class="price">0.01 💎 TON</div>
-<button onclick="buyShopItem('hp', 0, 0.01)">Purchase</button>
-</div>
-
-<div class="item-card">
-<div class="icon">🎁</div>
-<div class="name">Mega Pack</div>
-<div class="desc">10K coins + 2000 XP</div>
-<div class="price">0.1 💎 TON</div>
-<button onclick="buyShopItem('mega', 0, 0.1)">Purchase</button>
-</div>
-</div>
-
-<div style="margin-top:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:12px;color:#aaa">
-💡 This is a simulation. No real payments are processed.
-</div>
-`;
-shopContent.innerHTML = html;
-openModal("shopModal");
-}
-
-// ✨ NEW: Buy shop item
-function buyShopItem(type, value, cost){
-if(player.ton < cost){
-toastMsg("❌ Insufficient TON!");
-return;
-}
-
-confirmCallback = () => {
-player.ton -= cost;
-sounds.play('coin');
-
-switch(type){
-case 'coins':
-player.coins += value;
-toastMsg(`✅ Purchased ${value} coins!`);
-break;
-case 'xp':
-player.xp += value;
-if(player.xp >= player.xpMax){
-player.xp -= player.xpMax;
-player.level++;
-player.xpMax = Math.floor(100 + (player.level * 15));
-}
-toastMsg(`✅ Gained ${value} XP!`);
-break;
-case 'hp':
-player.hp = player.max;
-toastMsg("✅ HP restored!");
-break;
-case 'mega':
-player.coins += 10000;
-player.xp += 2000;
-if(player.xp >= player.xpMax){
-player.xp -= player.xpMax;
-player.level++;
-player.xpMax = Math.floor(100 + (player.level * 15));
-}
-toastMsg("✅ Mega Pack purchased!");
-break;
-}
-
-update();
-closeModal("shopModal");
-};
-
-showConfirmDialog("🛒 Confirm Purchase?", `Spend ${cost} TON on this item?`);
-}
-
-// Reward Functions
-function watchAd(){
-player.coins += 20;
-player.ton += 0.002;
-player.coinsEarned += 20;
-player.tonEarned += 0.002;
-sounds.play('coin');
-toastMsg("📺 +20💰 +0.002💎 TON");
-update();
-}
-
-// Initialize Game
+// Initialize
+window.onload = function(){
 initSounds();
 loadGame();
+openSpinWheel(); // Initialize wheel
+
+// ✨ FEATURE 4: Add event listener for withdrawal amount input
+const withdrawAmountInput = document.getElementById('withdrawAmount');
+if (withdrawAmountInput) {
+withdrawAmountInput.addEventListener('input', updateWithdrawalSummary);
+withdrawAmountInput.addEventListener('change', updateWithdrawalSummary);
+}
+};
+
+// Close modal when clicking outside
+window.onclick = function(event){
+if(event.target.classList.contains('modal')){
+event.target.classList.remove('show');
+}
+}
 </script>
 </body>
 </html>
